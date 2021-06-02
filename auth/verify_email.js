@@ -1,6 +1,6 @@
 const express = require('express')
 const Router = express.Router()
-const AccountModel = require('../Models/AccountModel')
+const AccountModel = require('../models/AccountModel')
 
 Router.get('/account/:token', async(req,res) => {
     try{

@@ -8,7 +8,7 @@ const crypto = require('crypto')
 
 const loginValidator = require('./Validators/LoginValidator')
 const registerValidatpr = require('./Validators/RegisterValidator')
-const AccountModel = require('../Models/AccountModel')
+const AccountModel = require('../models/AccountModel')
 const checkLogin = require('../auth/checkLogin')
 
 Router.get('/',(req,res) => {

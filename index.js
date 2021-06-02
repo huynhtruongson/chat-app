@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 
-const AccountRouter = require('./Routers/AccountRouter')
+const AccountRouter = require('./routers/AccountRouter')
 const VerifyEmailAuth = require('./auth/verify_email')
 // const server = require('http').createServer(app);
 // const io = require('socket.io')(server)
