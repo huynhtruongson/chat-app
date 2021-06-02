@@ -1,0 +1,105 @@
+import { TextField, Box, Button } from '@material-ui/core';
+import {ArrowRightAlt,Facebook} from '@material-ui/icons';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import AuthForm from '../../components/AuthForm';
+import Images from '../../constants/Images';
+import { useStyle } from './style';
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup'
+const schema = yup.object().shape({
+    email : yup.string().email('Invalid email!').required('Email is required!'),
+    password : yup.string().required('Password is required!')
+})
+function LoginPage() {
+    const style = useStyle();
+    const {register,handleSubmit, formState : {errors}} = useForm({
+        resolver : yupResolver(schema)
+    })
+    const onSubmit = (data) => {
+        console.log(data);
+    }
+    return (
+        <AuthForm isLogin>
+            <Box className={style.container} width="76%" mt={2.5}>
+                <Button
+                    classes={{
+                        root : style.button,
+                        startIcon : style.startIcon,
+                        endIcon : style.endIcon,
+                    }}
+                    variant="contained"
+                    fullWidth
+                    startIcon={<img className={style.googleIcon} src={Images.GOOGLE_ICON} alt=""></img>}
+                    endIcon={<div></div>}
+                >
+                    Login with Google
+                </Button>
+                <Button
+                    classes={{
+                        root : style.button,
+                        startIcon : style.startIcon,
+                        endIcon : style.endIcon,
+                        iconSizeMedium : style.icon,
+                        label : style.facebookBtnLabel
+                    }}
+                    variant="contained"
+                    fullWidth
+                    startIcon={<Facebook    />}
+                    endIcon={<div></div>}
+                >
+                    Login with Facebook
+                </Button>
+                <div className={style.divider}><span>OR LOGIN WITH EMAIL</span></div>
+                <form className={style.formContainer} onSubmit={handleSubmit(onSubmit)}>
+                    <TextField
+                        {...register('email')}
+                        variant="outlined"
+                        label="Email"
+                        fullWidth
+                        InputProps={{classes : {input : style.input}}}
+                        InputLabelProps={{classes : {outlined : style.label}}}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                    />
+                    <TextField
+                        {...register('password')}
+                        variant="outlined"
+                        label="Password"
+                        type='password'
+                        fullWidth
+                        InputProps={{classes : {input : style.input}}}
+                        InputLabelProps={{classes : {outlined : style.label}}}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                    />
+                    <Box textAlign='end'>
+                        <Link to='#' className={style.link}>Forgot password !</Link>
+                    </Box>
+                    <Button 
+                        type='submit'
+                        fullWidth
+                        variant='contained'
+                        color='primary'
+                        endIcon={<ArrowRightAlt/>}
+                        startIcon={<div></div>}
+                        classes={{
+                            root : style.loginBtn,
+                            iconSizeMedium : style.icon,
+                            startIcon : style.startIcon,
+                            endIcon : style.endIcon,
+                        }}
+                    >
+                        Login
+                    </Button>
+                </form>
+                <Box textAlign='center' color='#9e9e9e' mt={1.5}>Don't have an account yet ?
+                    <Link to='/register' className={style.link}>{''} Register</Link>
+                </Box>
+            </Box>
+        </AuthForm>
+    );
+}
+
+export default LoginPage;

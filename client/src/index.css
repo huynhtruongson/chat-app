@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+html {
+    /* font-size: 62.5%; */
+    box-sizing: border-box;
+}
