@@ -49,7 +49,8 @@ const UserModal = ({ open, onClose }) => {
             alert('Unsupported File Format')
         }
         else {
-            handleEditClick('avatar')
+            // handleEditClick('avatar')
+            setEdit({...edit,avatar : true})
         }
     }
     const isSubmitable = () => {
