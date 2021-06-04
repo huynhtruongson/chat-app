@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
+import Images from '../../constants/Images';
 const schema = yup.object().shape({
     firstname : yup.string().max(10,'Firstname must at most 10 characters long!').required('Firstname is required!'),
     lastname : yup.string().max(10,'Lastname must at most 10 characters long!').required('Lastname is required!'),
@@ -23,7 +24,7 @@ const RegisterPage = () => {
         console.log(data);
     };
     return (
-        <AuthForm>
+        <AuthForm title='Create Account' logo={Images.CHAT_LOGO}>
             <Box className={style.container} width="76%" mt={2.5}>
                 <form className={style.formContainer} onSubmit={handleSubmit(onSubmit)}>
                     <TextField

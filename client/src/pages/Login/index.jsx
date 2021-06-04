@@ -21,7 +21,7 @@ function LoginPage() {
         console.log(data);
     }
     return (
-        <AuthForm isLogin>
+        <AuthForm title='Welcome Back' logo={Images.CHAT_LOGO2}>
             <Box className={style.container} width="76%" mt={2.5}>
                 <Button
                     classes={{

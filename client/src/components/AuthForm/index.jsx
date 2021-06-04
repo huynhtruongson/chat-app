@@ -2,7 +2,7 @@ import { Box, Grid, makeStyles, Paper, Typography } from '@material-ui/core';
 import Images from '../../constants/Images';
 import React from 'react';
 
-function AuthForm({ isLogin , children}) {
+function AuthForm({ title ,logo, children}) {
     const style = useStyle();
     return (
         <div className={style.root}>
@@ -20,14 +20,14 @@ function AuthForm({ isLogin , children}) {
                                 variant="h4"
                                 color='primary'
                             >
-                                {isLogin ? 'Welcome Back' : 'Create Account'}
+                                {{title}}
                             </Typography>
                             {children}
                         </Box>
                     </Grid>
                     <Grid item md={6} xs={false}>
                         <Box className={style.wallpaper} display='flex' alignItems='center' height='100%'>
-                            <img className={style.chatLogo} src={isLogin ? Images.CHAT_LOGO : Images.CHAT_LOGO2} alt="" />
+                            <img className={style.chatLogo} src={logo} alt="" />
                         </Box>
                     </Grid>
                 </Grid>
@@ -40,6 +40,9 @@ const useStyle = makeStyles((theme) => ({
         width: '100vw',
         height: '100vh',
         position: 'relative',
+        backgroundImage : `url(${Images.AUTH_BG})`,
+        backgroundRepeat : 'no-repeat',
+        backgroundSize : 'cover'
     },
     wallpaper : {
         [theme.breakpoints.down('sm')] : {

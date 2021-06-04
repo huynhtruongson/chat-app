@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar,Badge,Box,Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton,makeStyles,TextField,Typography,Zoom,} from '@material-ui/core';
+import { Avatar,Badge,Box,Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton,TextField,Typography,Zoom,} from '@material-ui/core';
 import { Close, PhotoCamera, BorderColor } from '@material-ui/icons';
-import {useForm} from 'react-hook-form'
+import {useForm,Controller} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import {useData} from '../../context/DataContext'
 import useStyle from './style'
+import { updateUserInfo } from '../../actions/userAction';
+import { readFileAsBase64 } from '../../utils';
 const Transition = React.forwardRef((props, ref) => {
     return <Zoom ref={ref} {...props} />;
 });
@@ -18,21 +20,21 @@ const schema = yup.object().shape({
     // })
 })
 const UserModal = ({ open, onClose }) => {
-    const [edit, setEdit] = useState({firstname: false,lastname: false,avatar : false});
+    const [edit, setEdit] = useState({firstname: false,lastname: false});
     const data = useData()
-    const [user] = data.user
+    const [avatar,setAvatar] = useState(null)
+    const [user,dispatch] = data.user
     const style = useStyle(edit);
-    // const avatarRef = useRef()
-    const {register,handleSubmit,formState : {errors,isDirty},reset,getValues,setValue} = useForm({
+    const {register,handleSubmit,formState : {errors,isDirty},reset,getValues,setValue,control} = useForm({
         mode : 'onChange',
         resolver : yupResolver(schema),
         shouldUnregister : true
     })
     useEffect(()=>{
         reset({
-            ...user.infor
+            ...user.info
         })
-    },[user.infor,reset])
+    },[user.info,reset])
     const {ref : fnameRef, ...fnameRest} = register('firstname')
     const {ref: lnameRef, ...lnameRest} = register('lastname')
     const handleEditClick = (field) => {
@@ -40,24 +42,32 @@ const UserModal = ({ open, onClose }) => {
     };
     const handleModalClose = () => {
         setEdit({fname: false,lname: false,pwd: false})
+        setAvatar(null)
         reset()
     }
-    const handleAvatarChange = (e) => {
+    const handleAvatarChange = async (e) => {
         const file  = e.target.files[0]
         if(!SUPPORTED_FORMATS.includes(file.type)) {
             setValue('avatar',getValues('avatar'))
             alert('Unsupported File Format')
         }
         else {
-            // handleEditClick('avatar')
-            setEdit({...edit,avatar : true})
+            const src = await readFileAsBase64(e.target.files[0])
+            setAvatar(src)
+            setValue('avatar',e.target.files)
         }
     }
     const isSubmitable = () => {
+        console.log(Object.keys(edit).some(key => edit[key]),isDirty);
+        if(getValues('avatar') && getValues('avatar').length) {
+            return false
+        }
         return Object.keys(edit).some(key => edit[key]) && isDirty
     }
     const onSubmit = (data) => {
         console.log(data)
+        // const {firstname,lastname} = data
+        // dispatch(updateUserInfo({firstname,lastname}))
     }
     return (
         <Dialog
@@ -113,7 +123,7 @@ const UserModal = ({ open, onClose }) => {
                             >
                                 <Avatar
                                     classes={{ root: style.avatar }}
-                                    src="https://picsum.photos/200/300"
+                                    src={avatar}
                                 />
                             </Badge>
                         </Box>
@@ -148,7 +158,7 @@ const UserModal = ({ open, onClose }) => {
                                     variant="subtitle1"
                                     classes={{ root: style.textInfo }}
                                 >
-                                    Sơn
+                                    {user.info.firstname}
                                 </Typography>
                             )}
                             <IconButton
@@ -178,7 +188,7 @@ const UserModal = ({ open, onClose }) => {
                                     variant="subtitle1"
                                     classes={{ root: style.textInfo }}
                                 >
-                                    Huỳnh
+                                    {user.info.lastname}
                                 </Typography>
                             )}
                             <IconButton
