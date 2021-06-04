@@ -6,8 +6,8 @@ const AccountSchema = new Schema({
         type:String,
         unique: true
     },
-    firstName:String,
-    lastName:String,
+    firstname:String,
+    lastname:String,
     birth:String,
     gender:String,
     phone:String,

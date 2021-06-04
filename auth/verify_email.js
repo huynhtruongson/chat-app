@@ -7,24 +7,23 @@ Router.get('/account/:token', async(req,res) => {
         let {token} = req.params
         
         if(!token){
-            throw new Error("Link xác thực bị lỗi, vui lòng đăng ký lại")
+            throw new Error("Verify link is broken, please re-register")
         }
 
         let accountVerify = await AccountModel.findOne({"tokenVerify":token})
         if (!accountVerify){
-            throw new Error("không có dữ liệu của tài khoản vui lòng đăng ký lại")
+            throw new Error("No account data, please re-register")
         }
 
         if(accountVerify.verify === true){
-            throw new Error("Tài khoản này đã được xác thực, vui lòng không xác thực thêm")
+            throw new Error("This account has been verified, please do not verify further")
         }
-
-        res.json({
-            code: 0,
-            message: 'xác thực thành công'
+        await AccountModel.findOneAndUpdate({"tokenVerify":token},{verify:true})
+        res.status(200).json({
+            message: 'Successful verify'
         })
     }catch(err){
-        return res.send('Xác thực thất bại: '+ err.message)
+        return res.send('Verify failed: '+ err.message)
     }
 })
 
