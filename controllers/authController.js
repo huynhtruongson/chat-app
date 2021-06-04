@@ -24,7 +24,7 @@ module.exports.loginController =  async(req, res) => {
             let passwordMatch = await bcrypt.compare(password, account.password)
             
             if(!passwordMatch){
-                return res.status(401).json({code: 2, message: "Mật khẩu không chính xác"})
+                return res.status(400).json({message: "Mật khẩu không chính xác"})
             }
             const {JWT_SECRET} = process.env
             jwt.sign({
@@ -33,8 +33,7 @@ module.exports.loginController =  async(req, res) => {
                 expiresIn:'3h'
             },(err,token)=>{
                 if(err) throw err
-                return res.json({
-                    code: 0,
+                return res.status(200).json({
                     message: "Đăng nhập thành công",
                     token: token
                 })
@@ -52,7 +51,7 @@ module.exports.loginController =  async(req, res) => {
         }
     }
     catch(err){
-        return res.status(401).json({message : "Đăng nhập thất bại:" + err.message})
+        return res.status(400).json({message : "Đăng nhập thất bại:" + err.message})
     }
 }
 
@@ -96,7 +95,7 @@ module.exports.registerController = async (req,res) =>{
             }
         })
 
-        let link_verify = `${process.env.PATH_HOST}/api/verify/account/${token}`
+        let link_verify = `${process.env.PATH_HOST}/verify-email/${token}`
         var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
             from: process.env.EMAIL,
             to: email,
@@ -108,10 +107,36 @@ module.exports.registerController = async (req,res) =>{
             if (err) {
                 return res.send("error message: "+err.message)
             } else {
-                res.send('done');
+                res.status(200).json({message:"Register success"})
             }
         }) 
     }catch(err){
-        return res.send(err.message)
+        return res.status(400).json({message:err.message})
     }
+}
+
+module.exports.verifyController = async (req,res) =>{
+    try{
+        let {token} = req.body
+        
+        if(!token){
+            throw new Error("Verify link is broken, please re-register")
+        }
+
+        let accountVerify = await AccountModel.findOne({"tokenVerify":token})
+        if (!accountVerify){
+            throw new Error("No account data, please re-register")
+        }
+
+        if(accountVerify.verify === true){
+            throw new Error("This account has been verified, please do not verify further")
+        }
+        await AccountModel.findOneAndUpdate({"tokenVerify":token},{verify:true})
+        res.status(200).json({
+            message: 'Successful verify'
+        })
+    }catch(err){
+        return res.status(400).json('Verify failed: '+ err.message)
+    }
+
 }
