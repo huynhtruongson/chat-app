@@ -20,7 +20,7 @@ function AuthForm({ title ,logo, children}) {
                                 variant="h4"
                                 color='primary'
                             >
-                                {{title}}
+                                {title}
                             </Typography>
                             {children}
                         </Box>
