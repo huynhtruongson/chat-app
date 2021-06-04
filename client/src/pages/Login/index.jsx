@@ -21,7 +21,7 @@ function LoginPage() {
         console.log(data);
     }
     return (
-        <AuthForm isLogin>
+        <AuthForm title='Welcome Back' logo={Images.CHAT_LOGO2}>
             <Box className={style.container} width="76%" mt={2.5}>
                 <Button
                     classes={{
@@ -75,7 +75,7 @@ function LoginPage() {
                         helperText={errors.password?.message}
                     />
                     <Box textAlign='end'>
-                        <Link to='#' className={style.link}>Forgot password !</Link>
+                        <Link to='/forgot-password' className={style.link}>Forgot password !</Link>
                     </Box>
                     <Button 
                         type='submit'

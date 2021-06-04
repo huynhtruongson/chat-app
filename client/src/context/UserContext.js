@@ -1,17 +1,15 @@
 import { useEffect, useReducer } from 'react'
+import { updateUserInfo } from '../actions/userAction'
 import UserReducer from '../reducers/UserReducer'
 
 const UserContext = () => {
     const initialState = {
         isLogged : false,
-        infor : {}
+        info : {}
     }
     const [state,dispath] = useReducer(UserReducer,initialState)
     useEffect(() => {
-        dispath({type : 'UPDATE_USER_INFOR',payload : {
-            firstname : 'Sơn',
-            lastname : 'Huỳnh'
-        }})
+        dispath(updateUserInfo({firstname : 'Sơn',lastname : 'Huỳnh'}))
     },[])
     return [state,dispath]
 }
