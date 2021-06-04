@@ -95,7 +95,7 @@ module.exports.registerController = async (req,res) =>{
             }
         })
 
-        let link_verify = `${process.env.PATH_HOST}/api/verify/account/${token}`
+        let link_verify = `${process.env.PATH_HOST}/verify-email/${token}`
         var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
             from: process.env.EMAIL,
             to: email,
@@ -113,4 +113,30 @@ module.exports.registerController = async (req,res) =>{
     }catch(err){
         return res.status(400).json({message:err.message})
     }
+}
+
+module.exports.verifyController = async (req,res) =>{
+    try{
+        let {token} = req.body
+        
+        if(!token){
+            throw new Error("Verify link is broken, please re-register")
+        }
+
+        let accountVerify = await AccountModel.findOne({"tokenVerify":token})
+        if (!accountVerify){
+            throw new Error("No account data, please re-register")
+        }
+
+        if(accountVerify.verify === true){
+            throw new Error("This account has been verified, please do not verify further")
+        }
+        await AccountModel.findOneAndUpdate({"tokenVerify":token},{verify:true})
+        res.status(200).json({
+            message: 'Successful verify'
+        })
+    }catch(err){
+        return res.status(400).json('Verify failed: '+ err.message)
+    }
+
 }
