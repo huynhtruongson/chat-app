@@ -1,24 +1,44 @@
 import { TextField, Box, Button } from '@material-ui/core';
 import {ArrowRightAlt,Facebook} from '@material-ui/icons';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import AuthForm from '../../components/AuthForm';
 import Images from '../../constants/Images';
 import { useStyle } from './style';
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
+import AuthApi from '../../api/authApi';
+import useAlert from '../../hooks/alert'
+import { useData } from '../../context/DataContext';
 const schema = yup.object().shape({
     email : yup.string().email('Invalid email!').required('Email is required!'),
     password : yup.string().required('Password is required!')
 })
 function LoginPage() {
     const style = useStyle();
+    const {token : {setToken}} = useData()
     const {register,handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
-    const onSubmit = (data) => {
-        console.log(data);
+    const {_alert} =useAlert()
+    const history = useHistory()
+    const onSubmit = async (data) => {
+        try {
+            const res = await AuthApi.login(data)
+            if(res.status === 200) {
+                localStorage.setItem('token',res.token)
+                setToken(res.token)
+                history.push('/')
+            }
+        } catch (error) {
+            const {data : {message},status} = error.response
+            if(status === 400)
+                _alert({
+                    icon : 'error',
+                    msg : message
+                })
+            }
     }
     return (
         <AuthForm title='Welcome Back' logo={Images.CHAT_LOGO2}>

@@ -1,16 +1,32 @@
 import { useEffect, useReducer } from 'react'
-import { updateUserInfo } from '../actions/userAction'
+import { updateUserInfo,userLogout,userLogin } from '../actions/userAction'
 import UserReducer from '../reducers/UserReducer'
-
-const UserContext = () => {
+import UserApi from '../api/userApi'
+const UserContext = (token) => {
     const initialState = {
         isLogged : false,
         info : {}
     }
     const [state,dispath] = useReducer(UserReducer,initialState)
     useEffect(() => {
-        dispath(updateUserInfo({firstname : 'Sơn',lastname : 'Huỳnh'}))
-    },[])
+        const fetchUserInfo = async () => {
+            try {
+                if(token) {
+                    dispath(userLogin())
+                    const res = await UserApi.getInfo(token)
+                    if(res.status === 200) {
+                        dispath(updateUserInfo(res.data))
+                    }
+                }
+            } catch (error) {
+                const {status} = error.response
+                if(status === 400) {
+                    dispath(userLogout())
+                }
+            }
+        }
+        fetchUserInfo()
+    },[token])
     return [state,dispath]
 }
 

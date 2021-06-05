@@ -57,6 +57,7 @@ const useStyle = makeStyles((theme) => ({
         left: '50%',
         transform: 'translate(-50%,-50%)',
         borderRadius: '8px',
+        overflow : 'hidden',
         [theme.breakpoints.down('md')] : {
             width : '80%'
         },
