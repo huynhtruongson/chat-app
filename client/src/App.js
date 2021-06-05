@@ -7,6 +7,7 @@ import RegisterPage from './pages/Register'
 import HomePage from './pages/Home'
 import ForgotPwdPage from './pages/ForgotPwd'
 import { CssBaseline } from '@material-ui/core';
+import VerifyEmailPage from './pages/VerifyEmail';
 function App() {
     return (
         <ThemeProvider>
@@ -18,6 +19,7 @@ function App() {
                         <Route path='/login' component={LoginPage}/>
                         <Route path='/register' component={RegisterPage}/>
                         <Route path='/forgot-password' component={ForgotPwdPage}/>
+                        <Route path='/verify-email/:token' component={VerifyEmailPage}/>
                     </Switch>
                 </Router>
             </DataProvider>

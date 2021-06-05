@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextField, Box, Button } from '@material-ui/core';
+import React, { useEffect } from 'react';
+import { TextField, Box, Button, Backdrop, CircularProgress } from '@material-ui/core';
 import { ArrowRightAlt } from '@material-ui/icons';
 import AuthForm from '../../components/AuthForm';
 import { useStyle } from './style';
@@ -8,6 +8,8 @@ import {useForm} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
 import Images from '../../constants/Images';
+import AuthApi from '../../api/authApi';
+import useAlert from '../../hooks/alert';
 const schema = yup.object().shape({
     firstname : yup.string().max(10,'Firstname must at most 10 characters long!').required('Firstname is required!'),
     lastname : yup.string().max(10,'Lastname must at most 10 characters long!').required('Lastname is required!'),
@@ -17,12 +19,28 @@ const schema = yup.object().shape({
 })
 const RegisterPage = () => {
     const style = useStyle();
-    const {register,handleSubmit,formState : {errors}} = useForm({
+    const {register,handleSubmit,formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
-    const onSubmit = (data) => {
-        console.log(data);
-    };
+    const {_alert} = useAlert()
+    const onSubmit = async (data) => {
+        // try {
+        //     const res = await AuthApi.register(data)
+        //     if(res.status === 200) {
+        //         _alert({
+        //             icon : 'success',
+        //             title : ''
+        //         })
+        //     }
+        // } catch (error) {
+        //     const {data : {message},status} = error.response
+        //     if(status === 400)
+        //         _alert({
+        //             icon : 'error',
+        //             msg : message
+        //         })
+        // }
+    };  
     return (
         <AuthForm title='Create Account' logo={Images.CHAT_LOGO}>
             <Box className={style.container} width="76%" mt={2.5}>
@@ -103,6 +121,9 @@ const RegisterPage = () => {
                     </Link>
                 </Box>
             </Box>
+            <Backdrop open={isSubmitting} classes={{root : style.backdrop}}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </AuthForm>
     );
 };

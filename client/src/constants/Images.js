@@ -4,12 +4,14 @@ import CHAT_LOGO2 from '../assets/images/chat-logo2.webp'
 import GOOGLE_ICON from '../assets/images/google-icon.png'
 import FORGOT_LOGO from '../assets/images/forgot-logo.jpg'
 import AUTH_BG from '../assets/images/auth-bg.jpg'
+import EMAIL_BG from '../assets/images/email-bg.jpg'
 const Images = {
     TDT_LOGO,
     CHAT_LOGO,
     CHAT_LOGO2,
     GOOGLE_ICON,
     AUTH_BG,
-    FORGOT_LOGO
+    FORGOT_LOGO,
+    EMAIL_BG
 }
 export default Images
