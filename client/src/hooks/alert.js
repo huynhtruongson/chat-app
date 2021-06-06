@@ -5,7 +5,7 @@ import withReactContent from 'sweetalert2-react-content'
 const useAlert = () => {
     const style =  useStyle()
     const mySwal = withReactContent(Swal)
-    const _alert = ({icon,title,msg}) => {
+    const _alert = ({icon,title,msg,callback}) => {
         mySwal.fire({
             allowOutsideClick : false,
             icon,
@@ -15,7 +15,7 @@ const useAlert = () => {
                 title : style.title,
                 htmlContainer : style.text
             }
-        })
+        }).then(callback)
     }
     return {_alert}
 }

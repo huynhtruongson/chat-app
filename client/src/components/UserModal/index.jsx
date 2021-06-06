@@ -58,9 +58,8 @@ const UserModal = ({ open, onClose }) => {
         }
     }
     const isSubmitable = () => {
-        console.log(Object.keys(edit).some(key => edit[key]),isDirty);
-        if(getValues('avatar') && getValues('avatar').length) {
-            return false
+        if(avatar) {
+            return true
         }
         return Object.keys(edit).some(key => edit[key]) && isDirty
     }

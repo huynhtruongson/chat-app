@@ -4,7 +4,7 @@ const UserApi = {
     getInfo(token) {
         const url = '/api/user/current'
         return axiosClient.get(url,{
-            headers : {Authorization : token}
+            headers : {Authorization : `Bearer ${token}`}
         })
     }
 }

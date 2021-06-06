@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react'
 import {Box, Button, makeStyles, Typography} from '@material-ui/core';
 import Images from '../../constants/Images';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import AuthApi from '../../api/authApi';
 import useAlert from '../../hooks/alert'
 const VerifyEmailPage = () => {
     const style = useStyle()
     const {token} = useParams()
     const {_alert} = useAlert()
+    const history = useHistory()
     useEffect(() => {
         const verifyEmail= async () => {
             try {
                 const res = await AuthApi.verifyEmail({token})
                 if(res.status === 200) {
                     _alert({
-                        icon : 'error',
-                        msg : res.message
+                        icon : 'success',
+                        msg : res.message,
+                        callback : (result) => result.isConfirmed &&  history.push('/')
                     })
                 }
             } catch (error) {
@@ -23,18 +25,19 @@ const VerifyEmailPage = () => {
                 if(status === 400)
                     _alert({
                         icon : 'error',
-                        msg : message
+                        msg : message,
+                        callback : (result) => result.isConfirmed &&  history.push('/')
                     })
                 }
         }
         verifyEmail()
-    },[token,_alert])
+    },[_alert,token,history])
     return (
         <Box className={style.container}>
-            <Box display='flex' flexDirection='column' alignItems='center'>
+            {/* <Box display='flex' flexDirection='column' alignItems='center'>
                 <Typography variant='h4'>Thank you for registration</Typography>
                 <Button href='/' variant='contained' color='primary'>Continue to Zolo</Button>
-            </Box>
+            </Box> */}
         </Box>
     )
 }

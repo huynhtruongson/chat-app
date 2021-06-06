@@ -2,11 +2,11 @@ import './App.css';
 import ThemeProvider from './assets/styles/ThemeProvider';
 import {DataProvider} from './context/DataContext'
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
+import { CssBaseline } from '@material-ui/core';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register'
 import HomePage from './pages/Home'
 import ForgotPwdPage from './pages/ForgotPwd'
-import { CssBaseline } from '@material-ui/core';
 import VerifyEmailPage from './pages/VerifyEmail';
 function App() {
     return (

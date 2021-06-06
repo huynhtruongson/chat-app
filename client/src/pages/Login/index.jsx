@@ -26,6 +26,7 @@ function LoginPage() {
     const onSubmit = async (data) => {
         try {
             const res = await AuthApi.login(data)
+            console.log(res)
             if(res.status === 200) {
                 localStorage.setItem('token',res.token)
                 setToken(res.token)
@@ -33,7 +34,13 @@ function LoginPage() {
             }
         } catch (error) {
             const {data : {message},status} = error.response
-            if(status === 400)
+            if(status === 401)
+                _alert({
+                    icon : 'error',
+                    title : 'Unverified Account',
+                    msg : message,
+                })
+            else if(status === 400) 
                 _alert({
                     icon : 'error',
                     msg : message
