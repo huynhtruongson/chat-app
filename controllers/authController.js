@@ -17,16 +17,17 @@ module.exports.loginController =  async(req, res) => {
             if (!account){
                 throw new Error("Wrong email or password")
             }
-            
-            if(account.verify === false){
-                return res.status(401).json({message: "Unverified account. Please check your email for email verification"})
-            }
 
             let passwordMatch = await bcrypt.compare(password, account.password)
             
             if(!passwordMatch){
                 return res.status(400).json({message: "Wrong email or password"})
             }
+            
+            if(account.verify === false){
+                return res.status(401).json({message: "Unverified account. Please check your email for email verification"})
+            }
+            
             const {JWT_SECRET} = process.env
             jwt.sign({
                 id:account.id,

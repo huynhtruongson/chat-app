@@ -4,7 +4,7 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.current = async(req,res)=>{
     try{
-        let data = await AccountModel.findById(req.user.id)
+        let data = await AccountModel.findById(req.user.id,'_id email firstname lastname')
     
         return res.json({
             code:0,
