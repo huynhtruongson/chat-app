@@ -19,20 +19,20 @@ module.exports.current = async(req,res)=>{
 module.exports.updateUser = async(req,res) =>{
     try{
         let {id} = req.params
-        let {firstName,lastName} = req.body
+        let {firstname,lastname} = req.body
         let  file = req.files.image
         let data = undefined
         if(!file){
             data = {
-                firstname:firstName,
-                lastName:lastName
+                firstname:firstname,
+                lastname:lastname
             }
         }
         else{
             const imageCloud = await cloudinary.uploader.upload(file.path)
             data = {
-                firstname:firstName,
-                lastName:lastName,
+                firstname:firstname,
+                lastname:lastname,
                 avatar:imageCloud.secure_url,
                 id_avatar:imageCloud.public_id
             }

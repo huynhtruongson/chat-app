@@ -136,7 +136,7 @@ module.exports.verifyController = async (req,res) =>{
             message: 'Successful verify'
         })
     }catch(err){
-        return res.status(400).json('Verify failed: '+ err.message)
+        return res.status(400).json({message:'Verify failed: '+ err.message})
     }
 
 }

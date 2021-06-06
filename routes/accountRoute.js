@@ -7,6 +7,7 @@ const checkLogin = require('../auth/checkLogin')
 const {current,updateUser} = require('../controllers/accountController')
 
 Router.route('/current').get(checkLogin,current)
+
 Router.route('/update/:id').put(checkLogin,multipartMiddleware, updateUser)
 
 module.exports = Router
