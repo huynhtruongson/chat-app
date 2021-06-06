@@ -5,11 +5,11 @@ module.exports = [
     .exists().withMessage('Vui lòng cung cấp tên email')
     .notEmpty().withMessage('Vui lòng không để tên email trống'),
 
-    check('firstName')
+    check('firstname')
     .exists().withMessage('Vui lòng cung cấp tên')
     .notEmpty().withMessage('Vui lòng không để tên tróng'),
-
-    check('lastName')
+ 
+    check('lastname')
     .exists().withMessage('Vui lòng cung cấp họ')
     .notEmpty().withMessage('Vui lòng không để họ trống'),
 
