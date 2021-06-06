@@ -14,17 +14,17 @@ module.exports.loginController =  async(req, res) => {
             let account = await AccountModel.findOne({email: email})
             
             if (!account){
-                throw new Error("Tài khoản không tồn tại")
+                throw new Error("Wrong email or password")
             }
             
             if(account.verify === false){
-                throw new Error("Tài khoản chưa được xác thực")
+                return res.status(401).json({message: "Unverified account"})
             }
 
             let passwordMatch = await bcrypt.compare(password, account.password)
             
             if(!passwordMatch){
-                return res.status(400).json({message: "Mật khẩu không chính xác"})
+                return res.status(400).json({message: "Wrong email or password"})
             }
             const {JWT_SECRET} = process.env
             jwt.sign({
@@ -133,7 +133,7 @@ module.exports.verifyController = async (req,res) =>{
         }
         await AccountModel.findOneAndUpdate({"tokenVerify":token},{verify:true})
         res.status(200).json({
-            message: 'Successful verify'
+            message: 'A verification link has seen to your email account. Please click the link to verify your email and continue the registration process.'
         })
     }catch(err){
         return res.status(400).json({message:'Verify failed: '+ err.message})
