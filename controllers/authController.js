@@ -108,7 +108,7 @@ module.exports.registerController = async (req,res) =>{
             if (err) {
                 return res.send("error message: "+err.message)
             } else {
-                res.status(200).json({message:"Register success"})
+                res.status(200).json({message:"A verification link has seen to your email account. Please click the link to verify your email and continue the registration process."})
             }
         }) 
     }catch(err){
@@ -134,7 +134,7 @@ module.exports.verifyController = async (req,res) =>{
         }
         await AccountModel.findOneAndUpdate({"tokenVerify":token},{verify:true})
         res.status(200).json({
-            message: 'A verification link has seen to your email account. Please click the link to verify your email and continue the registration process.'
+            message: 'Verify success'
         })
     }catch(err){
         return res.status(400).json({message:'Verify failed: '+ err.message})
