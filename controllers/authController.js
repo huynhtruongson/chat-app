@@ -8,6 +8,7 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.loginController =  async(req, res) => {
     try{
+
         let result = validationResult(req)
         if(result.errors.length === 0){
             let {email, password} = req.body
