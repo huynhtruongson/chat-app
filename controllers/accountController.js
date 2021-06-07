@@ -24,8 +24,14 @@ module.exports.updateUser = async(req,res) =>{
             firstname:firstname,
             lastname:lastname
         }
-        
-        if(file){
+
+        let checkAvatar = await AccountModel.findById(req.user.id)
+
+        if (checkAvatar.avatar) {
+            await cloudinary.uploader.destroy(checkAvatar.id_avatar)            
+        }
+
+        if (file){
             const imageCloud = await cloudinary.uploader.upload(file.path,{folder:'avatar'})
             data = {
                 ...data,
