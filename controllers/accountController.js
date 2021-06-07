@@ -34,7 +34,7 @@ module.exports.updateUser = async(req,res) =>{
             }
         }
 
-        let user = await AccountModel.findByIdAndUpdate(req.user.id, data,{new:true}).select('email firstname lastname avatar')
+        let user = await AccountModel.findByIdAndUpdate(req.user.id, data,{new:true}).select('-_id email firstname lastname avatar')
 
         res.status(200).json({message:"Update success",data:user})
     }catch(err){
