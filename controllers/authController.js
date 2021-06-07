@@ -71,7 +71,7 @@ module.exports.registerController = async (req,res) =>{
             throw new Error (message)
         }
         let {email,firstname,lastname,password} = req.body
-        var token = crypto.randomBytes(48).toString('hex');
+        var token = crypto.randomBytes(48).toString('hex')
         let checkExist = await AccountModel.findOne({email:email})
         if (checkExist){
             throw new Error('Tài khoản này đã đăng ký')
@@ -117,7 +117,7 @@ module.exports.registerController = async (req,res) =>{
     }
 }
 
-module.exports.verifyController = async (req,res) =>{
+module.exports.verifyController = async (req, res) =>{
     try{
         let {token} = req.body
         
@@ -142,3 +142,12 @@ module.exports.verifyController = async (req,res) =>{
     }
 
 }
+
+// module.exports.forgotPasswordController = async(req, res) => {
+//     try {
+//         var token = crypto.randomBytes(48).toString('hex')
+
+//     } catch(err) {
+//         return res.status(400).json({message:'Verify failed: '+ err.message})
+//     }
+// }
