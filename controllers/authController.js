@@ -143,11 +143,44 @@ module.exports.verifyController = async (req, res) =>{
 
 }
 
-// module.exports.forgotPasswordController = async(req, res) => {
-//     try {
-//         var token = crypto.randomBytes(48).toString('hex')
+module.exports.forgotPasswordController = async(req, res) => {
+    try {
+        let email = req.body.email
+        var token = crypto.randomBytes(48).toString('hex')
 
-//     } catch(err) {
-//         return res.status(400).json({message:'Verify failed: '+ err.message})
-//     }
-// }
+        await AccountModel.findOneAndUpdate({email:email},{token:token})
+
+        var transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASS_EMAIL
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        })
+
+        let link_verify = `${process.env.PATH_HOST}/reset-password/${token}`
+        var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Reset password account',
+            html: '<p>Đây là tin nhắn của<b>LƯỢM message</b> giúp bạn reset password. <br>Để kích đổi lại mật khẩu và sử dụng dịch vụ của chúng tôi, vui lòng nhấn <a href="'+link_verify+'">vào đây</a> để thay đổi mật khẩu tài khoản</p>'
+        }
+        
+        transporter.sendMail(mainOptions, function(err, info){
+            if (err) {
+                return res.send("error message: "+err.message)
+            } else {
+                res.status(200).json({message:"A reset password link has seen to your email account. Please click the link to change your password and continue the registration process."})
+            }
+        })
+
+    } catch(err) {
+        return res.status(400).json({message:'Verify failed: '+ err.message})
+    }
+}
+
+
+// module.exports.verifyResetpassword =
