@@ -1,10 +1,10 @@
-const {cloudinary} = require('../config/cloudinary')
+const cloudinary = require('../config/cloudinary')
 
 const AccountModel = require('../models/AccountModel')
 
 module.exports.current = async(req,res)=>{
     try{
-        let data = await AccountModel.findById(req.user.id,'_id email firstname lastname')
+        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar')
     
         return res.json({
             code:0,
@@ -18,27 +18,23 @@ module.exports.current = async(req,res)=>{
 
 module.exports.updateUser = async(req,res) =>{
     try{
-        let {id} = req.params
         let {firstname,lastname} = req.body
-        let  file = req.files.image
-        let data = undefined
-        if(!file){
-            data = {
-                firstname:firstname,
-                lastname:lastname
-            }
+        let  file = req.files.avatar
+        let data = {
+            firstname:firstname,
+            lastname:lastname
         }
-        else{
-            const imageCloud = await cloudinary.uploader.upload(file.path)
+        
+        if(file){
+            const imageCloud = await cloudinary.uploader.upload(file.path,{folder:'avatar'})
             data = {
-                firstname:firstname,
-                lastname:lastname,
+                ...data,
                 avatar:imageCloud.secure_url,
                 id_avatar:imageCloud.public_id
             }
         }
 
-        let user = await AccountModel.findByIdAndUpdate(id, data)
+        let user = await AccountModel.findByIdAndUpdate(req.user.id, data,{new:true}).select('email firstname lastname avatar')
 
         res.status(200).json({message:"Update success",data:user})
     }catch(err){
