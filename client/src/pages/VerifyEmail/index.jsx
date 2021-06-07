@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import {Box, Button, makeStyles, Typography} from '@material-ui/core';
+import {Box, makeStyles} from '@material-ui/core';
 import Images from '../../constants/Images';
 import { useHistory, useParams } from 'react-router';
 import AuthApi from '../../api/authApi';
@@ -17,6 +17,7 @@ const VerifyEmailPage = () => {
                     _alert({
                         icon : 'success',
                         msg : res.message,
+                        confirmButtonText : 'Continue to Chat-app',
                         callback : (result) => result.isConfirmed &&  history.push('/')
                     })
                 }
@@ -26,7 +27,8 @@ const VerifyEmailPage = () => {
                     _alert({
                         icon : 'error',
                         msg : message,
-                        callback : (result) => result.isConfirmed &&  history.push('/')
+                        confirmButtonText : 'Continue to Chat-app',
+                        callback : (result) => result.isConfirmed &&  history.push('/login')
                     })
                 }
         }

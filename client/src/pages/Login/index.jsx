@@ -1,4 +1,4 @@
-import { TextField, Box, Button } from '@material-ui/core';
+import { TextField, Box, Button, Backdrop, CircularProgress } from '@material-ui/core';
 import {ArrowRightAlt,Facebook} from '@material-ui/icons';
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
@@ -17,8 +17,8 @@ const schema = yup.object().shape({
 })
 function LoginPage() {
     const style = useStyle();
-    const {token : {setToken}} = useData()
-    const {register,handleSubmit, formState : {errors}} = useForm({
+    const {token : [token,setToken]} = useData()
+    const {register,handleSubmit, formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
     const {_alert} =useAlert()
@@ -26,9 +26,9 @@ function LoginPage() {
     const onSubmit = async (data) => {
         try {
             const res = await AuthApi.login(data)
-            console.log(res)
             if(res.status === 200) {
                 localStorage.setItem('token',res.token)
+                AuthApi.setHeaderAxios(res.token)
                 setToken(res.token)
                 history.push('/')
             }
@@ -125,6 +125,9 @@ function LoginPage() {
                     <Link to='/register' className={style.link}>{''} Register</Link>
                 </Box>
             </Box>
+            <Backdrop open={isSubmitting} classes={{root : style.backdrop}}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </AuthForm>
     );
 }

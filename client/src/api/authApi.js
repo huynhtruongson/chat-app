@@ -12,6 +12,17 @@ const AuthApi = {
     verifyEmail(data) {
         const url = '/api/auth/verify-user'
         return axiosClient.post(url,data)
+    },
+    forgotPwd(email) {
+        const url = '/api/auth/forgot-passsword'
+        return axiosClient.post(url,email)
+    },
+    resetPwd(data) {
+        const url = '/api/auth/reset-password'
+        return axiosClient.post(url,data)
+    },
+    setHeaderAxios(token) {
+        axiosClient.defaults.headers.common['Authorization'] = 'Bearer ' + token
     }
 }
 export default AuthApi
