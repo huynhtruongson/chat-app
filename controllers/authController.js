@@ -183,4 +183,8 @@ module.exports.forgotPasswordController = async(req, res) => {
 }
 
 
-// module.exports.verifyResetpassword =
+module.exports.verifyResetpassword = async(req, res) =>{
+    let {token, password} = req.body
+    
+    let user = await AccountModel.findOne()
+}
