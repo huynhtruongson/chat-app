@@ -184,7 +184,22 @@ module.exports.forgotPasswordController = async(req, res) => {
 
 
 module.exports.verifyResetpassword = async(req, res) =>{
-    let {token, password} = req.body
-    
-    let user = await AccountModel.findOne()
+    try {
+        let {token, password} = req.body
+        
+        if (!token) {
+            throw new Error("Token not found")
+        }    
+        
+        let password_hash = await bcrypt.hash(password, 10)
+        let user = await AccountModel.findOneAndUpdate({token: token}, {password: password_hash})
+        
+        if (!user) {
+            throw new Error('Opss, something went wrong...')
+        }
+
+        return res.status(400).json({message:"Change password success"})
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
 }
