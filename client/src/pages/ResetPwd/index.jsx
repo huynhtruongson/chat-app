@@ -2,7 +2,7 @@ import { Box, Button, makeStyles, TextField, Typography } from '@material-ui/cor
 import { ArrowRightAlt } from '@material-ui/icons'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import AuthForm from '../../components/AuthForm'
 import Images from '../../constants/Images'
 import * as yup from 'yup'
@@ -19,6 +19,7 @@ const ResetPwdPage = () => {
         resolver : yupResolver(schema)
     })
     const {token} = useParams()
+    const history = useHistory()
     const {_alert} = useAlert()
     const onSubmit = async (data) => {
         try {
@@ -26,7 +27,9 @@ const ResetPwdPage = () => {
             if(res === 200) {
                 _alert({
                     icon : 'success',
-                    msg : res.message
+                    msg : res.message,
+                    confirmButtonText : 'Continue to Login',
+                    callback : (result) => result.isConfirmed &&  history.push('/login')
                 })
             }
         } catch (error) {
