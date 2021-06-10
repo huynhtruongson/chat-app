@@ -1,16 +1,26 @@
 import { Avatar, Badge, Box,Button, Divider, makeStyles, Popover, TextField} from '@material-ui/core';
 import {Search,Settings,AccountCircleOutlined,VpnKeyOutlined,ExitToAppOutlined} from '@material-ui/icons';
 import React, { useState } from 'react';
+import { userLogout } from '../../actions/userAction';
 import ChatCard from '../../components/ChatCard';
 import MessageBox from '../../components/MessageBox';
 import PasswordModal from '../../components/PwdModal';
 import UserModal from '../../components/UserModal';
+import { useData } from '../../context/DataContext';
+import { useHistory } from 'react-router';
 
 const HomePage = () => {
     const [userModal, setUserModal] = useState(false)
     const [pwdModal, setPwdModal] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
+    const {user:[state,dispatch]} = useData()
+    const history = useHistory()
     const style = useStyle();
+    const handleLogOut = () => {
+        dispatch(userLogout())
+        localStorage.removeItem('token')
+        history.push('/login')
+    }
     return (
         <Box height="100vh" display="flex">
             <Box className={style.sidebar} py={1} display='flex' flexDirection='column' justifyContent='space-between'>
@@ -55,7 +65,7 @@ const HomePage = () => {
                                 Change password
                             </Button>
                             <Divider/>
-                            <Button href='#' classes={{root : style.popoverBtn}} startIcon={<ExitToAppOutlined/>}>
+                            <Button onClick={handleLogOut} classes={{root : style.popoverBtn}} startIcon={<ExitToAppOutlined/>}>
                                 Logout
                             </Button>
                         </Box>

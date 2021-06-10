@@ -4,7 +4,7 @@ import UserReducer from '../reducers/UserReducer'
 import UserApi from '../api/userApi'
 const UserContext = (token) => {
     const initialState = {
-        isLogged : false,
+        isLogged : !!token,
         info : {}
     }
     const [state,dispath] = useReducer(UserReducer,initialState)
@@ -12,9 +12,9 @@ const UserContext = (token) => {
         const fetchUserInfo = async () => {
             try {
                 if(token) {
-                    dispath(userLogin())
                     const res = await UserApi.getInfo(token)
                     if(res.status === 200) {
+                        dispath(userLogin())
                         dispath(updateUserInfo(res.data))
                     }
                 }

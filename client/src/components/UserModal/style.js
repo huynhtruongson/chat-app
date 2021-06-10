@@ -50,6 +50,11 @@ const useStyle = makeStyles((theme) => ({
     svgIcon: {
         fontSize: '18px',
     },
+    backdrop : {
+        zIndex : theme.zIndex.drawer  + 1,
+        color : '#fff',
+        backgroundColor : 'rgba(0, 0, 0, 0.2)'
+    }
 }));
 
 export default useStyle

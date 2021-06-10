@@ -5,17 +5,18 @@ import withReactContent from 'sweetalert2-react-content'
 const useAlert = () => {
     const style =  useStyle()
     const mySwal = withReactContent(Swal)
-    const _alert = ({icon,title,msg}) => {
+    const _alert = ({title,msg,callback,...props}) => {
         mySwal.fire({
             allowOutsideClick : false,
-            icon,
             title : title && <p>{title}</p>,
             html : msg && <p>{msg}</p>,
             customClass : {
                 title : style.title,
-                htmlContainer : style.text
-            }
-        })
+                htmlContainer : style.text,
+                container : style.swalContainer
+            },
+            ...props
+        }).then(callback)
     }
     return {_alert}
 }
@@ -27,6 +28,9 @@ const useStyle = makeStyles(theme => ({
     },
     text : {
         padding : '0 1rem',
+    },
+    swalContainer : {
+        zIndex : theme.zIndex.modal + 1
     }
 }))
 export default useAlert

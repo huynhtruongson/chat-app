@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TextField, Box, Button, Backdrop, CircularProgress } from '@material-ui/core';
 import { ArrowRightAlt } from '@material-ui/icons';
 import AuthForm from '../../components/AuthForm';
@@ -24,22 +24,23 @@ const RegisterPage = () => {
     })
     const {_alert} = useAlert()
     const onSubmit = async (data) => {
-        // try {
-        //     const res = await AuthApi.register(data)
-        //     if(res.status === 200) {
-        //         _alert({
-        //             icon : 'success',
-        //             title : ''
-        //         })
-        //     }
-        // } catch (error) {
-        //     const {data : {message},status} = error.response
-        //     if(status === 400)
-        //         _alert({
-        //             icon : 'error',
-        //             msg : message
-        //         })
-        // }
+        try {
+            const res = await AuthApi.register(data)
+            if(res.status === 200) {
+                _alert({
+                    icon : 'success',
+                    title : 'Email Verification',
+                    msg  : res.message
+                })
+            }
+        } catch (error) {
+            const {data : {message},status} = error.response
+            if(status === 400)
+                _alert({
+                    icon : 'error',
+                    msg : message
+                })
+        }
     };  
     return (
         <AuthForm title='Create Account' logo={Images.CHAT_LOGO}>

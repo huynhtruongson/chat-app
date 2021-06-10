@@ -1,8 +1,8 @@
-import { Backdrop, Box, Button, CircularProgress, makeStyles, TextField, Typography } from '@material-ui/core'
+import { Box, Button, makeStyles, TextField, Typography } from '@material-ui/core'
 import { ArrowRightAlt } from '@material-ui/icons'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import AuthForm from '../../components/AuthForm'
 import Images from '../../constants/Images'
 import * as yup from 'yup'
@@ -10,51 +10,67 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import AuthApi from '../../api/authApi'
 import useAlert from '../../hooks/alert'
 const schema = yup.object().shape({
-    email : yup.string().email('Invalid email!').required('Email is required!'),
+    password : yup.string().min(6,'Password must at least 6 characters long!').required('Password is required!'),
+    confirm_password : yup.string().oneOf([yup.ref('password'),null],'Incorrect confirm password!').required('Confirm password is required!'),
 })
-const ForgotPwdPage = () => {
+const ResetPwdPage = () => {
     const style = useStyle()
-    const {_alert} = useAlert()
-    const {register,handleSubmit,formState : {errors,isSubmitting}} = useForm({
+    const {register,handleSubmit,formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
+    const {token} = useParams()
+    const history = useHistory()
+    const {_alert} = useAlert()
     const onSubmit = async (data) => {
         try {
-            const {email} = data
-            const res = await AuthApi.forgotPwd(email)
-            if(res.status === 200) {
+            const res = await AuthApi.resetPwd({...data,token})
+            if(res === 200) {
                 _alert({
                     icon : 'success',
-                    msg : res.message
+                    msg : res.message,
+                    confirmButtonText : 'Continue to Login',
+                    callback : (result) => result.isConfirmed &&  history.push('/login')
                 })
             }
         } catch (error) {
             const {data : {message},status} = error.response
-                if(status === 400)
-                    _alert({
-                        icon : 'error',
-                        msg : message,
-                    })
+            if(status === 400)
+                _alert({
+                    icon : 'error',
+                    msg : message,
+                })
         }
     }
     return (
-        <AuthForm title='Forgot Password' logo={Images.FORGOT_LOGO}>
+        <AuthForm title='Reset Password' logo={Images.RESET_LOGO}>
             <Box className={style.container} width="76%" mt={2.5}>
                 <Box mb={2}>
                     <Typography variant='body1'>
-                        Please enter your registered email address we will get back to you with the reset password link.Thanks
+                        Forgot your password? Let's get a new one
                     </Typography>
                 </Box>
                 <form className={style.formContainer} onSubmit={handleSubmit(onSubmit)}>
                     <TextField
-                        {...register('email')}
+                        {...register('password')}
+                        type='password'
                         variant="outlined"
-                        label="Email"
+                        label="New password"
                         fullWidth
                         InputProps={{classes : {input : style.input}}}
                         InputLabelProps={{classes : {outlined : style.label}}}
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                    />
+                    <TextField
+                        {...register('confirm_password')}
+                        type='password'
+                        variant="outlined"
+                        label="Confirm password"
+                        fullWidth
+                        InputProps={{classes : {input : style.input}}}
+                        InputLabelProps={{classes : {outlined : style.label}}}
+                        error={!!errors.confirm_password}
+                        helperText={errors.confirm_password?.message}
                     />
                     <Button 
                         type='submit'
@@ -70,16 +86,13 @@ const ForgotPwdPage = () => {
                             endIcon : style.endIcon,
                         }}
                     >
-                        Send
+                        Reset
                     </Button>
                 </form>
                 <Box textAlign='center' color='#9e9e9e' mt={1.5}>Go back to login.
                     <Link to='/login' className={style.link}>Login</Link>
                 </Box>
             </Box>
-            <Backdrop open={isSubmitting} classes={{root : style.backdrop}}>
-                <CircularProgress color="inherit" />
-            </Backdrop>
         </AuthForm>
     )
 }
@@ -119,4 +132,4 @@ const useStyle =  makeStyles(theme => ({
         marginLeft : 'auto'
     },
 }))
-export default ForgotPwdPage
+export default ResetPwdPage
