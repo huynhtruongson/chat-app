@@ -16,7 +16,7 @@ function App() {
     return (
         <ThemeProvider>
             <DataProvider>
-                <CssBaseline/>
+                {/* <CssBaseline/> */}
                 <Router>
                     <Switch>
                         <PrivateRoute path='/' exact>

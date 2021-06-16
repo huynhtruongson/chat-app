@@ -22,7 +22,6 @@ const UserModal = ({ open, onClose }) => {
     const [edit, setEdit] = useState({firstname: false,lastname: false});
     const {user : [user,dispatch]} = useData()
     const [avatar,setAvatar] = useState(null)
-    // const avatarRef = useRef()
     const {_alert} = useAlert()
     const style = useStyle(edit);
     const {register,handleSubmit,formState : {errors,isDirty,isSubmitting},reset,setValue,watch} = useForm({
@@ -36,8 +35,8 @@ const UserModal = ({ open, onClose }) => {
         setEdit({ ...edit, [field]: !edit[field] });
     };
     const handleModalClose = () => {
-        setEdit({fname: false,lname: false,pwd: false})
-        reset()
+        setEdit({fname: false,lname: false})
+        reset() //reset to default value
     }
     const handleAvatarChange = async (e) => {
         const file  = e.target.files[0]
@@ -82,15 +81,15 @@ const UserModal = ({ open, onClose }) => {
             }
         } catch (error) {
             const {data : {message},status} = error.response
-                if(status === 400)
-                    _alert({
-                        icon : 'error',
-                        msg : message,
-                    })
+            if(status === 400)
+                _alert({
+                    icon : 'error',
+                    msg : message,
+                })
         }
     }
     useEffect(()=>{
-        reset({
+        reset({           //set defaultValue to hook-form 
             firstname : user.info.firstname,
             lastname : user.info.lastname,
         })
@@ -173,8 +172,6 @@ const UserModal = ({ open, onClose }) => {
                                     fullWidth 
                                     autoFocus
                                     autoComplete='off'
-                                    // defaultValue={getValues('firstname') || ''}
-                                    // {...register('firstname')}
                                     inputRef={fnameRef}
                                     {...fnameRest}
                                     error={!!errors.firstname}
@@ -203,8 +200,6 @@ const UserModal = ({ open, onClose }) => {
                                     fullWidth 
                                     autoFocus
                                     autoComplete='off'
-                                    // defaultValue={getValues('lastname') || ''}
-                                    // {...register('lastname')}
                                     inputRef={lnameRef}
                                     {...lnameRest}
                                     error={!!errors.lastname}

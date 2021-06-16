@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient"
 
 const UserApi = {
     getInfo(token) {
-        const url = '/api/user/current'
+        const url = '/api/current' //  '/api/user/current'
         return axiosClient.get(url)
     },
     updateInfo(info)  {

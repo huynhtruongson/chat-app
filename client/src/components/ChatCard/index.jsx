@@ -1,10 +1,10 @@
 import { Avatar, Badge, Box, makeStyles, Typography } from '@material-ui/core'
 import React from 'react'
 
-const ChatCard = () => {
-    const style = useStyle()
+const ChatCard = ({user,handleClickUser,active}) => {
+    const style = useStyle({active})
     return (
-        <Box className={style.chatCard} display='flex' p={1} alignItems='center'>
+        <Box onClick={handleClickUser} className={style.chatCard} display='flex' p={1} alignItems='center'>
             <Badge
                 variant="dot"
                 classes={{
@@ -14,12 +14,12 @@ const ChatCard = () => {
             >
                 <Avatar
                     classes={{ root: style.avatar }}
-                    src="https://picsum.photos/200/300"
+                    src={user.avatar}
                 />
             </Badge>
             <Box flex={1} display='flex' flexDirection='column' justifyContent='center' ml={1} overflow='hidden'>
-                <Typography>Sơn Huỳnh</Typography>
-                <Typography variant='body2' noWrap color='textSecondary'>Lorem ipsum, dolor sit amet consectetur</Typography>
+                <Typography>{`${user.firstname} ${user.lastname}`}</Typography>
+                <Typography variant='body2' noWrap color='textSecondary'>{user.text}</Typography>
             </Box>
         </Box>
     )
@@ -27,8 +27,9 @@ const ChatCard = () => {
 const useStyle = makeStyles(theme => ({
     chatCard : {
         cursor : 'pointer',
+        backgroundColor : ({active}) => active ? '#E5EFFF' : null,
         '&:hover' : {
-            backgroundColor : theme.palette.grey[100]
+            backgroundColor : theme.palette.grey[200]
         }
     },
     avatar : {
