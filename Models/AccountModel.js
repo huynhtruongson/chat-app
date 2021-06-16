@@ -21,7 +21,10 @@ const AccountSchema = new Schema({
         type:Boolean,
         default:false,
     },
-    conversations: Array,
+    friend_invite:[String],
+    friend:[String],
+    friend_request:[String],
     deleted:[Object],
+    blocked:[String]
 },{timestamps:true})
 module.exports = mongoose.model('Account',AccountSchema)
