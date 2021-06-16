@@ -52,30 +52,85 @@ module.exports.loginController =  async(req, res) => {
             throw new Error (message)
         }
     }
-    catch(err){
+    catch (err) {
         return res.status(400).json({message : "Đăng nhập thất bại:" + err.message})
     }
 }
 
+module,exports.googleLoginController = (req, res) =>{
+    const{tokenId}=req.body
+    let original_id = mongoose.Types.ObjectId()
+    client.verifyIdToken({idToken :tokenId,audience:"173768816222-a3th16lqbckuej5epilhsnv3tg0l031q.apps.googleusercontent.com"})
+    .then(response=>{
+        const {email_verified,name,email,picture}= response.payload
 
-module.exports.registerController = async (req,res) =>{
+        if(email_verified){        
+            AccountModel.findOne({email:email}).exec((err,user)=>{
+                if(err){
+                    return res.status(400).json({message:err.message})
+                } else{
+                    
+                    if(user){
+                        const {JWT_SECRET} = process.env
+                        const token = jwt.sign({
+                            id:user.id,
+                        },JWT_SECRET,{expiresIn:"3h"})
+                        res.json({code:0,message:"Login success",token:token})
+                        
+                    }else{
+                        cloudinary.uploader.upload(picture)
+                        .then(imageCloud=>{
+                        let newAccount = new AccountModel({
+                            _id: original_id,
+                            email: email,
+                            firstname: firstname,
+                            lastname: lastname,
+                            avatar: imageCloud.secure_url,
+                            id_avatar: imageCloud.public_id,
+                            
+                        })
+                        newAccount.save((err,data)=>{
+                            if(err){
+                                return res.status(400).json({
+                                   message:err.message
+                                })
+                            }
+
+                            const {JWT_SECRET} = process.env
+                            const token = jwt.sign({
+                                id:data.id,
+                                },JWT_SECRET,{expiresIn:"3d"})
+                                res.status(200).json({message:"Login success",token:token})
+                        })
+                    })
+                    }
+                }
+            })
+        }
+    })
+}
+
+module.exports.registerController = async (req, res) =>{
     try{
         let result = validationResult(req)
         if(result.errors.length !== 0){
             let messages = result.mapped()
             let message = ''
+
             for(m in messages){
-                message= messages[m].msg
+                message = messages[m].msg
                 break
             }
             throw new Error (message)
         }
-        let {email,firstname,lastname,password} = req.body
+        let {email, firstname, lastname, password} = req.body
         var token = crypto.randomBytes(48).toString('hex')
-        let checkExist = await AccountModel.findOne({email:email})
-        if (checkExist){
-            throw new Error('Tài khoản này đã đăng ký')
+        let checkExist = await AccountModel.findOne({email: email})
+
+        if (checkExist) {
+            throw new Error ('This account is registered')
         }
+        
         let password_hash = await bcrypt.hash(password,10)
         let account = await new AccountModel({
             email: email,
@@ -112,7 +167,7 @@ module.exports.registerController = async (req,res) =>{
                 res.status(200).json({message:"A verification link has seen to your email account. Please click the link to verify your email and continue the registration process."})
             }
         }) 
-    }catch(err){
+    } catch (err) {
         return res.status(400).json({message:err.message})
     }
 }
