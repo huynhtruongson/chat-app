@@ -3,8 +3,8 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 
-const mongoConnect = require('./config/databaseConfig')
-const route = require('./routes')
+const mongoConnect = require('./src/config/databaseConfig')
+const route = require('./src/routes')
 // const server = require('http').createServer(app);
 // const io = require('socket.io')(server)
 
