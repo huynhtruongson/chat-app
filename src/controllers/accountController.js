@@ -105,3 +105,17 @@ module.exports.addFriend = async (req, res) => {
         return res.status(400).json({message: err.message})
     }
 }
+
+module.exports.search = async(req, res) =>{
+    try{
+        let {name} = req.body
+        let userCurrent = await AccountModel.find({_id: req.user.id})
+        let {friend} = userCurrent
+        let searchList = await AccountModel.find({fullname: {"$regex":name,"$options":"i"}, _id: {$ne: friend}}).limit(10)
+        console.log(searchList)
+        return res.status(200).json({message:"success", data: searchList})
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+
+}

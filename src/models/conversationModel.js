@@ -6,7 +6,6 @@ const conversationSchema = new Schema({
         {
             type: Schema.Types.ObjectId,
             ref:"Account",
-            required: [true, "user id in party should not be emty"]
         }
     ],
     text: String,
