@@ -1,6 +1,6 @@
 import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
 import {Info,PhotoLibrary,AttachFile,ThumbUp,EmojiEmotionsRounded,Send, CancelOutlined,Description} from '@material-ui/icons';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
@@ -16,7 +16,8 @@ const MessageBox = () => {
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
     const {message : [messageState,dispatch],user:[userState]} = useData()
-    const {user,messages} = messageState
+    const {activeConv,messages} = messageState
+    const [msgData,setMsgData] = useState({})
     const handleClickIcon = (icon) => {
         setValue('message', getValues('message') + icon);
     };
@@ -43,17 +44,21 @@ const MessageBox = () => {
         console.log(data);
         const msg = {
             sender : userState.info._id,
-            recipient : user._id,
+            recipient : activeConv._id,
             text : data.message,
             media : [].concat(data.media || [])
         }
         if(!data.message && !data.media)
             msg.text = ':like:'
         console.log(msg)
-        dispatch(addMessage(msg,user))
+        dispatch(addMessage(msg,activeConv))
         reset()
     };
-    if(!user._id)
+    useEffect(()=> {
+        const data = messages.find(msg => msg._id === activeConv._id)
+        setMsgData(data)
+    },[activeConv._id,messages])
+    if(!activeConv._id)
         return (
             <Box position='relative' height='100%'>
                 <Box className={style.bgcGreeting} textAlign='center'>
@@ -72,13 +77,13 @@ const MessageBox = () => {
                 p={1}
             >
                 <Box display="flex" alignItems="center">
-                    <Avatar classes={{ root: style.avatar }} src={user.avatar} />
+                    <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
                     <Box ml={0.8}>
                         <Typography
                             classes={{ root: style.username }}
                             variant="subtitle2"
                         >
-                            {`${user.firstname} ${user.lastname}`}
+                            {`${activeConv.firstname} ${activeConv.lastname}`}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                             Active now
@@ -94,14 +99,14 @@ const MessageBox = () => {
             <Box
                 flex={1}
                 display="flex"
-                overflowx="auto"
+                overflow="auto"
                 flexDirection="column-reverse">
                 {
-                    messages.map(msg => (
+                    msgData && msgData.data.map(msg => (
                         <Message 
                             key={msg+Math.random()} 
                             msg={msg} 
-                            user={messageState.user}
+                            user={activeConv}
                             self={msg.sender === userState.info._id}/>
                     ))
                 }
@@ -171,7 +176,6 @@ const MessageBox = () => {
                         <TextField
                             inputRef={inputRef}
                             {...inputRest}
-                            // multiline
                             fullWidth
                             variant="outlined"
                             placeholder="Aa"

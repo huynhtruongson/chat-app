@@ -12,15 +12,15 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
         message: [messageState, dispatch],
         user: [userState],
     } = useData();
-    const {conversations, user: msgUser} = messageState;
+    const {conversations, activeConv} = messageState;
     const {friends} = userState.info;
     const handleClickUserConversations = (id) => {
-        if (msgUser._id === id) return;
-        const user = conversations[conversations.findIndex((user) => user._id === id)];
+        if (activeConv._id === id) return;
+        const user = conversations[conversations.findIndex((cv) => cv._id === id)];
         dispatch(getUserMessage(user));
     };
     const handleClickUserFriends = (id) => {
-        if (msgUser._id === id) return;
+        if (activeConv._id === id) return;
         const user = friends[friends.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
         handleShowFrRequest(false);
@@ -71,17 +71,17 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
             )}
             <Box display="flex" flexDirection="column">
                 {!showFriendList
-                    ? conversations.map((user) => (
+                    ? conversations.map((cv) => (
                           <ChatCard
-                              active={user._id === msgUser._id}
-                              key={user._id}
-                              user={user}
-                              handleClickUser={() => handleClickUserConversations(user._id)}
+                              active={cv._id === activeConv._id}
+                              key={cv._id}
+                              user={cv}
+                              handleClickUser={() => handleClickUserConversations(cv._id)}
                           />
                       ))
                     : friends.map((user) => (
                           <ChatCard
-                              active={user._id === msgUser._id}
+                              active={user._id === activeConv._id}
                               key={user._id}
                               user={user}
                               handleClickUser={() => handleClickUserFriends(user._id)}

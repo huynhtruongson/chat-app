@@ -6,7 +6,7 @@ import MessageReducer from "../reducers/MessageReducer";
 const MessageContext = () => {
     const initialState = {
         conversations: [],
-        user: {},
+        activeConv: {},
         messages: [],
         isConversationLoaded: false,
     };
@@ -15,16 +15,18 @@ const MessageContext = () => {
         const fetchMessage = async (id) => {
             try {
                 if(!id) return
-                const res = await MessageApi.getMessages(id)
-                if(res.status === 200) {
-                    dispatch(getMessages(res.data))
+                if(state.messages.every(cv => cv._id !== id)) {
+                    const res = await MessageApi.getMessages(id)
+                    if(res.status === 200) {
+                        dispatch(getMessages({data : [...res.data],_id : id}))
+                    }
                 }
             } catch (error) {
                 console.log(error)
             }
         }
-        fetchMessage(state.user._id)
-    },[state.user])
+        fetchMessage(state.activeConv._id)
+    },[state.activeConv,state.messages])
     return [state, dispatch];
 };
 
