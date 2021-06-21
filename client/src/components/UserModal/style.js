@@ -1,28 +1,20 @@
 import { makeStyles } from "@material-ui/core";
 
 const useStyle = makeStyles((theme) => ({
-    dialog: {
-        width: '480px',
-    },
-    closeBtn: {
-        position: 'absolute',
-        top: theme.spacing(1),
-        right: theme.spacing(1),
-    },
     backgroundImg: {
         height: '100%',
         width: '100%',
         objectFit: 'cover',
     },
     avatar: {
-        width: '120px',
-        height: '120px',
-        border: '5px solid #fff',
+        width: '100px',
+        height: '100px',
+        border: '3px solid #fff',
         cursor: 'pointer',
     },
     badgeAnchor: {
-        bottom: '22px',
-        right: '22px',
+        bottom: '16px',
+        right: '16px',
     },
     avatarContainer: {
         transform: 'translate(-50%,50%)',
@@ -54,6 +46,13 @@ const useStyle = makeStyles((theme) => ({
         zIndex : theme.zIndex.drawer  + 1,
         color : '#fff',
         backgroundColor : 'rgba(0, 0, 0, 0.2)'
+    },
+    dialogContent: {
+        padding: theme.spacing(1.5),
+    },
+    dialogBtn : {
+        fontSize:'.9rem',
+        textTransform : 'initial'
     }
 }));
 

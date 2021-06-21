@@ -6,7 +6,7 @@ import MessageApi from "../../api/messageApi";
 import Images from "../../constants/Images";
 import {useData} from "../../context/DataContext";
 import ChatCard from "../ChatCard";
-const ChatUserList = ({showFriendList, handleShowFrRequest}) => {
+const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
     const style = useStyle();
     const {
         message: [messageState, dispatch],
@@ -38,7 +38,6 @@ const ChatUserList = ({showFriendList, handleShowFrRequest}) => {
                                 formatConv.push({...user, text: cv.text, media: cv.media});
                         });
                     });
-                    console.log(formatConv);
                     dispatch(getConversations(formatConv));
                 }
             } catch (error) {
@@ -58,13 +57,15 @@ const ChatUserList = ({showFriendList, handleShowFrRequest}) => {
                     placeholder='Search'
                     InputProps={{
                         classes:{root : style.searchInput},
-                        startAdornment : <Search color='disabled'/>
+                        startAdornment : <Search color='disabled'/>,
                     }}/>
-                <Box><IconButton><PersonAdd/></IconButton></Box>
+                <IconButton classes={{root : style.addFriendBtn}} onClick={handleShowSearchModal}>
+                    <PersonAdd/>
+                </IconButton>
             </Box>
             {showFriendList && (
-                <Box className={style.addFrBtn} onClick={() => handleShowFrRequest(true)}>
-                    <img className={style.addFrIcon} src={Images.ADDFR_ICON} alt="icon" />
+                <Box className={style.friendRequestBtn} onClick={() => handleShowFrRequest(true)}>
+                    <img className={style.friendRequestIcon} src={Images.ADDFR_ICON} alt="icon" />
                     <Typography>Friend Request</Typography>
                 </Box>
             )}
@@ -92,17 +93,18 @@ const ChatUserList = ({showFriendList, handleShowFrRequest}) => {
 };
 const useStyle = makeStyles((theme) => ({
     searchInput : {
-        borderRadius : '100rem'
+        borderRadius : '100rem',
+        fontSize : '.85rem',
     },
     searchIcon: {
         fontSize: "30px",
     },
-    addFrIcon: {
+    friendRequestIcon: {
         width: "52px",
         height: "52px",
         marginRight: theme.spacing(2),
     },
-    addFrBtn: {
+    friendRequestBtn: {
         display: "flex",
         alignItems: "center",
         padding: theme.spacing(1),
@@ -111,5 +113,9 @@ const useStyle = makeStyles((theme) => ({
             backgroundColor: theme.palette.grey[200],
         },
     },
+    addFriendBtn:{
+        padding : '8px',
+        marginLeft : theme.spacing(1)
+    }
 }));
 export default ChatUserList;

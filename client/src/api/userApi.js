@@ -8,6 +8,10 @@ const UserApi = {
     updateInfo(info)  {
         const url = '/api/user/update'
         return axiosClient.put(url,info)
+    },
+    searchFriends(params) {
+        const url = '/api/searchs'
+        return axiosClient.get(url,{params})
     }
 }
 export default UserApi

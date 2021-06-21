@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar,Backdrop,Badge,Box,Button,CircularProgress,Dialog,DialogActions,DialogContent,DialogTitle,IconButton,TextField,Typography,Zoom,} from '@material-ui/core';
-import { Close, PhotoCamera, BorderColor } from '@material-ui/icons';
+import { Avatar,Backdrop,Badge,Box,Button,CircularProgress,DialogActions,DialogContent,IconButton,TextField,Typography,Zoom,} from '@material-ui/core';
+import { PhotoCamera, BorderColor } from '@material-ui/icons';
 import {useForm} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -10,6 +10,7 @@ import { updateUserInfo } from '../../actions/userAction';
 import { readFileAsBase64 } from '../../utils';
 import UserApi from '../../api/userApi';
 import useAlert from '../../hooks/alert';
+import ModalBase from '../ModalBase';
 const Transition = React.forwardRef((props, ref) => {
     return <Zoom ref={ref} {...props} />;
 });
@@ -36,6 +37,7 @@ const UserModal = ({ open, onClose }) => {
     };
     const handleModalClose = () => {
         setEdit({fname: false,lname: false})
+        setAvatar(user.info.avatar)
         reset() //reset to default value
     }
     const handleAvatarChange = async (e) => {
@@ -55,8 +57,7 @@ const UserModal = ({ open, onClose }) => {
         }
     }
     const isSubmitable = () => {
-        const avatar = watch('avatar')
-        if(avatar && avatar.length)
+        if(watch('avatar') && watch('avatar').length)
             return true
         return Object.keys(edit).some(key => edit[key]) && isDirty
     }
@@ -96,22 +97,13 @@ const UserModal = ({ open, onClose }) => {
         setAvatar(user.info.avatar)
     },[user.info,reset])
     return (
-        <Dialog
+        <ModalBase
             open={open}
             TransitionComponent={Transition}
-            classes={{ paper: style.dialog }}
+            onClose={onClose}
             onExited={handleModalClose}
             disableBackdropClick
-        >
-            <DialogTitle disableTypography>
-                <Typography variant="h6">User Information</Typography>
-                <IconButton
-                    onClick={onClose}
-                    classes={{ root: style.closeBtn }}
-                >
-                    <Close />
-                </IconButton>
-            </DialogTitle>
+            title='User Information'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <input accept="image/*" 
                     id="icon-button-file" 
@@ -120,12 +112,12 @@ const UserModal = ({ open, onClose }) => {
                     {...register('avatar')}
                     onChange={handleAvatarChange}
                 />
-                <DialogContent dividers>
-                    <Box height="180px" mx={-2} position="relative">
+                <DialogContent dividers classes={{dividers : style.dialogContent}}>
+                    <Box height="150px" mx={-1.5} position="relative">
                         <img
                             className={style.backgroundImg}
                             src="https://cover-talk.zadn.vn/0/4/b/2/3/02b40a29341081a8e6a005375f6ffcf0.jpg"
-                            alt=""
+                            alt="img"
                         />
                         <Box
                             className={style.avatarContainer}
@@ -142,7 +134,7 @@ const UserModal = ({ open, onClose }) => {
                                 badgeContent={
                                     <label htmlFor="icon-button-file">
                                         <IconButton classes={{ root: style.uploadBtn }} component='span'>
-                                            <PhotoCamera />
+                                            <PhotoCamera fontSize='small'/>
                                         </IconButton>
                                     </label>
                                 }
@@ -154,7 +146,7 @@ const UserModal = ({ open, onClose }) => {
                             </Badge>
                         </Box>
                     </Box>
-                    <Box textAlign="center" mt={8}>
+                    <Box textAlign="center" mt={6.5}>
                         <Typography variant="h6">{`${user.info.firstname} ${user.info.lastname}`}</Typography>
                     </Box>
                     <Box mt={3}>
@@ -162,7 +154,7 @@ const UserModal = ({ open, onClose }) => {
                             <Typography color="textSecondary">Email:</Typography>
                             <Typography classes={{root : style.textInfo}}>{user.info.email}</Typography>
                         </Box>
-                        <Box display="flex" mt={1.5} alignItems="center">
+                        <Box display="flex" mt={1} alignItems="center">
                             <Typography color="textSecondary">
                                 Firstname:
                             </Typography>
@@ -192,7 +184,7 @@ const UserModal = ({ open, onClose }) => {
                                 <BorderColor classes={{ root: style.svgIcon }} />
                             </IconButton>
                         </Box>
-                        <Box display="flex" mt={1.5} alignItems="center">
+                        <Box display="flex" mt={1} alignItems="center">
                             <Typography color="textSecondary">Lastname:</Typography>
                             {edit.lastname ? (
                                 <TextField 
@@ -223,10 +215,14 @@ const UserModal = ({ open, onClose }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose} color="secondary">
+                    <Button onClick={onClose} color="default" classes={{root : style.dialogBtn}}>
                         Cancel
                     </Button>
-                    <Button color="primary" type='submit'
+                    <Button 
+                        classes={{root : style.dialogBtn}}
+                        color="primary" 
+                        type='submit'
+                        variant='contained'
                         disabled={!isSubmitable()}
                     >Update</Button>
                 </DialogActions>
@@ -234,7 +230,7 @@ const UserModal = ({ open, onClose }) => {
             <Backdrop open={isSubmitting} classes={{root : style.backdrop}}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-        </Dialog>
+        </ModalBase>
     );
 };
 

@@ -47,7 +47,10 @@ const MessageBox = () => {
             text : data.message,
             media : [].concat(data.media || [])
         }
-        dispatch(addMessage(msg))
+        if(!data.message && !data.media)
+            msg.text = ':like:'
+        console.log(msg)
+        dispatch(addMessage(msg,user))
         reset()
     };
     if(!user._id)
@@ -91,17 +94,15 @@ const MessageBox = () => {
             <Box
                 flex={1}
                 display="flex"
-                overflow="auto"
-                flexDirection="column-reverse"
-            >
+                overflowx="auto"
+                flexDirection="column-reverse">
                 {
                     messages.map(msg => (
                         <Message 
-                            key={msg} 
+                            key={msg+Math.random()} 
                             msg={msg} 
                             user={messageState.user}
-                            self={msg.sender === userState.info._id}
-                        />
+                            self={msg.sender === userState.info._id}/>
                     ))
                 }
             </Box>

@@ -9,9 +9,11 @@ import {useData} from "../../context/DataContext";
 import {useHistory} from "react-router";
 import ChatUserList from "../../components/ChatUserList";
 import FriendRequest from '../../components/FriendRequest'
+import SearchModal from "../../components/SearchModal";
 const HomePage = () => {
     const [userModal, setUserModal] = useState(false);
     const [pwdModal, setPwdModal] = useState(false);
+    const [searchModal,setSearchModal] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const [showFriendList,setShowFriendList] = useState(false)
     const [showFrRequest,setShowFrRequest] = useState(false) 
@@ -97,7 +99,10 @@ const HomePage = () => {
             </Box>
             <Box display="flex" position="relative" flex={1} height="100%">
                 <Box width="336px" className={style.chatList} height="100%">
-                    <ChatUserList showFriendList={showFriendList} handleShowFrRequest={(val)=>setShowFrRequest(val)}/>
+                    <ChatUserList 
+                        showFriendList={showFriendList} 
+                        handleShowFrRequest={(val)=>setShowFrRequest(val)}
+                        handleShowSearchModal={()=>setSearchModal(true)}/>
                 </Box>
                 <Box flex={1} height="100%" className={style.messageBox}>
                     {
@@ -108,6 +113,7 @@ const HomePage = () => {
             </Box>
             <UserModal open={userModal} onClose={() => setUserModal(false)} />
             <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} />
+            <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} />
         </Box>
     );
 };
@@ -115,7 +121,7 @@ const useStyle = makeStyles((theme) => ({
     sidebar: {
         width: "64px",
         height: "100%",
-        backgroundColor: "#0091ff",
+        backgroundColor: theme.palette.primary.main,
     },
     avatar: {
         width: "48px",

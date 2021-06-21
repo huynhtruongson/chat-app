@@ -5,18 +5,27 @@ const MessageReducer = (state, action) => {
         case GET_USER_MESSAGE:
             return {...state, user: {...action.payload},messages : []};
         case ADD_MESSAGE:
+            const cvArr = [...state.conversations]
+            const {msg,user} = action.payload
+            const index = cvArr.findIndex(cv => cv._id === msg.sender || cv._id === msg.recipient)
+            if(index !== -1) {
+                cvArr[index] = {...cvArr[index],text : msg.text,media : msg.media}
+                cvArr.sort((currCv,nextCv) => {
+                    if(currCv._id === cvArr[index]._id)
+                        return -1
+                    else if(nextCv._id === cvArr[index]._id)
+                        return 1
+                    return 0
+                })
+            }
+            else { 
+                const newCv = {...user,text : msg.text,media : msg.media}
+                cvArr.unshift(newCv)
+            }
             return {
                 ...state,
-                messages: [{...action.payload}, ...state.messages],
-                conversations: state.conversations.map((cv) =>
-                    cv.id === action.payload.sender || cv.id === action.payload.recipient
-                        ? {
-                              ...cv,
-                              text: action.payload.text,
-                              media: action.payload.medi,
-                          }
-                        : cv
-                ),
+                messages: [{...msg}, ...state.messages],
+                conversations: cvArr,
             };
         case GET_CONVERSATIONS: 
             return {
