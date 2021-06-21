@@ -1,3 +1,5 @@
+const mongoose = require('mongoose')
+
 const conversationModel = require('../models/conversationModel')
 const messageModel = require('../models/messageModel')
 const cloudinary = require('../config/cloudinary')
@@ -6,23 +8,24 @@ const AccountModel = require('../models/AccountModel')
 module.exports.conversationList = async (req, res) => {
     try{
         let {time} = req.params
+
         let pageSkip = undefined
         if(!parseInt(time)){
             throw new Error ("Resquest is not a number type")
         }
-        
-        let countConversation = await conversationModel.countDocuments({users: req.user.id})
-        console.log(Math.ceil(countConversation/10))
-        // if(Math.ceil(countConversation/10) < parseInt( time )){
-        //     return res.json({message:"End of list"})
-        // } 
-        // pageSkip = (parseInt(time)-1)*10
+        let countConversation = await conversationModel.find({party: req.user.id})
 
-        // let messlist = await message.find({}).populate('user').populate('user_id','_id user_name avatar').sort({'date': 'desc'}).limit(10).skip(parseInt(pageSkip))
+        if(Math.ceil(countConversation/10) < parseInt( time )){
+            return res.json({message:"End of list"})
+        } 
+        pageSkip = (parseInt(time)-1)*10
+
+        let conversationList = await conversationModel.find({party: req.user.id}).sort({'date': 'desc'}).limit(10).skip(pageSkip)
+        
         return res.json({
-                message: '',
+                message: 'get conversation list success',
                 total:(Math.ceil(countConversation/10)),
-                // data:messlist
+                data:conversationList
             })
     }
     catch(err){
@@ -36,19 +39,23 @@ module.exports.addMessage = async (req, res) => {
         let {text,receiver} = req.body
         let {file} = req.files
 
+        if (!receiver) {
+            throw new Error ("error message")
+        }
+
         if (!text && !file ) {
             throw new Error ("error message")
         }
 
-        let checkReceiver = await AccountModel.findById(receiver)
-
+        let checkReceiver = await AccountModel.findById(mongoose.Types.ObjectId(receiver))    
+        
         if (!checkReceiver) {
             throw new Error ("error message - 404")
         }
 
         let promiseArr = []
         let messageMedia = []
-
+        let listError = []
 
         if(file){
             
@@ -95,7 +102,7 @@ module.exports.addMessage = async (req, res) => {
                 }
                 
                 let uploadInf = await Promise.all(promiseArr)
-                let listError = []
+                
                 
                 for (let i = 0; i < uploadInf.length; i++) {
                     
@@ -126,11 +133,11 @@ module.exports.addMessage = async (req, res) => {
 
         let conversationUpdate = await conversationModel.findOneAndUpdate({ 
             $or: [
-                { party: [req.user.id, receiver] }, 
-                { party: [receiver, req.user.id] }
+                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(receiver)] }, 
+                { party: [mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] }
             ]},
             {
-                party: [receiver, req.user.id] ,
+                party: [ mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] ,
                 text: text,
                 media: messageMedia
             },
@@ -138,9 +145,9 @@ module.exports.addMessage = async (req, res) => {
         )
         
 
-        let new_message = new messageMedia({
-            sender: req.user.id,
-            receiver: receiver,
+        let new_message = new messageModel({
+            sender: mongoose.Types.ObjectId(req.user.id),
+            receiver: mongoose.Types.ObjectId(receiver),
             text: String,
             media: messageMedia,
         })

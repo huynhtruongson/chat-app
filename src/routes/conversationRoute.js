@@ -6,7 +6,7 @@ var multipartMiddleware = multipart();
 const checkLogin = require('../auth/checkLogin')
 const {conversationList, addMessage} = require('../controllers/conversationController')
 
-Router.route('/list/:time').get(conversationList)
+Router.route('/list/:time').get(checkLogin, conversationList)
 
 Router.route('/add-message').post(checkLogin, multipartMiddleware, addMessage)
 

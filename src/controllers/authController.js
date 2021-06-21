@@ -125,7 +125,7 @@ module.exports.registerController = async (req, res) =>{
         }
         let {email, firstname, lastname, password} = req.body
         var token = crypto.randomBytes(48).toString('hex')
-
+        let fullname = firstname + " " + lastname
         
         let checkExist = await AccountModel.findOne({email: email})
 
@@ -136,6 +136,7 @@ module.exports.registerController = async (req, res) =>{
         let password_hash = await bcrypt.hash(password,10)
         let account = await new AccountModel({
             email: email,
+            fullname: fullname,
             firstname: firstname,
             lastname: lastname,
             password: password_hash,
