@@ -1,9 +1,9 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { Redirect, Route } from 'react-router'
-import { useData } from '../../context/DataContext'
 
 const PrivateRoute = ({children,...props}) => {
-    const {user : [{isLogged}]} = useData()
+    const {isLogged} = useSelector(state => state.user)
     return (
         <Route 
             {...props} 

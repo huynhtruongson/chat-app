@@ -1,6 +1,5 @@
 import './App.css';
 import ThemeProvider from './assets/styles/ThemeProvider';
-import {DataProvider} from './context/DataContext'
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 // import { CssBaseline } from '@material-ui/core';
 import LoginPage from './pages/Login';
@@ -12,10 +11,21 @@ import NotFoundPage from './pages/NotFound'
 import PrivateRoute from './components/PrivateRoute';
 import AuthRoute from './components/AuthRoute'
 import ResetPwdPage from './pages/ResetPwd';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserInfo } from './actions/userAction';
 function App() {
+    const {isLogged} = useSelector(state => state.user) 
+    const dispatch = useDispatch()
+    useEffect(() => {
+        const fetchUserInfo = () => {
+            if(isLogged)
+                dispatch(getUserInfo(localStorage.getItem('token')))
+        }
+        fetchUserInfo()
+    },[isLogged,dispatch])
     return (
         <ThemeProvider>
-            <DataProvider>
                 {/* <CssBaseline/> */}
                 <Router>
                     <Switch>
@@ -40,7 +50,6 @@ function App() {
                         <Route component={NotFoundPage} />
                     </Switch>
                 </Router>
-            </DataProvider>
         </ThemeProvider>
     );
 }

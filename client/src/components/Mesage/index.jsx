@@ -12,7 +12,7 @@ const Message = ({user, self, msg}) => {
             <Box minWidth='40px' mr={1}>
                 {!self && <Avatar src={user.avatar} />}
             </Box>
-            <Box display='flex' flexDirection='column' alignItems='flex-end'>
+            <Box display='flex' flexDirection='column' align9Items='flex-end'>
                 {!!msg.text && msg.text === ':like:' ? (
                     <ThumbUp fontSize='large' color='primary'/>
                 ) : (

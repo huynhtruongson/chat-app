@@ -1,23 +1,24 @@
 import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
 import {Info,PhotoLibrary,AttachFile,ThumbUp,EmojiEmotionsRounded,Send, CancelOutlined,Description} from '@material-ui/icons';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
 import Message from '../Mesage';
-import {useData} from '../../context/DataContext'
 import { addMessage } from '../../actions/messageAction';
 import Images from '../../constants/Images'
+import { useDispatch, useSelector } from 'react-redux';
 const MessageBox = () => {
+    console.log('rednder')
     const style = useStyle();
     const [anchorEl, setAnchoEl] = useState(null);
     const { register, handleSubmit, setValue, getValues, watch,reset } = useForm();
     const chatFileRef = useRef();
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
-    const {message : [messageState,dispatch],user:[userState]} = useData()
-    const {activeConv,messages} = messageState
-    const [msgData,setMsgData] = useState({})
+    const {info} = useSelector(state => state.user)
+    const {messages,activeConv} = useSelector(state => state.message)
+    const dispatch = useDispatch()
     const handleClickIcon = (icon) => {
         setValue('message', getValues('message') + icon);
     };
@@ -41,23 +42,17 @@ const MessageBox = () => {
         setValue('media',currentFiles)
     }
     const onSubmit = (data) => {
-        console.log(data);
         const msg = {
-            sender : userState.info._id,
+            sender : info._id,
             recipient : activeConv._id,
             text : data.message,
             media : [].concat(data.media || [])
         }
         if(!data.message && !data.media)
             msg.text = ':like:'
-        console.log(msg)
         dispatch(addMessage(msg,activeConv))
         reset()
     };
-    useEffect(()=> {
-        const data = messages.find(msg => msg._id === activeConv._id)
-        setMsgData(data)
-    },[activeConv._id,messages])
     if(!activeConv._id)
         return (
             <Box position='relative' height='100%'>
@@ -102,12 +97,12 @@ const MessageBox = () => {
                 overflow="auto"
                 flexDirection="column-reverse">
                 {
-                    msgData && msgData.data.map(msg => (
+                    messages && messages.map(msg => (
                         <Message 
                             key={msg+Math.random()} 
                             msg={msg} 
                             user={activeConv}
-                            self={msg.sender === userState.info._id}/>
+                            self={msg.sender === info._id}/>
                     ))
                 }
             </Box>
@@ -198,9 +193,11 @@ const MessageBox = () => {
                         />
                     </Box>
                     <IconButton type="submit" color="primary">
-                        {watch('message') ? <Send /> : <ThumbUp />}
+                        {/* {watch('message') || watch('media') ? <Send /> : <ThumbUp />} */}
+                        <Send />
                     </IconButton>
                 </Box>
+                <input type="text" />
             </form>
             <Popover
                 open={!!anchorEl}
@@ -291,8 +288,6 @@ const useStyle = makeStyles((theme) => ({
         display:'-webkit-box',
         '-webkit-line-clamp': 2,
         '-webkit-box-orient': 'vertical',
-        // webkitLineClamp : 3,
-        // webkitBoxOrient : 'vertical',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         wordBreak: 'break-word',

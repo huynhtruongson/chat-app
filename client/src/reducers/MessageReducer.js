@@ -1,9 +1,13 @@
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from '../actions/type';
-
-const MessageReducer = (state, action) => {
+import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from '../actions/type';
+const initialState = {
+    conversations: [],
+    activeConv: {},
+    messages: [],
+}
+const MessageReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_USER_MESSAGE:
-            return {...state, activeConv: action.payload};
+            return {...state, activeConv: action.payload,messages : []};
         case ADD_MESSAGE:
             const cvArr = [...state.conversations];
             const {msg, user} = action.payload;
@@ -23,14 +27,10 @@ const MessageReducer = (state, action) => {
             }
             return {
                 ...state,
-                messages: state.messages.map((cv) =>
-                    cv._id === msg.sender || cv._id === msg.recipient
-                        ? {...cv, data: [msg,...cv.data]}
-                        : cv
-                ),
+                messages: [msg,...state.messages],
                 conversations: cvArr,
             };
-        case GET_CONVERSATIONS:
+        case UPDATE_CONVERSATIONS:
             return {
                 ...state,
                 conversations: action.payload,
@@ -39,7 +39,7 @@ const MessageReducer = (state, action) => {
         case GET_MESSAGES:
             return {
                 ...state,
-                messages: [...state.messages, action.payload],
+                messages: action.payload
             };
         default:
             return state;

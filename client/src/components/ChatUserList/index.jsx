@@ -1,19 +1,15 @@
 import {Box, makeStyles, TextField, Typography,IconButton} from "@material-ui/core";
 import {Search,PersonAdd} from "@material-ui/icons";
 import {useEffect} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {getConversations, getUserMessage} from "../../actions/messageAction";
-import MessageApi from "../../api/messageApi";
 import Images from "../../constants/Images";
-import {useData} from "../../context/DataContext";
 import ChatCard from "../ChatCard";
 const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
     const style = useStyle();
-    const {
-        message: [messageState, dispatch],
-        user: [userState],
-    } = useData();
-    const {conversations, activeConv} = messageState;
-    const {friends} = userState.info;
+    const {info : {_id : userId,friends}} = useSelector(state => state.user)
+    const {conversations,activeConv} = useSelector(state => state.message)
+    const dispatch = useDispatch()
     const handleClickUserConversations = (id) => {
         if (activeConv._id === id) return;
         const user = conversations[conversations.findIndex((cv) => cv._id === id)];
@@ -26,26 +22,8 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
         handleShowFrRequest(false);
     };
     useEffect(() => {
-        const fetchConversations = async (id) => {
-            try {
-                if (!id) return;
-                const res = await MessageApi.getConversations();
-                if (res.status === 200) {
-                    const formatConv = [];
-                    res.data.forEach((cv) => {
-                        cv.recipients.forEach((user) => {
-                            if (user._id !== id)
-                                formatConv.push({...user, text: cv.text, media: cv.media});
-                        });
-                    });
-                    dispatch(getConversations(formatConv));
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        fetchConversations(userState.info._id);
-    }, [dispatch, userState.info._id]);
+        dispatch(getConversations(userId))
+    }, [dispatch,userId]);
     return (
         <Box>
             <Box display="flex" alignItems="center" px={1} mt={3}>
