@@ -37,11 +37,10 @@ module.exports.loginController =  async(req, res) => {
                 if(err) throw err
                 return res.status(200).json({
                     message: "Login success",
-                    token: token
+                    data: token
                 })
             })
-
-            
+   
         }else{
             let messages = result.mapped()
             let message = ''
