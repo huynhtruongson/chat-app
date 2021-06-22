@@ -17,7 +17,7 @@ const schema = yup.object().shape({
 })
 function LoginPage() {
     const style = useStyle();
-    const {token : [token,setToken]} = useData()
+    const {token : [,setToken]} = useData()
     const {register,handleSubmit, formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })

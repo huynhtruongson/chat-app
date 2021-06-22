@@ -1,12 +1,9 @@
 import React from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, makeStyles, TextField, Typography, Zoom } from '@material-ui/core';
-import { Close } from '@material-ui/icons';
+import { Button, DialogActions, DialogContent, makeStyles, TextField } from '@material-ui/core';
 import {useForm} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-const Transition = React.forwardRef((props, ref) => {
-    return <Zoom ref={ref} {...props} />;
-});
+import ModalBase from '../ModalBase';
 const schema = yup.object().shape({
     password : yup.string().required('Password is required'),
     new_password : yup.string().min(6,'Password must at least 6 characters long!').required('Password is required!'),
@@ -21,28 +18,20 @@ const PasswordModal = ({open,onClose}) => {
         console.log(data)
     }
     return (
-        <Dialog
+        <ModalBase
             open={open}
-            TransitionComponent={Transition}
-            classes={{ paper: style.dialog }}
             onExit={()=> reset()}
             disableBackdropClick
+            title='Change Password'
+            onClose={onClose}
         >
-            <DialogTitle disableTypography>
-                <Typography variant="h6">Change password</Typography>
-                <IconButton
-                    onClick={onClose}
-                    classes={{ root: style.closeBtn }}
-                >
-                    <Close />
-                </IconButton>
-            </DialogTitle>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <DialogContent dividers classes={{root : style.formContainer}}>
+                <DialogContent dividers classes={{root : style.dialogContent}}>
                     <TextField
                         variant='outlined'
                         label='Password'
                         fullWidth
+                        type='password'
                         InputProps={{classes : {input : style.input}}}
                         InputLabelProps={{classes : {outlined : style.label}}}
                         {...register('password')}
@@ -73,34 +62,33 @@ const PasswordModal = ({open,onClose}) => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose} color="secondary">
+                    <Button classes={{root : style.dialogBtn}} onClick={onClose} color="default">
                         Cancel
                     </Button>
-                    <Button color="primary" type='submit'>Update</Button>
+                    <Button classes={{root : style.dialogBtn}} color="primary" type='submit' variant='contained'>
+                        Update
+                    </Button>
                 </DialogActions>
             </form>
-        </Dialog>
+        </ModalBase>
     )
 }
 const useStyle = makeStyles(theme => ({
-    dialog: {
-        width: '480px',
-    },
-    closeBtn: {
-        position: 'absolute',
-        top: theme.spacing(1),
-        right: theme.spacing(1),
-    },
     input: {
         padding : '14px'
     },
     label: {
         transform: 'translate(14px, 16px) scale(1)',
     },
-    formContainer : {
+    dialogContent: {
+        padding: theme.spacing(1.5),
         '& .MuiTextField-root' : {
             marginBottom : theme.spacing(1.5)
         }
+    },
+    dialogBtn : {
+        fontSize:'.9rem',
+        textTransform : 'initial'
     }
 }))
 export default PasswordModal

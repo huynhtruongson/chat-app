@@ -5,6 +5,7 @@ import GOOGLE_ICON from '../assets/images/google-icon.png'
 import FORGOT_LOGO from '../assets/images/forgot-logo.jpg'
 import AUTH_BG from '../assets/images/auth-bg.jpg'
 import RESET_LOGO from '../assets/images/reset-logo.jpg'
+import ADDFR_ICON from '../assets/images/addfr-icon.png'
 const Images = {
     TDT_LOGO,
     CHAT_LOGO,
@@ -12,6 +13,7 @@ const Images = {
     GOOGLE_ICON,
     AUTH_BG,
     FORGOT_LOGO,
-    RESET_LOGO
+    RESET_LOGO,
+    ADDFR_ICON
 }
 export default Images

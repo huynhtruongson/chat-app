@@ -1,35 +1,23 @@
-import {
-    Avatar,
-    Box,
-    IconButton,
-    InputAdornment,
-    makeStyles,
-    Popover,
-    TextField,
-    Typography,
-} from '@material-ui/core';
-import {
-    Info,
-    PhotoLibrary,
-    AttachFile,
-    ThumbUp,
-    EmojiEmotionsRounded,
-    Send,
-    CancelOutlined
-} from '@material-ui/icons';
-import { useState, useRef } from 'react';
+import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
+import {Info,PhotoLibrary,AttachFile,ThumbUp,EmojiEmotionsRounded,Send, CancelOutlined,Description} from '@material-ui/icons';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
 import Message from '../Mesage';
-
+import {useData} from '../../context/DataContext'
+import { addMessage } from '../../actions/messageAction';
+import Images from '../../constants/Images'
 const MessageBox = () => {
     const style = useStyle();
     const [anchorEl, setAnchoEl] = useState(null);
-    const { register, handleSubmit, setValue, getValues, watch } = useForm();
+    const { register, handleSubmit, setValue, getValues, watch,reset } = useForm();
     const chatFileRef = useRef();
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
+    const {message : [messageState,dispatch],user:[userState]} = useData()
+    const {activeConv,messages} = messageState
+    const [msgData,setMsgData] = useState({})
     const handleClickIcon = (icon) => {
         setValue('message', getValues('message') + icon);
     };
@@ -54,7 +42,31 @@ const MessageBox = () => {
     }
     const onSubmit = (data) => {
         console.log(data);
+        const msg = {
+            sender : userState.info._id,
+            recipient : activeConv._id,
+            text : data.message,
+            media : [].concat(data.media || [])
+        }
+        if(!data.message && !data.media)
+            msg.text = ':like:'
+        console.log(msg)
+        dispatch(addMessage(msg,activeConv))
+        reset()
     };
+    useEffect(()=> {
+        const data = messages.find(msg => msg._id === activeConv._id)
+        setMsgData(data)
+    },[activeConv._id,messages])
+    if(!activeConv._id)
+        return (
+            <Box position='relative' height='100%'>
+                <Box className={style.bgcGreeting} textAlign='center'>
+                    <img src={Images.CHAT_LOGO2} className={style.bgcImage} alt='img'/>
+                    <Typography variant='h5'>Welcome to Chat App</Typography>
+                </Box>
+            </Box>
+        )
     return (
         <Box display="flex" flexDirection="column" height="100%">
             <Box
@@ -65,13 +77,13 @@ const MessageBox = () => {
                 p={1}
             >
                 <Box display="flex" alignItems="center">
-                    <Avatar classes={{ root: style.avatar }} />
+                    <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
                     <Box ml={0.8}>
                         <Typography
                             classes={{ root: style.username }}
                             variant="subtitle2"
                         >
-                            Tấn Vinh
+                            {`${activeConv.firstname} ${activeConv.lastname}`}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                             Active now
@@ -88,23 +100,16 @@ const MessageBox = () => {
                 flex={1}
                 display="flex"
                 overflow="auto"
-                flexDirection="column-reverse"
-            >
-                <Message self={true}>
-                    1Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure qui maxime accusamus asperiores dolores, voluptatem
-                    placeat dolore ex a
-                </Message>
-                <Message>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure qui maxime accusamus asperiores dolores, voluptatem
-                    placeat dolore ex a
-                </Message>
-                <Message avatar>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure qui maxime accusamus asperiores dolores, voluptatem
-                    placeat dolore ex a
-                </Message>
+                flexDirection="column-reverse">
+                {
+                    msgData && msgData.data.map(msg => (
+                        <Message 
+                            key={msg+Math.random()} 
+                            msg={msg} 
+                            user={activeConv}
+                            self={msg.sender === userState.info._id}/>
+                    ))
+                }
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Box display="flex" alignItems="flex-end" py={0.8} borderTop='1px solid #bdbdbd'>
@@ -151,13 +156,17 @@ const MessageBox = () => {
                                                 controls
                                                 className={style.mediaMessage}
                                             />
-                                        ) : (
+                                        ) : media.type.match(/image/i) ? (
                                             <img
                                                 src={URL.createObjectURL(media)}
                                                 alt="img"
                                                 className={style.mediaMessage}  
                                             />
-                                        )}
+                                        ) : <Box display='flex' height='100%' alignItems='center' width='120px'>
+                                                <Description/>
+                                                <Typography className={style.mediaFileName} variant='body2'>{media.name}</Typography>
+                                            </Box>
+                                        }
                                         <span className={style.mediaMessageIcon} onClick={()=>handleRemoveMedia(index)}>
                                             <CancelOutlined/>
                                         </span>
@@ -167,7 +176,6 @@ const MessageBox = () => {
                         <TextField
                             inputRef={inputRef}
                             {...inputRest}
-                            multiline
                             fullWidth
                             variant="outlined"
                             placeholder="Aa"
@@ -270,5 +278,24 @@ const useStyle = makeStyles((theme) => ({
         boxShadow : theme.shadows[1],
         flex : 'none'
     },
+    bgcImage : {
+        width : '450px',
+    },
+    bgcGreeting : {
+        position : 'absolute',
+        top : '50%',
+        left : '50%',
+        transform : 'translate(-50%,-50%)'
+    },
+    mediaFileName : {
+        display:'-webkit-box',
+        '-webkit-line-clamp': 2,
+        '-webkit-box-orient': 'vertical',
+        // webkitLineClamp : 3,
+        // webkitBoxOrient : 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        wordBreak: 'break-word',
+    }
 }));
 export default MessageBox;
