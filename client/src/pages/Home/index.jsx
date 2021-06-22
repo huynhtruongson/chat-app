@@ -5,19 +5,20 @@ import {userLogout} from "../../actions/userAction";
 import MessageBox from "../../components/MessageBox";
 import PasswordModal from "../../components/PwdModal";
 import UserModal from "../../components/UserModal";
-import {useData} from "../../context/DataContext";
 import {useHistory} from "react-router";
 import ChatUserList from "../../components/ChatUserList";
 import FriendRequest from '../../components/FriendRequest'
 import SearchModal from "../../components/SearchModal";
+import { useDispatch } from "react-redux";
 const HomePage = () => {
+    console.log('home page render')
     const [userModal, setUserModal] = useState(false);
     const [pwdModal, setPwdModal] = useState(false);
     const [searchModal,setSearchModal] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const [showFriendList,setShowFriendList] = useState(false)
     const [showFrRequest,setShowFrRequest] = useState(false) 
-    const {user: [,dispatch]} = useData();
+    const dispatch = useDispatch()
     const history = useHistory();
     const style = useStyle();
     const handleLogOut = () => {
@@ -105,15 +106,16 @@ const HomePage = () => {
                         handleShowSearchModal={()=>setSearchModal(true)}/>
                 </Box>
                 <Box flex={1} height="100%" className={style.messageBox}>
-                    {
-                        (showFrRequest && showFriendList)
-                        ? <FriendRequest/> : <MessageBox />
-                    }
+                    
+                        {/* (showFrRequest && showFriendList)
+                        ? <FriendRequest/> : <MessageBox /> */}
+                        <MessageBox/>
+                    
                 </Box>
             </Box>
-            <UserModal open={userModal} onClose={() => setUserModal(false)} />
-            <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} />
-            <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} />
+            {/* <UserModal open={userModal} onClose={() => setUserModal(false)} /> */}
+            {/* <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} /> */}
+            {/* <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} /> */}
         </Box>
     );
 };

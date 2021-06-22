@@ -10,14 +10,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
 import AuthApi from '../../api/authApi';
 import useAlert from '../../hooks/alert'
-import { useData } from '../../context/DataContext';
+import { useDispatch } from 'react-redux';
+import { userLoginSuccess } from '../../actions/userAction';
 const schema = yup.object().shape({
     email : yup.string().email('Invalid email!').required('Email is required!'),
     password : yup.string().required('Password is required!')
 })
 function LoginPage() {
     const style = useStyle();
-    const {token : [,setToken]} = useData()
+    const dispatch  = useDispatch()
     const {register,handleSubmit, formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
@@ -29,7 +30,7 @@ function LoginPage() {
             if(res.status === 200) {
                 localStorage.setItem('token',res.token)
                 AuthApi.setHeaderAxios(res.token)
-                setToken(res.token)
+                dispatch(userLoginSuccess())
                 history.push('/')
             }
         } catch (error) {

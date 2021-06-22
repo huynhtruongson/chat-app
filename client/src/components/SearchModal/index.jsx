@@ -1,9 +1,9 @@
 import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress,} from "@material-ui/core";
 import {Search} from "@material-ui/icons";
 import React, {useState} from "react";
+import { useDispatch } from "react-redux";
 import { getUserMessage } from "../../actions/messageAction";
 import UserApi from "../../api/userApi";
-import { useData } from "../../context/DataContext";
 import ModalBase from "../ModalBase";
 import UserCard from "../UserCard";
 import UserProfile from "../UserProfile";
@@ -13,7 +13,7 @@ const SearchModal = ({open, onClose}) => {
     const [searchList, setSearchList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [userDetail, setUserDetail] = useState(null);
-    const {message : [,dispatch]} = useData()
+    const dispatch = useDispatch()
     const handleSearch = async () => {
         try {
             setLoading(true);

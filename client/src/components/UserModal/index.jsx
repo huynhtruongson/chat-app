@@ -4,13 +4,13 @@ import { PhotoCamera, BorderColor } from '@material-ui/icons';
 import {useForm} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import {useData} from '../../context/DataContext'
 import useStyle from './style'
 import { updateUserInfo } from '../../actions/userAction';
 import { readFileAsBase64 } from '../../utils';
 import UserApi from '../../api/userApi';
 import useAlert from '../../hooks/alert';
 import ModalBase from '../ModalBase';
+import { useDispatch, useSelector } from 'react-redux';
 const Transition = React.forwardRef((props, ref) => {
     return <Zoom ref={ref} {...props} />;
 });
@@ -21,8 +21,8 @@ const schema = yup.object().shape({
 })
 const UserModal = ({ open, onClose }) => {
     const [edit, setEdit] = useState({firstname: false,lastname: false});
-    const {user : [user,dispatch]} = useData()
     const [avatar,setAvatar] = useState(null)
+    const {info} = useSelector(state => state.user)
     const {_alert} = useAlert()
     const style = useStyle(edit);
     const {register,handleSubmit,formState : {errors,isDirty,isSubmitting},reset,setValue,watch} = useForm({
@@ -32,12 +32,13 @@ const UserModal = ({ open, onClose }) => {
     })
     const {ref : fnameRef, ...fnameRest} = register('firstname')
     const {ref: lnameRef, ...lnameRest} = register('lastname')
+    const dispatch = useDispatch()
     const handleEditClick = (field) => {
         setEdit({ ...edit, [field]: !edit[field] });
     };
     const handleModalClose = () => {
         setEdit({fname: false,lname: false})
-        setAvatar(user.info.avatar)
+        setAvatar(info.avatar)
         reset() //reset to default value
     }
     const handleAvatarChange = async (e) => {
@@ -91,11 +92,11 @@ const UserModal = ({ open, onClose }) => {
     }
     useEffect(()=>{
         reset({           //set defaultValue to hook-form 
-            firstname : user.info.firstname,
-            lastname : user.info.lastname,
+            firstname : info.firstname,
+            lastname : info.lastname,
         })
-        setAvatar(user.info.avatar)
-    },[user.info,reset])
+        setAvatar(info.avatar)
+    },[info,reset])
     return (
         <ModalBase
             open={open}
@@ -147,12 +148,12 @@ const UserModal = ({ open, onClose }) => {
                         </Box>
                     </Box>
                     <Box textAlign="center" mt={6.5}>
-                        <Typography variant="h6">{`${user.info.firstname} ${user.info.lastname}`}</Typography>
+                        <Typography variant="h6">{`${info.firstname} ${info.lastname}`}</Typography>
                     </Box>
                     <Box mt={3}>
                         <Box display="flex">
                             <Typography color="textSecondary">Email:</Typography>
-                            <Typography classes={{root : style.textInfo}}>{user.info.email}</Typography>
+                            <Typography classes={{root : style.textInfo}}>{info.email}</Typography>
                         </Box>
                         <Box display="flex" mt={1} alignItems="center">
                             <Typography color="textSecondary">
@@ -174,7 +175,7 @@ const UserModal = ({ open, onClose }) => {
                                     variant="subtitle1"
                                     classes={{ root: style.textInfo }}
                                 >
-                                    {user.info.firstname}
+                                    {info.firstname}
                                 </Typography>
                             )}
                             <IconButton
@@ -202,7 +203,7 @@ const UserModal = ({ open, onClose }) => {
                                     variant="subtitle1"
                                     classes={{ root: style.textInfo }}
                                 >
-                                    {user.info.lastname}
+                                    {info.lastname}
                                 </Typography>
                             )}
                             <IconButton
