@@ -142,7 +142,7 @@ const MessageBox = () => {
                     </Box>
                     <Box flex="1" display="flex" flexDirection="column">
                         <Box display="flex" py={1} overflow='auto'>
-                            {watch('media') &&
+                            {/* {watch('media') &&
                                 getValues('media').map((media, index) => (
                                     <Box key={media.name+index} className={style.mediaBox}>
                                         {media.type.match(/video/i) ? (
@@ -166,7 +166,7 @@ const MessageBox = () => {
                                             <CancelOutlined/>
                                         </span>
                                     </Box>
-                                ))}
+                                ))} */}
                         </Box>
                         <TextField
                             inputRef={inputRef}
