@@ -22,9 +22,9 @@ const AccountSchema = new Schema({
         type:Boolean,
         default:false,
     },
-    friend_invite:[String],
-    friend:[String],
-    friend_request:[String],
+    friend_invite_list:[String],
+    friend_list:[String],
+    friend_request_list:[String],
     deleted:[Object],
     blocked:[String]
 },{timestamps:true})
