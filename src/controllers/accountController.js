@@ -5,7 +5,7 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.current = async(req,res)=>{
     try{
-        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar idAdd')
+        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar idAdd friend_request_list fullname friend_list friend_invite_list')
     
         return res.json({
             code:0,
