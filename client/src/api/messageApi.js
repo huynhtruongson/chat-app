@@ -10,7 +10,7 @@ const MessageApi = {
         return axiosClient.get(url)
     },
     addMessage(msg) {
-        const url = 'api/add-message'
+        const url = 'api/conversation/add-message'
         return axiosClient.post(url,msg)
     }
 }

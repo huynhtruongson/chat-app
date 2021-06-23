@@ -60,6 +60,7 @@ const SearchModal = ({open, onClose}) => {
                         user={userDetail} 
                         handleBackClick={()=> setUserDetail(null)}
                         handleChatClick={handleChatClick}
+                        handleRequestClick={()=> handleAddFriend(userDetail._id)}
                         />
                 ) : (
                     <Box>
@@ -87,7 +88,7 @@ const SearchModal = ({open, onClose}) => {
                                         key={user._id}
                                         user={user}
                                         handleClick={() => handleClickUser(user)}
-                                        handleAddFriend={handleAddFriend}
+                                        handleAddFriend={() => handleAddFriend(user._id)}
                                     />
                                 ))
                             ) : (

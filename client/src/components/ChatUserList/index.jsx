@@ -49,7 +49,7 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
             )}
             <Box display="flex" flexDirection="column">
                 {!showFriendList
-                    ? conversations.map((cv) => (
+                    ? conversations?.map((cv) => (
                           <ChatCard
                               active={cv._id === activeConv._id}
                               key={cv._id}
@@ -57,7 +57,7 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
                               handleClickUser={() => handleClickUserConversations(cv._id)}
                           />
                       ))
-                    : friend_list.map((user) => (
+                    : friend_list?.map((user) => (
                           <ChatCard
                               active={user._id === activeConv._id}
                               key={user._id}
