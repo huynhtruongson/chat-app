@@ -7,7 +7,7 @@ const FriendRequest = () => {
         <Box display="flex" flexDirection="column" height="100%">
             <Box display="flex" alignItems="center" borderBottom="1px solid #cacaca" p={1}>
                 <img className={style.addFrIcon} src={Images.ADDFR_ICON} alt="img" />
-                    <Typography variant="h6">Friend Requests</Typography>
+                    <Typography variant="h6">Frien  uests</Typography>
             </Box>
             <Box p={2}>
                 <Box className={style.requestItem}>

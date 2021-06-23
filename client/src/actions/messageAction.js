@@ -11,10 +11,20 @@ export const getUserMessage = (user) => async (dispatch) => {
         console.log(error)
     }
 }
-export const addMessage = (msg,user) => ({
-    type: ADD_MESSAGE,
-    payload: {msg,user},
-});
+export const addMessage = (msg,user) => async (dispatch) => {
+    try {
+        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
+        const msgData = new FormData()
+        msgData.append('text',msg.text)
+        msgData.append('receiver',msg.receiver)
+        const fileArr = []
+        msgData.forEach(file => fileArr.push(file))
+        msgData.append('media',fileArr)
+        await MessageApi.addMessage(msgData)
+    } catch (error) {
+        console.log(error)
+    }
+};
 export const getConversations = (id) => async (dispatch) => {
     try {
         if(!id) return

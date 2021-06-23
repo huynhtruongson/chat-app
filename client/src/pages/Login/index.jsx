@@ -28,8 +28,8 @@ function LoginPage() {
         try {
             const res = await AuthApi.login(data)
             if(res.status === 200) {
-                localStorage.setItem('token',res.token)
-                AuthApi.setHeaderAxios(res.token)
+                localStorage.setItem('token',res.data)
+                AuthApi.setHeaderAxios(res.data)
                 dispatch(userLoginSuccess())
                 history.push('/')
             }

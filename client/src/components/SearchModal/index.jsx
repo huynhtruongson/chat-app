@@ -17,7 +17,7 @@ const SearchModal = ({open, onClose}) => {
     const handleSearch = async () => {
         try {
             setLoading(true);
-            const params = {fullname_like: searchInput};
+            const params = {fullname: searchInput};
             const res = await UserApi.searchFriends(params);
             if (res.status === 200) {
                 setLoading(false);
@@ -41,6 +41,9 @@ const SearchModal = ({open, onClose}) => {
         dispatch(getUserMessage(userDetail))
         onClose()
     }
+    const handleAddFriend = (id) => {
+        UserApi.addFriend(id)
+    }
     return (
         <ModalBase
             open={open}
@@ -57,6 +60,7 @@ const SearchModal = ({open, onClose}) => {
                         user={userDetail} 
                         handleBackClick={()=> setUserDetail(null)}
                         handleChatClick={handleChatClick}
+                        handleRequestClick={()=> handleAddFriend(userDetail._id)}
                         />
                 ) : (
                     <Box>
@@ -78,12 +82,13 @@ const SearchModal = ({open, onClose}) => {
                             </Typography>
                         </Box>
                         <Box textAlign="center" mt={1}>
-                            {searchList.length ? (
+                            {searchList?.length ? (
                                 searchList.map((user) => (
                                     <UserCard
                                         key={user._id}
                                         user={user}
                                         handleClick={() => handleClickUser(user)}
+                                        handleAddFriend={() => handleAddFriend(user._id)}
                                     />
                                 ))
                             ) : (

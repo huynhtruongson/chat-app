@@ -22,7 +22,7 @@ const UserProfile = ({user,handleBackClick,handleChatClick,handleRequestClick}) 
                 <Button onClick={handleChatClick} classes={{root : style.actionBtn}} variant="outlined" size='small' color='primary'>
                     Chat
                 </Button>
-                <Button classes={{root : style.actionBtn}} variant="contained" size='small' color='primary'>
+                <Button onClick={handleRequestClick} classes={{root : style.actionBtn}} variant="contained" size='small' color='primary'>
                     {user.isRequest ? 'Undo' : 'Add Friend'}
                 </Button>
             </Box>
