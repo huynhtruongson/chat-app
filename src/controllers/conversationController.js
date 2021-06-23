@@ -38,8 +38,9 @@ module.exports.addMessage = async (req, res) => {
     try {
 
         let {text,receiver} = req.body
-        let {file} = req.files
-
+        let {media} = req.files
+        let file = media
+        
         if (!receiver) {
             throw new Error ("error message")
         }
