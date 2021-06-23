@@ -6,8 +6,12 @@ const MessageApi = {
         return axiosClient.get(url)
     },
     getMessages(id) {
-        const url = `/api/messages?recipient._id=${id}&_sort=createdAt&_order=desc`
+        const url = `/api/message/${id}`
         return axiosClient.get(url)
+    },
+    addMessage(msg) {
+        const url = 'api/add-message'
+        return axiosClient.post(url,msg)
     }
 }
 export default MessageApi

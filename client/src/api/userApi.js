@@ -12,6 +12,10 @@ const UserApi = {
     searchFriends(params) {
         const url = '/api/searchs'
         return axiosClient.get(url,{params})
+    },
+    addFriend(id) {
+        const url = `api/user/add-friend/${id}`
+        return axiosClient.put(url)
     }
 }
 export default UserApi

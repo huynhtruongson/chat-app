@@ -106,16 +106,14 @@ const HomePage = () => {
                         handleShowSearchModal={()=>setSearchModal(true)}/>
                 </Box>
                 <Box flex={1} height="100%" className={style.messageBox}>
-                    
-                        {/* (showFrRequest && showFriendList)
-                        ? <FriendRequest/> : <MessageBox /> */}
-                        <MessageBox/>
-                    
+                        {(showFrRequest && showFriendList)
+                            ? <FriendRequest/> : <MessageBox />
+                        }
                 </Box>
             </Box>
-            {/* <UserModal open={userModal} onClose={() => setUserModal(false)} /> */}
-            {/* <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} /> */}
-            {/* <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} /> */}
+            <UserModal open={userModal} onClose={() => setUserModal(false)} />
+            <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} />
+            <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} />
         </Box>
     );
 };

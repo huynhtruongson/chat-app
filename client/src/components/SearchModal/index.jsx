@@ -41,6 +41,9 @@ const SearchModal = ({open, onClose}) => {
         dispatch(getUserMessage(userDetail))
         onClose()
     }
+    const handleAddFriend = (id) => {
+        UserApi.addFriend(id)
+    }
     return (
         <ModalBase
             open={open}
@@ -84,6 +87,7 @@ const SearchModal = ({open, onClose}) => {
                                         key={user._id}
                                         user={user}
                                         handleClick={() => handleClickUser(user)}
+                                        handleAddFriend={handleAddFriend}
                                     />
                                 ))
                             ) : (

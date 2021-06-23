@@ -8,11 +8,12 @@ import Message from '../Mesage';
 import { addMessage } from '../../actions/messageAction';
 import Images from '../../constants/Images'
 import { useDispatch, useSelector } from 'react-redux';
+import IsolateSubmitBtn from '../IsolateSubmitBtn';
+import IsolateMedia from '../IsolateMedia';
 const MessageBox = () => {
-    console.log('rednder')
     const style = useStyle();
     const [anchorEl, setAnchoEl] = useState(null);
-    const { register, handleSubmit, setValue, getValues, watch,reset } = useForm();
+    const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
     const chatFileRef = useRef();
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
@@ -44,7 +45,7 @@ const MessageBox = () => {
     const onSubmit = (data) => {
         const msg = {
             sender : info._id,
-            recipient : activeConv._id,
+            receiver : activeConv._id,
             text : data.message,
             media : [].concat(data.media || [])
         }
@@ -142,31 +143,7 @@ const MessageBox = () => {
                     </Box>
                     <Box flex="1" display="flex" flexDirection="column">
                         <Box display="flex" py={1} overflow='auto'>
-                            {/* {watch('media') &&
-                                getValues('media').map((media, index) => (
-                                    <Box key={media.name+index} className={style.mediaBox}>
-                                        {media.type.match(/video/i) ? (
-                                            <video
-                                                src={URL.createObjectURL(media)}
-                                                controls
-                                                className={style.mediaMessage}
-                                            />
-                                        ) : media.type.match(/image/i) ? (
-                                            <img
-                                                src={URL.createObjectURL(media)}
-                                                alt="img"
-                                                className={style.mediaMessage}  
-                                            />
-                                        ) : <Box display='flex' height='100%' alignItems='center' width='120px'>
-                                                <Description/>
-                                                <Typography className={style.mediaFileName} variant='body2'>{media.name}</Typography>
-                                            </Box>
-                                        }
-                                        <span className={style.mediaMessageIcon} onClick={()=>handleRemoveMedia(index)}>
-                                            <CancelOutlined/>
-                                        </span>
-                                    </Box>
-                                ))} */}
+                            <IsolateMedia control={control} handleRemoveMedia={handleRemoveMedia} />
                         </Box>
                         <TextField
                             inputRef={inputRef}
@@ -193,11 +170,9 @@ const MessageBox = () => {
                         />
                     </Box>
                     <IconButton type="submit" color="primary">
-                        {/* {watch('message') || watch('media') ? <Send /> : <ThumbUp />} */}
-                        <Send />
+                        <IsolateSubmitBtn control={control}/>
                     </IconButton>
                 </Box>
-                <input type="text" />
             </form>
             <Popover
                 open={!!anchorEl}
@@ -253,28 +228,6 @@ const useStyle = makeStyles((theme) => ({
         fontSize: '1.2rem',
         cursor: 'pointer',
     },
-    mediaMessage : {
-        height : '100%',
-        width : '100%',
-        objectFit:'cover',
-        borderRadius:'inherit'
-    },
-    mediaMessageIcon : {
-        position : 'absolute',
-        top : '-6px',
-        right : '-6px',
-        color : theme.palette.secondary.main,
-        cursor: 'pointer'
-    },
-    mediaBox : {
-        height:'60px',
-        flexBasis : '60px',
-        position:'relative',
-        marginRight : theme.spacing(1),
-        borderRadius:'8px',
-        boxShadow : theme.shadows[1],
-        flex : 'none'
-    },
     bgcImage : {
         width : '450px',
     },
@@ -284,13 +237,5 @@ const useStyle = makeStyles((theme) => ({
         left : '50%',
         transform : 'translate(-50%,-50%)'
     },
-    mediaFileName : {
-        display:'-webkit-box',
-        '-webkit-line-clamp': 2,
-        '-webkit-box-orient': 'vertical',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        wordBreak: 'break-word',
-    }
 }));
 export default MessageBox;
