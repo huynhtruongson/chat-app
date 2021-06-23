@@ -6,7 +6,7 @@ const initialState = {
 const UserReducer = (state = initialState,action) => {
     switch (action.type) {
         case USER_LOGIN_SUCCESS :
-                return {...state,isLogged : true,token : action.payload}
+                return {...state,isLogged : true}
         case UPDATE_USER_INFO :
             return {...state,info:action.payload}
         case USER_LOGOUT :

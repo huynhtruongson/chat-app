@@ -7,7 +7,7 @@ import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
 const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
     const style = useStyle();
-    const {info : {_id : userId,friends}} = useSelector(state => state.user)
+    const {info : {_id : userId,friend_list}} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
     const dispatch = useDispatch()
     const handleClickUserConversations = (id) => {
@@ -17,7 +17,7 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
     };
     const handleClickUserFriends = (id) => {
         if (activeConv._id === id) return;
-        const user = friends[friends.findIndex((user) => user._id === id)];
+        const user = friend_list[friend_list.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
         handleShowFrRequest(false);
     };
@@ -57,7 +57,7 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
                               handleClickUser={() => handleClickUserConversations(cv._id)}
                           />
                       ))
-                    : friends.map((user) => (
+                    : friend_list.map((user) => (
                           <ChatCard
                               active={user._id === activeConv._id}
                               key={user._id}

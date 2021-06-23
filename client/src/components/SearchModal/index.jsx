@@ -17,7 +17,7 @@ const SearchModal = ({open, onClose}) => {
     const handleSearch = async () => {
         try {
             setLoading(true);
-            const params = {fullname_like: searchInput};
+            const params = {fullname: searchInput};
             const res = await UserApi.searchFriends(params);
             if (res.status === 200) {
                 setLoading(false);
@@ -81,7 +81,7 @@ const SearchModal = ({open, onClose}) => {
                             </Typography>
                         </Box>
                         <Box textAlign="center" mt={1}>
-                            {searchList.length ? (
+                            {searchList?.length ? (
                                 searchList.map((user) => (
                                     <UserCard
                                         key={user._id}

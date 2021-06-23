@@ -14,13 +14,16 @@ import ResetPwdPage from './pages/ResetPwd';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from './actions/userAction';
+import AuthApi from './api/authApi';
 function App() {
     const {isLogged} = useSelector(state => state.user) 
     const dispatch = useDispatch()
     useEffect(() => {
         const fetchUserInfo = () => {
-            if(isLogged)
+            if(isLogged) {
+                AuthApi.setHeaderAxios(localStorage.getItem('token'))
                 dispatch(getUserInfo(localStorage.getItem('token')))
+            }
         }
         fetchUserInfo()
     },[isLogged,dispatch])
