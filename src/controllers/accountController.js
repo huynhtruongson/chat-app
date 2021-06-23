@@ -21,9 +21,12 @@ module.exports.updateUser = async(req,res) =>{
     try{
         let {firstname,lastname} = req.body
         let  file = req.files.avatar
+        let fullname = firstname + " " + lastname
+
         let data = {
             firstname:firstname,
-            lastname:lastname
+            lastname:lastname,
+            fullname: fullname
         }
 
         let checkAvatar = await AccountModel.findById(req.user.id)
@@ -63,12 +66,12 @@ module.exports.acceptFriend = async (req, res) => {
             throw new Error ("Opps, something went wrong...")
         }
 
-        if(!user.friend_invite.includes(req.user.id)) {
+        if(!user.friend_invite_list.includes(req.user.id)) {
             throw new Error ("This user not already add friend you")
         }
 
-        await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_request: id}, friend: id},{ safe: true })
-        await AccountModel.findByIdAndUpdate(id, {$pull: {friend_invite: req.user.id}, friend: req.user.id}, { safe: true })
+        await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_request_list: id}, friend_list: id},{ safe: true })
+        await AccountModel.findByIdAndUpdate(id, {$pull: {friend_invite_list: req.user.id}, friend_list: req.user.id}, { safe: true })
 
         return res.status(200).json({message: "Accept success"})
 
@@ -91,13 +94,13 @@ module.exports.addFriend = async (req, res) => {
             throw new Error ("Id user not found, please check id again")
         }
 
-        if (userAddFriend.friendrequest.includes(req.user.id)) {
+        if (userAddFriend.friend_request_list.includes(req.user.id)) {
             throw new Error ("The account has already sent a friend request, please wait for acceptance")
         }
 
-        await AccountModel.findByIdAndUpdate(req.user.id, {$push: {friend_invite: id} })
+        await AccountModel.findByIdAndUpdate(req.user.id, {$push: {friend_invite_list: id} })
 
-        userAddFriend.friendrequest.push(req.user.id)
+        userAddFriend.friend_request_list.push(req.user.id)
         userAddFriend.save()
 
         return res.status(200).json({message:"Sent a friend request"})
@@ -110,11 +113,11 @@ module.exports.search = async(req, res) =>{
     try{
         let {fullname} = req.query
         let userCurrent = await AccountModel.find({_id: req.user.id})
-        let {friend, friend_invite} = userCurrent
+        let {friend_list, friend_invite_list} = userCurrent
         
-        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"}, _id: {$ne: friend}}, "-verify -password -tokenVerify -friend_request -friend_invite").limit(10).lean()
+        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"}, _id: {$ne: friend_list}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").limit(10).lean()
 
-        searchList = searchList.map(user => friend_invite && friend_invite.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
+        searchList = searchList.map(user => friend_invite_list && friend_invite.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
         
         return res.status(200).json({message:"success", data: searchList})
     } catch (err) {
