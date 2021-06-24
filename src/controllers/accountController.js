@@ -95,7 +95,10 @@ module.exports.addFriend = async (req, res) => {
         }
 
         if (userAddFriend.friend_request_list.includes(req.user.id)) {
-            throw new Error ("The account has already sent a friend request, please wait for acceptance")
+            await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_invite_list: id}}, {safe: true})
+            await AccountModel.findByIdAndUpdate(id, {$pull: {friend_request_list: req.user.id}}, {safe: true})
+
+            return res.status(200).json({message:"remove a friend request"})
         }
 
         await AccountModel.findByIdAndUpdate(req.user.id, {$push: {friend_invite_list: id} })
