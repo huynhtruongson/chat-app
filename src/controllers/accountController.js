@@ -128,3 +128,13 @@ module.exports.search = async(req, res) =>{
     }
 
 }
+
+module.exports.friendRequestList = async (req, res) => {
+    try {
+        let friendRequestList = await AccountModel.findById(req.user.id, "friend_request_list").populate("friend_request_list",'email firstname lastname fullname avatar')
+
+        return res.status(200).json({message:"success", data: friendRequestList})
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
