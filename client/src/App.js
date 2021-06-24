@@ -41,15 +41,15 @@ function App() {
                         <AuthRoute path='/register'>
                             <RegisterPage/>
                         </AuthRoute>
-                        <AuthRoute path='/forgot-password'>
+                        <Route path='/forgot-password'>
                             <ForgotPwdPage/>
-                        </AuthRoute>
-                        <AuthRoute path='/verify-email/:token'>
+                        </Route>
+                        <Route path='/verify-email/:token'>
                             <VerifyEmailPage/>
-                        </AuthRoute>
-                        <AuthRoute path='/reset-password/:token'>
+                        </Route>
+                        <Route path='/reset-password/:token'>
                             <ResetPwdPage/>
-                        </AuthRoute>
+                        </Route>
                         <Route component={NotFoundPage} />
                     </Switch>
                 </Router>
