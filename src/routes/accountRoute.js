@@ -10,7 +10,7 @@ Router.route('/current').get(checkLogin, current)
 
 Router.route('/update').put(checkLogin, multipartMiddleware, updateUser)
 
-Router.route('/add-friend/:id').put(checkLogin, addFriend)
+Router.route('/request-friend/:id').put(checkLogin, addFriend)
 
 Router.route('/accept-friend/:id').put(checkLogin, acceptFriend)
 
