@@ -1,14 +1,16 @@
 import {Box, makeStyles, TextField, Typography,IconButton} from "@material-ui/core";
 import {Search,PersonAdd} from "@material-ui/icons";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {getConversations, getUserMessage} from "../../actions/messageAction";
+import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
 const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
     const style = useStyle();
-    const {info : {_id : userId,friend_list}} = useSelector(state => state.user)
+    const {info : {_id : userId}} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
+    const [friendList,setFriendList] = useState([])
     const dispatch = useDispatch()
     const handleClickUserConversations = (id) => {
         if (activeConv._id === id) return;
@@ -17,12 +19,22 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
     };
     const handleClickUserFriends = (id) => {
         if (activeConv._id === id) return;
-        const user = friend_list[friend_list.findIndex((user) => user._id === id)];
+        const user = friendList[friendList.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
         handleShowFrRequest(false);
     };
     useEffect(() => {
-        dispatch(getConversations(userId))
+        const fetchUserData = async () => {
+            try {
+                dispatch(getConversations(userId))
+                const res = await UserApi.getFriendList()
+                if(res.status === 200)
+                    setFriendList(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchUserData()
     }, [dispatch,userId]);
     return (
         <Box>
@@ -57,7 +69,7 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
                               handleClickUser={() => handleClickUserConversations(cv._id)}
                           />
                       ))
-                    : friend_list?.map((user) => (
+                    : friendList?.map((user) => (
                           <ChatCard
                               active={user._id === activeConv._id}
                               key={user._id}

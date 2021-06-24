@@ -45,8 +45,8 @@ const SearchModal = ({open, onClose}) => {
     const handleRequestClick = async (id) => {
         try {
             setIsRequesting(true)
-            // const res = await UserApi.addFriend(id)
-            // if(res.status === 200) {
+            const res = await UserApi.requestFriend(id)
+            if(res.status === 200) {
                 const newSearchList = searchList.map((user) =>
                     user._id === id ? {...user, isRequested: !user.isRequested} : user
                 );
@@ -54,7 +54,7 @@ const SearchModal = ({open, onClose}) => {
                 if(userDetail)
                     setUserDetail({...userDetail,isRequested: !userDetail.isRequested})
                 setIsRequesting(false)
-            // }
+            }
         } catch (error) {
             console.log(error)
         }
