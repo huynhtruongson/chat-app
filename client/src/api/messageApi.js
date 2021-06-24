@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient"
 
 const MessageApi = {
     getConversations() {
-        const url = '/api/conversations'
+        const url = '/api/conversation/list'
         return axiosClient.get(url)
     },
     getMessages(id) {

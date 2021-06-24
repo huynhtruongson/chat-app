@@ -24,6 +24,10 @@ const UserApi = {
     getFriendList() {
         const url = 'api/user/friend-list'
         return axiosClient.get(url)
+    },
+    acceptAddFriend(id) {
+        const url = `api/user/accept-friend/${id}`
+        return axiosClient.put(url)
     }
 }
 export default UserApi
