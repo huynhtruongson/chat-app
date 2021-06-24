@@ -7,19 +7,15 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.conversationList = async (req, res) => {
     try{
-        let {pageSkip} = req.query
-
-        if(!parseInt(pageSkip)){
-            throw new Error ("Resquest is not a number type")
-        }
+        let pageSkip = req.query.pageSkip*1 || 0
 
         let countConversation = await conversationModel.find({party: req.user.id})
 
-        if(Math.ceil(countConversation/10) < parseInt(pageSkip)){
+        if(Math.ceil(countConversation/10) < pageSkip){
             return res.status(200).json({message:"End of list"})
         }
 
-        pageSkip = (parseInt(pageSkip)-1)*10
+        pageSkip = (pageSkip-1)*10
 
         let conversationList = await conversationModel.find({party: req.user.id}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate(party)
         
