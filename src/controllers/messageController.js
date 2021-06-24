@@ -22,7 +22,7 @@ module.exports.getMessage = async (req, res) =>{
         let messageList = await messageModel.find({$or: [
             { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
             { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
-        ]}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate(party)
+        ]}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party")
         
         return res.status(200).json({
             message: 'get conversation list success',
