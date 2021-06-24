@@ -39,7 +39,6 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
     return (
         <Box>
             <Box display="flex" alignItems="center" px={1} mt={3}>
-                {/* <Search classes={{root: style.searchIcon}} color="disabled" /> */}
                 <TextField 
                     variant='outlined' 
                     fullWidth 
