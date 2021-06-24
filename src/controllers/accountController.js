@@ -115,12 +115,12 @@ module.exports.addFriend = async (req, res) => {
 module.exports.search = async(req, res) =>{
     try{
         let {fullname} = req.query
-        let userCurrent = await AccountModel.find({_id: req.user.id})
+        let userCurrent = await AccountModel.findById( req.user.id)
         let {friend_list, friend_invite_list} = userCurrent
         
         let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"}, _id: {$ne: friend_list, $ne: req.user.id}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").limit(10).lean()
 
-        searchList = searchList.map(user => friend_invite_list && friend_invite.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
+        searchList = searchList.map(user => friend_invite_list && friend_invite_list.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
         
         return res.status(200).json({message:"success", data: searchList})
     } catch (err) {
