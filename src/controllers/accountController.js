@@ -148,3 +148,31 @@ module.exports.friendList = async (req, res) => {
         return res.status(400).json({message: err.message})
     }
 }
+
+module.exports.refuseFriend = async (req, res) => {
+    try {
+        let {id} = req.params
+        
+        if (!id){
+            throw new Error ("Invaluable id")
+        }
+
+        let user = await AccountModel.findById(id)
+
+        if (!user) {
+            throw new Error ("Opps, something went wrong...")
+        }
+
+        if(!user.friend_invite_list.includes(req.user.id)) {
+            throw new Error ("This user not already add friend you")
+        }
+
+        await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_request_list: id}},{ safe: true })
+        await AccountModel.findByIdAndUpdate(id, {$pull: {friend_invite_list: req.user.id}}, { safe: true })
+
+        return res.status(200).json({message: "Refuse success"})
+
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
