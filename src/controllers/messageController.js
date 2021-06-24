@@ -15,11 +15,9 @@ module.exports.getMessage = async (req, res) =>{
             { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
         ]})
 
-        if(Math.ceil(countMessage/10) < parseInt(pageSkip)){
+        if(Math.ceil(countMessage/10) < pageSkip){
             return res.status(200).json({message:"End of list"})
         }
-
-        pageSkip = (parseInt(pageSkip)-1)*10
 
         let messageList = await messageModel.find({$or: [
             { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
