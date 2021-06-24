@@ -138,3 +138,13 @@ module.exports.friendRequestList = async (req, res) => {
         return res.status(400).json({message: err.message})
     }
 }
+
+module.exports.friendList = async (req, res) => {
+    try {
+        let friendList = await AccountModel.findById(req.user.id, "friend_list").populate("friend_list",'email firstname lastname fullname avatar')
+
+        return res.status(200).json({message:"success", data: friendList})
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
