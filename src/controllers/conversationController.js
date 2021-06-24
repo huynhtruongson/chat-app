@@ -9,23 +9,15 @@ module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
 
-        let countConversation = await conversationModel.find({party: req.user.id})
-
-        if(Math.ceil(countConversation/10) < pageSkip){
-            return res.status(200).json({message:"End of list"})
-        }
-
-        pageSkip = (pageSkip-1)*10
-
-        let conversationList = await conversationModel.find({party: req.user.id}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate(party)
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id)}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party")
         
         return res.status(200).json({
                 message: 'get conversation list success',
-                total:(Math.ceil(countConversation/10)),
                 data:conversationList
         })
     }
     catch(err){
+        console.log(err)
         return res.status(400).json({message:err.message})
     }
 }
