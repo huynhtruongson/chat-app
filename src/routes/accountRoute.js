@@ -3,7 +3,7 @@ const Router = express.Router()
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 
-const checkLogin = require('../auth/checkLogin')
+const checkLogin = require('../middlewares/checkLogin')
 const {current, updateUser, addFriend, acceptFriend, search, friendRequestList, friendList, refuseFriend} = require('../controllers/accountController');
 
 
