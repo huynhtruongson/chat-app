@@ -3,7 +3,7 @@ const Router = express.Router()
 var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
 
-const checkLogin = require('../auth/checkLogin')
+const checkLogin = require('../middlewares/checkLogin')
 const {conversationList, addMessage} = require('../controllers/conversationController')
 
 Router.route('/list').get(checkLogin, conversationList)

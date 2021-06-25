@@ -28,7 +28,7 @@ module.exports.addMessage = async (req, res) => {
         let {text,receiver} = req.body
         let {media} = req.files
         let file = media
-        
+
         if (!receiver) {
             throw new Error ("error message")
         }
@@ -90,7 +90,6 @@ module.exports.addMessage = async (req, res) => {
                 
                     }
                 }
-                
                 let uploadInf = await Promise.all(promiseArr)
                 
                 
@@ -107,6 +106,7 @@ module.exports.addMessage = async (req, res) => {
                         })
                     
                     }else{
+
                         messageMedia.push({
                             id_cloud: uploadInf[i].public_id,
                             url_cloud: uploadInf[i].secure_url,
@@ -118,7 +118,6 @@ module.exports.addMessage = async (req, res) => {
             }
 
         }
-
         //service in database
 
         let conversationUpdate = await conversationModel.findOneAndUpdate({ 
@@ -133,12 +132,11 @@ module.exports.addMessage = async (req, res) => {
             },
             { new: true, upsert: true }
         )
-        
 
         let new_message = new messageModel({
             sender: mongoose.Types.ObjectId(req.user.id),
             receiver: mongoose.Types.ObjectId(receiver),
-            text: String,
+            text: text,
             media: messageMedia,
         })
         new_message.save()

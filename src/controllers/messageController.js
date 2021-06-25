@@ -33,3 +33,13 @@ module.exports.getMessage = async (req, res) =>{
         return res.status(400).json({message: err.message})
     }
 }
+
+module.exports.deleteMessage = async (req, res) =>{
+    try{
+        let {id} = req.body
+ 
+        return res.send("done")
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}

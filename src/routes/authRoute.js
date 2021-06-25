@@ -5,7 +5,7 @@ const loginValidator = require('./Validators/LoginValidator')
 const registerValidator = require('./Validators/RegisterValidator')
 
 const {loginController,registerController,verifyController,forgotPasswordController,verifyResetpassword,googleLoginController} = require('../controllers/authController')
-const { route } = require('../auth/verify_email')
+
 Router.route('/login').post(loginValidator,loginController)
 
 Router.route('/login/google').post(googleLoginController)
