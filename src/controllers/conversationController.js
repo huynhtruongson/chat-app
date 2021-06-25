@@ -30,7 +30,7 @@ module.exports.addMessage = async (req, res) => {
         let file = media
 
         if (!receiver) {
-            throw new Error ("error message")
+            throw new Error ("error message, missing id")
         }
 
         if (!text && !file ) {
