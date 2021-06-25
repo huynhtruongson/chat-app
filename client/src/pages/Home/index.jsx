@@ -67,7 +67,8 @@ const HomePage = () => {
                         open={!!anchorEl}
                         anchorEl={anchorEl}
                         onClose={() => setAnchorEl(null)}
-                        anchorOrigin={{vertical: "top", horizontal: "right"}}>
+                        anchorOrigin={{vertical: "top", horizontal: "right"}}
+                        transformOrigin={{vertical : 'bottom',horizontal : 'left'}}>
                         <Box p={1} display="flex" flexDirection="column">
                             <Button
                                 classes={{root: style.popoverBtn}}

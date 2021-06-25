@@ -12,7 +12,7 @@ const MessageReducer = (state = initialState, action) => {
             const cvArr = [...state.conversations];
             const {msg, user} = action.payload;
             const index = cvArr.findIndex(
-                (cv) => cv._id === msg.sender || cv._id === msg.recipient
+                (cv) => cv._id === msg.sender || cv._id === msg.receiver
             );
             if (index !== -1) {
                 cvArr[index] = {...cvArr[index], text: msg.text, media: msg.media};

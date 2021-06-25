@@ -17,9 +17,7 @@ export const addMessage = (msg,user) => async (dispatch) => {
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)
-        const fileArr = []
-        msgData.forEach(file => fileArr.push(file))
-        msgData.append('media',fileArr)
+        msg.media.forEach(file => msgData.append('media',file))
         await MessageApi.addMessage(msgData)
     } catch (error) {
         console.log(error)
@@ -32,7 +30,7 @@ export const getConversations = (id) => async (dispatch) => {
         if (res.status === 200) {
             const formatConv = [];
             res.data.forEach((cv) => {
-                cv.recipients.forEach((user) => {
+                cv.party.forEach((user) => {
                     if (user._id !== id)
                         formatConv.push({...user, text: cv.text, media: cv.media});
                 });

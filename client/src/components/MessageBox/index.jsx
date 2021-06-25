@@ -1,5 +1,5 @@
 import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
-import {Info,PhotoLibrary,AttachFile,ThumbUp,EmojiEmotionsRounded,Send, CancelOutlined,Description} from '@material-ui/icons';
+import {Info,PhotoLibrary,AttachFile,EmojiEmotionsRounded} from '@material-ui/icons';
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
@@ -98,12 +98,13 @@ const MessageBox = () => {
                 overflow="auto"
                 flexDirection="column-reverse">
                 {
-                    messages && messages.map(msg => (
+                    messages && messages.map((msg,index) => (
                         <Message 
                             key={msg+Math.random()} 
                             msg={msg} 
                             user={activeConv}
-                            self={msg.sender === info._id}/>
+                            self={msg.sender === info._id}
+                            noAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}/>
                     ))
                 }
             </Box>
