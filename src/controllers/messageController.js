@@ -36,9 +36,24 @@ module.exports.getMessage = async (req, res) =>{
 
 module.exports.deleteMessage = async (req, res) =>{
     try{
-        let {id} = req.body
- 
-        return res.send("done")
+        let {id} = req.params
+        let {typeDelete} = req.body
+        let messageDel = undefined
+
+        if(!typeDelete) {
+            throw new Error ("Oops something went wrong")
+        }
+
+        if(typeDelete === "text") {
+            messageDel = await messageModel.findByIdAndUpdate(id, {text: ""}, {safe: true })
+        } 
+
+        if(!messageDel.text && !messageDel.media.length){
+            await messageModel.findByIdAndDelete(id)
+        }
+
+
+        return res.status(200).json({message:"success"})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }

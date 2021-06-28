@@ -4,10 +4,12 @@ var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
 
 const checkLogin = require('../middlewares/checkLogin')
-const {conversationList, addMessage} = require('../controllers/conversationController')
+const {conversationList, addMessage, imageGallery} = require('../controllers/conversationController')
 
 Router.route('/list').get(checkLogin, conversationList)
 
 Router.route('/add-message').post(checkLogin, multipartMiddleware, addMessage)
+
+Router.route('/image-gallery/:id').get(checkLogin, imageGallery)
 
 module.exports = Router
