@@ -191,7 +191,55 @@ module.exports.imageGallery = async (req, res) =>{
 
         imageListQuery.forEach(element => imageList = imageList.concat(element.media))
         
-        return res.status(200).json({message: imageList})
+        return res.status(200).json({message: "Get image gallery success", data: imageList})
+
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
+
+module.exports.videoGallery = async (req, res) =>{
+    try {
+
+        let {id} = req.params
+        let imageList = []
+        let imageListQuery = await messageModel.find({
+                $or: [ 
+                    { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
+                    { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
+                ],
+                "media.resource_type": "video"
+            },
+            "media.url_cloud"
+        ).sort({'createdAt': 'desc'})
+
+        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
+        
+        return res.status(200).json({message: "Get image gallery success", data: imageList})
+
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
+
+module.exports.fileGallery = async (req, res) =>{
+    try {
+
+        let {id} = req.params
+        let imageList = []
+        let imageListQuery = await messageModel.find({
+                $or: [ 
+                    { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
+                    { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
+                ],
+                "media.resource_type": "raw"
+            },
+            "media.url_cloud"
+        ).sort({'createdAt': 'desc'})
+
+        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
+        
+        return res.status(200).json({message: "Get image gallery success", data: imageList})
 
     } catch (err) {
         return res.status(400).json({message: err.message})
