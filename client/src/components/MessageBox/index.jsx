@@ -10,25 +10,30 @@ import Images from '../../constants/Images'
 import { useDispatch, useSelector } from 'react-redux';
 import IsolateSubmitBtn from '../IsolateSubmitBtn';
 import IsolateMedia from '../IsolateMedia';
+import ReactBnbGallery from 'react-bnb-gallery';
+import 'react-bnb-gallery/dist/style.css'
 const MessageBox = () => {
     const style = useStyle();
+    const {messages,activeConv} = useSelector(state => state.message)
+    const {info} = useSelector(state => state.user)
+    const dispatch = useDispatch()
     const [anchorEl, setAnchoEl] = useState(null);
+    const [showGallery,setShowGallery] = useState(false)
+    const [imageGallery,setImageGallery] = useState([])
     const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
     const chatFileRef = useRef();
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
-    const {info} = useSelector(state => state.user)
-    const {messages,activeConv} = useSelector(state => state.message)
-    const dispatch = useDispatch()
     const handleClickIcon = (icon) => {
         setValue('message', getValues('message') + icon);
     };
     const handleChangeMedia = (e) => {
         const files = [...e.target.files];
+        console.log(files)
         const fileArr = [];
         if (!files.length) return;
         files.forEach((file) => {
-            if (file.size > 1024 * 1024 * 5) {
+            if (file.size > 1024 * 1024 * 10) {
                 _alert({ icon: 'error', msg: 'File is too large!' });
                 return;
             }
@@ -42,6 +47,16 @@ const MessageBox = () => {
         currentFiles.splice(index,1)
         setValue('media',currentFiles)
     }
+    const handleShowGallery = (index) => {
+        if(imageGallery.length === 0)
+            setImageGallery([
+                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/q6oinxg9hvhmbaxb3o0q.png',
+                'https://res.cloudinary.com/luommess/image/upload/v1624785662/message/tcvkqbpn2rvvjakbfhsh.jpg',
+                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/m0yxzke7ohukfps7jvci.png',
+                'https://res.cloudinary.com/luommess/image/upload/v1624785664/message/txc2wtq9gldukex9gcwb.png'
+            ])
+        setShowGallery(true)
+    }   
     const onSubmit = (data) => {
         const msg = {
             sender : info._id,
@@ -70,15 +85,13 @@ const MessageBox = () => {
                 justifyContent="space-between"
                 alignItems="center"
                 borderBottom="1px solid #cacaca"
-                p={1}
-            >
+                p={1}>
                 <Box display="flex" alignItems="center">
                     <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
                     <Box ml={0.8}>
                         <Typography
                             classes={{ root: style.username }}
-                            variant="subtitle2"
-                        >
+                            variant="subtitle2">
                             {`${activeConv.firstname} ${activeConv.lastname}`}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
@@ -97,19 +110,18 @@ const MessageBox = () => {
                 display="flex"
                 overflow="auto"
                 flexDirection="column-reverse">
-                {
-                    messages && messages.map((msg,index) => (
-                        <Message 
-                            key={msg+Math.random()} 
-                            msg={msg} 
-                            user={activeConv}
-                            self={msg.sender === info._id}
-                            noAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}/>
-                    ))
-                }
+                {messages && messages.map((msg,index) => (
+                    <Message 
+                        key={msg+Math.random()} 
+                        msg={msg} 
+                        user={activeConv}
+                        self={msg.sender === info._id}
+                        noAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
+                        handleShowGallery={handleShowGallery}/>
+                ))}
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Box display="flex" alignItems="flex-end" py={0.8} borderTop='1px solid #bdbdbd'>
+                <Box display="flex" alignItems="flex-end" pb={0.8} borderTop='1px solid #bdbdbd'>
                     <Box display="flex">
                         <input
                             ref={chatFileRef}
@@ -123,10 +135,7 @@ const MessageBox = () => {
                             <IconButton
                                 color="primary"
                                 component="span"
-                                onClick={() =>
-                                    (chatFileRef.current.accept = 'image/*')
-                                }
-                            >
+                                onClick={() =>(chatFileRef.current.accept = 'image/*')}>
                                 <PhotoLibrary />
                             </IconButton>
                         </label>
@@ -134,16 +143,13 @@ const MessageBox = () => {
                             <IconButton
                                 color="primary"
                                 component="span"
-                                onClick={() =>
-                                    (chatFileRef.current.accept = '*')
-                                }
-                            >
+                                onClick={() =>(chatFileRef.current.accept = '*')}>
                                 <AttachFile />
                             </IconButton>
                         </label>
                     </Box>
                     <Box flex="1" display="flex" flexDirection="column">
-                        <Box display="flex" py={1} overflow='auto'>
+                        <Box display="flex" py={0.8} overflow='auto'>
                             <IsolateMedia control={control} handleRemoveMedia={handleRemoveMedia} />
                         </Box>
                         <TextField
@@ -159,10 +165,7 @@ const MessageBox = () => {
                                     <InputAdornment position="end">
                                         <IconButton
                                             classes={{ root: style.iconButton }}
-                                            onClick={(e) =>
-                                                setAnchoEl(e.target)
-                                            }
-                                        >
+                                            onClick={(e) => setAnchoEl(e.target)}>
                                             <EmojiEmotionsRounded color="primary" />
                                         </IconButton>
                                     </InputAdornment>
@@ -179,27 +182,20 @@ const MessageBox = () => {
                 open={!!anchorEl}
                 onClose={() => setAnchoEl(null)}
                 anchorEl={anchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-            >
+                anchorOrigin={{vertical: 'top',horizontal: 'left'}}
+                transformOrigin={{vertical: 'bottom',horizontal: 'right'}}>
                 <Box className={style.iconBox}>
                     {ICONS.map((icon) => (
                         <span
                             key={icon}
                             onClick={() => handleClickIcon(icon)}
-                            className={style.iconItem}
-                        >
+                            className={style.iconItem}>
                             {icon}
                         </span>
                     ))}
                 </Box>
             </Popover>
+            <ReactBnbGallery show={showGallery} photos={imageGallery} onClose={()=>setShowGallery(false)} backgroundColor='rgb(0 0 0 / 90%)'/> 
         </Box>
     );
 };

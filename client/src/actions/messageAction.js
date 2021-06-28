@@ -13,11 +13,15 @@ export const getUserMessage = (user) => async (dispatch) => {
 }
 export const addMessage = (msg,user) => async (dispatch) => {
     try {
-        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)
         msg.media.forEach(file => msgData.append('media',file))
+        msg.media = msg.media.map(md => {
+            const resource_type = md.type.split('/')[0]
+            return {url_cloud : URL.createObjectURL(md),resource_type}
+        })
+        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
         await MessageApi.addMessage(msgData)
     } catch (error) {
         console.log(error)

@@ -14,7 +14,7 @@ const MessageReducer = (state = initialState, action) => {
             const index = cvArr.findIndex(
                 (cv) => cv._id === msg.sender || cv._id === msg.receiver
             );
-            if (index !== -1) {
+            if (index !== -1) { 
                 cvArr[index] = {...cvArr[index], text: msg.text, media: msg.media};
                 cvArr.sort((currCv, nextCv) => {
                     if (currCv._id === cvArr[index]._id) return -1;
