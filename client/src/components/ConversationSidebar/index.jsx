@@ -6,7 +6,7 @@ import {getConversations, getUserMessage} from "../../actions/messageAction";
 import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
-const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
+const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
     const style = useStyle();
     const {info : {_id : userId}} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
@@ -18,10 +18,10 @@ const ChatUserList = ({showFriendList, handleShowFrRequest,handleShowSearchModal
         dispatch(getUserMessage(user));
     };
     const handleClickUserFriends = (id) => {
+        handleShowFrRequest(false);
         if (activeConv._id === id) return;
         const user = friendList[friendList.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
-        handleShowFrRequest(false);
     };
     useEffect(() => {
         const fetchUserData = async () => {
@@ -107,4 +107,4 @@ const useStyle = makeStyles((theme) => ({
         marginLeft : theme.spacing(1)
     }
 }));
-export default ChatUserList;
+export default ConversationSidebar;

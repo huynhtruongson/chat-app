@@ -3,6 +3,7 @@ const initialState = {
     conversations: [],
     activeConv: {},
     messages: [],
+    imageGallery : []
 }
 const MessageReducer = (state = initialState, action) => {
     switch (action.type) {

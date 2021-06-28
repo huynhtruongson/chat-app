@@ -49,18 +49,19 @@ const FriendRequest = () => {
                         </Box>
                         <Box>
                             {user.isAccepted ? <Typography color='primary'>Accepted successfully !</Typography> : 
-                            <>
-                                <Button color='primary' size='small'>
-                                    Skip
-                                </Button>
-                                <Button
-                                    onClick={() => handleAcceptFriend(user._id)}
-                                    color='primary'
-                                    variant='contained'
-                                    size='small'>
-                                    Accept
-                                </Button>
-                            </>}
+                                <>
+                                    <Button color='primary' size='small'>
+                                        Skip
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleAcceptFriend(user._id)}
+                                        color='primary'
+                                        variant='contained'
+                                        size='small'>
+                                        Accept
+                                    </Button>
+                                </>
+                            }
                         </Box>
                     </Box>
                 ))}

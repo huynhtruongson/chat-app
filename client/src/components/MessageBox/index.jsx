@@ -6,20 +6,15 @@ import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
 import Message from '../Mesage';
 import { addMessage } from '../../actions/messageAction';
-import Images from '../../constants/Images'
 import { useDispatch, useSelector } from 'react-redux';
 import IsolateSubmitBtn from '../IsolateSubmitBtn';
 import IsolateMedia from '../IsolateMedia';
-import ReactBnbGallery from 'react-bnb-gallery';
-import 'react-bnb-gallery/dist/style.css'
-const MessageBox = () => {
+const MessageBox = ({handleShowGallery}) => {
     const style = useStyle();
     const {messages,activeConv} = useSelector(state => state.message)
     const {info} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const [anchorEl, setAnchoEl] = useState(null);
-    const [showGallery,setShowGallery] = useState(false)
-    const [imageGallery,setImageGallery] = useState([])
     const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
     const chatFileRef = useRef();
     const { _alert } = useAlert();
@@ -29,7 +24,6 @@ const MessageBox = () => {
     };
     const handleChangeMedia = (e) => {
         const files = [...e.target.files];
-        console.log(files)
         const fileArr = [];
         if (!files.length) return;
         files.forEach((file) => {
@@ -46,17 +40,7 @@ const MessageBox = () => {
         const currentFiles = [...getValues('media')]
         currentFiles.splice(index,1)
         setValue('media',currentFiles)
-    }
-    const handleShowGallery = (index) => {
-        if(imageGallery.length === 0)
-            setImageGallery([
-                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/q6oinxg9hvhmbaxb3o0q.png',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785662/message/tcvkqbpn2rvvjakbfhsh.jpg',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/m0yxzke7ohukfps7jvci.png',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785664/message/txc2wtq9gldukex9gcwb.png'
-            ])
-        setShowGallery(true)
-    }   
+    }  
     const onSubmit = (data) => {
         const msg = {
             sender : info._id,
@@ -69,15 +53,6 @@ const MessageBox = () => {
         dispatch(addMessage(msg,activeConv))
         reset()
     };
-    if(!activeConv._id)
-        return (
-            <Box position='relative' height='100%'>
-                <Box className={style.bgcGreeting} textAlign='center'>
-                    <img src={Images.CHAT_LOGO2} className={style.bgcImage} alt='img'/>
-                    <Typography variant='h5'>Welcome to Chat App</Typography>
-                </Box>
-            </Box>
-        )
     return (
         <Box display="flex" flexDirection="column" height="100%">
             <Box
@@ -85,7 +60,8 @@ const MessageBox = () => {
                 justifyContent="space-between"
                 alignItems="center"
                 borderBottom="1px solid #cacaca"
-                p={1}>
+                height='65px'
+                px={1}>
                 <Box display="flex" alignItems="center">
                     <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
                     <Box ml={0.8}>
@@ -195,7 +171,6 @@ const MessageBox = () => {
                     ))}
                 </Box>
             </Popover>
-            <ReactBnbGallery show={showGallery} photos={imageGallery} onClose={()=>setShowGallery(false)} backgroundColor='rgb(0 0 0 / 90%)'/> 
         </Box>
     );
 };
@@ -224,15 +199,6 @@ const useStyle = makeStyles((theme) => ({
     iconItem: {
         fontSize: '1.2rem',
         cursor: 'pointer',
-    },
-    bgcImage : {
-        width : '450px',
-    },
-    bgcGreeting : {
-        position : 'absolute',
-        top : '50%',
-        left : '50%',
-        transform : 'translate(-50%,-50%)'
     },
 }));
 export default MessageBox;

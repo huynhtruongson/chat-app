@@ -10,6 +10,7 @@ const schema = yup.object().shape({
     confirm_password : yup.string().oneOf([yup.ref('new_password'),null],'Incorrect confirm password!').required('Confirm password is required!'),
 })
 const PasswordModal = ({open,onClose}) => {
+    console.log('pwdmodal rerender')
     const style = useStyle()
     const {register,handleSubmit,formState:{errors},reset} = useForm({
         resolver : yupResolver(schema)
