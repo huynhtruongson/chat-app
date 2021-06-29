@@ -3,7 +3,9 @@ const initialState = {
     conversations: [],
     activeConv: {},
     messages: [],
-    imageGallery : []
+    imageGallery : [],
+    videoGallery : [],
+    fileGallery : [],
 }
 const MessageReducer = (state = initialState, action) => {
     switch (action.type) {

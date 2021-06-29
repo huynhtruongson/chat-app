@@ -1,26 +1,41 @@
 import { Box,makeStyles, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import {  useSelector } from 'react-redux'
 import Images from '../../constants/Images'
 import ConversationInfo from '../ConversationInfo'
 import MessageBox from '../MessageBox'
 import ReactBnbGallery from 'react-bnb-gallery'
 import 'react-bnb-gallery/dist/style.css'
+import { useEffect } from 'react'
+import MessageApi from '../../api/messageApi'
 const Conversation = () => {
     const style = useStyle()
     const {activeConv} = useSelector(state => state.message)
     const [imageGallery,setImageGallery] = useState([])
     const [showGallery,setShowGallery] = useState(false)
-    const handleShowGallery = (index) => {
+    const [galleryIndex,setGalleryIndex] = useState(0)
+    const handleShowGallery = (src) => {
         if(imageGallery.length === 0)
-            setImageGallery([
-                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/q6oinxg9hvhmbaxb3o0q.png',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785662/message/tcvkqbpn2rvvjakbfhsh.jpg',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785663/message/m0yxzke7ohukfps7jvci.png',
-                'https://res.cloudinary.com/luommess/image/upload/v1624785664/message/txc2wtq9gldukex9gcwb.png'
-            ])
+            return
+        const imgIndex = imageGallery.findIndex(img => img === src)
+        setGalleryIndex(imgIndex)
         setShowGallery(true)
-    }   
+    }
+    useEffect(()=>{
+        const fetchUserMedia = async (id) => {
+            try {
+                if(!id) return
+                const res = await MessageApi.getImageGalerry(id)
+                if(res.status === 200) {
+                    const imageList = res.message.map(img => img.url_cloud) 
+                    setImageGallery(imageList)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchUserMedia(activeConv._id)
+    },[activeConv._id])   
     if(!activeConv._id)
         return (
             <Box position='relative' height='100%'>
@@ -35,10 +50,14 @@ const Conversation = () => {
             <Box className={style.messageBox}>
                 <MessageBox handleShowGallery={handleShowGallery}/>
             </Box>
-            <Box className={style.infoBox} display='none'>
+            <Box className={style.infoBox}>
                 <ConversationInfo handleShowGallery={handleShowGallery}/>
             </Box>
-            <ReactBnbGallery show={showGallery} photos={imageGallery} onClose={()=>setShowGallery(false)} backgroundColor='rgb(0 0 0 / 90%)'/> 
+            <ReactBnbGallery 
+                show={showGallery} 
+                photos={imageGallery}
+                activePhotoIndex={galleryIndex}
+                onClose={()=>setShowGallery(false)} backgroundColor='rgb(0 0 0 / 90%)'/> 
         </Box>
     )
 }

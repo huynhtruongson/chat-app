@@ -1,4 +1,5 @@
-import {Avatar, Box, makeStyles, Typography} from '@material-ui/core';
+import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary} from '@material-ui/core';
+import { ExpandMore } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -20,6 +21,41 @@ const ConversationInfo = () => {
                     <Box mt={1}>
                         <Typography classes={{root: style.title}} variant='subtitle2'>{activeConv.fullname}</Typography>
                     </Box>
+                </Box>
+                <Box mt={2} overflow='hidden'>
+                    <Accordion classes={{root : style.accordion}} square>
+                        <AccordionSummary expandIcon={<ExpandMore/>} classes={{root : style.accordionSummary,content : style.accordionSummaryContent}}>
+                            <Typography variant='subtitle2'>Photo</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
+                                maximus est, id dignissim quam.
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion classes={{root : style.accordion}} square>  
+                        <AccordionSummary expandIcon={<ExpandMore/>} classes={{root : style.accordionSummary,content : style.accordionSummaryContent}}>
+                            <Typography variant='subtitle2'>Video</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
+                                maximus est, id dignissim quam.
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion classes={{root : style.accordion}} square>  
+                        <AccordionSummary expandIcon={<ExpandMore/>} classes={{root : style.accordionSummary,content : style.accordionSummaryContent}}>
+                            <Typography variant='subtitle2'>File</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Typography>
+                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
+                                maximus est, id dignissim quam.
+                            </Typography>
+                        </AccordionDetails>
+                    </Accordion>
                 </Box>
             </Box>
         </Box>
@@ -44,5 +80,28 @@ const useStyle = makeStyles((theme) => ({
         width : '52px',
         height : '52px'
     },
+    accordion : {
+        boxShadow : 'none',
+        borderTop: '5px solid rgba(0, 0, 0, .1)',
+        '&:before': {
+            display: 'none',
+        },
+        '&.Mui-expanded': {
+            margin: 'auto',
+        },
+    },
+    accordionSummary : {
+        '& .MuiTypography-subtitle2' : {
+            fontSize: theme.typography.pxToRem(15)
+        },
+        '&.Mui-expanded' : {
+            minHeight : '48px'
+        }
+    },
+    accordionSummaryContent : {
+        '&.Mui-expanded': {
+            margin: '12px 0',
+          },
+    }
 }));
 export default ConversationInfo;

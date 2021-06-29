@@ -10,8 +10,12 @@ const MessageApi = {
         return axiosClient.get(url)
     },
     addMessage(msg) {
-        const url = 'api/conversation/add-message'
+        const url = '/api/conversation/add-message'
         return axiosClient.post(url,msg)
+    },
+    getImageGalerry(id) {
+        const url = `/api/conversation/image-gallery/${id}`
+        return axiosClient.get(url)
     }
 }
 export default MessageApi

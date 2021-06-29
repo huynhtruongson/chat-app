@@ -1,5 +1,5 @@
 import {Avatar, Box, makeStyles, Typography} from '@material-ui/core';
-import {ThumbUp} from '@material-ui/icons';
+import {ThumbUp,Description} from '@material-ui/icons';
 const formatImages = (images) => {
     const row = Math.ceil(images.length / 3);
     const imgArr = images.map((img, index) => {
@@ -19,24 +19,24 @@ const formatImages = (images) => {
     });
     return imgArr;
 };
-const Message = ({user, self, msg, noAvatar,handleShowGallery}) => {
+const Message = ({user, self, msg, noAvatar, handleShowGallery}) => {
     const style = useStyle({self});
     return (
         <Box
             mx={1}
             alignSelf={self ? 'flex-end' : 'flex-start'}
             display='flex'
-            alignItems='flex-start'>
+            alignItems='flex-end'>
             <Box minWidth='40px' mr={1} mb={1.5}>
                 {!self && noAvatar && <Avatar src={user.avatar} />}
             </Box>
-            <Box display='flex' flexDirection='column' alignItems='flex-start'>
+            <Box className={style.messageContainer}>
                 {msg.text &&
                     (msg.text === ':like:' ? (
                         <ThumbUp fontSize='large' color='primary' />
                     ) : (
                         <Box
-                            className={style.messageBox}
+                            className={style.textMessage}
                             p={1}
                             borderRadius='6px'
                             maxWidth='500px'
@@ -49,13 +49,21 @@ const Message = ({user, self, msg, noAvatar,handleShowGallery}) => {
                         <Box className={style.imageContainer}>
                             {formatImages(msg.media.filter((md) => md.resource_type === 'image'))
                                 .map(img => 
-                                    <img onClick={handleShowGallery} key={img.src} src={img.src} style={img.style} alt='img'/>
+                                    <img onClick={()=>handleShowGallery(img.src)} key={img.src} src={img.src} style={img.style} alt='img'/>
                                 )
                             }
                         </Box>
                         {msg.media.filter((md) => md.resource_type === 'video')
                             .map(video => <Box key={video.url_cloud} className={style.videoContainer}>
                                 <video src={video.url_cloud} className={style.videoMessage} controls />
+                            </Box>)
+                        }
+                        {msg.media.filter((md) => md.resource_type === 'raw')
+                            .map(file => <Box key={file.url_cloud} mb={1.5} maxWidth='250px'>
+                                <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
+                                    <Description/>
+                                    <Typography variant='inherit'>{file.name}</Typography>
+                                </a>
                             </Box>)
                         }
                     </>
@@ -65,7 +73,12 @@ const Message = ({user, self, msg, noAvatar,handleShowGallery}) => {
     );
 };
 const useStyle = makeStyles((theme) => ({
-    messageBox: {
+    messageContainer : {
+        display:'flex',
+        flexDirection:'column',
+        alignItems:({self}) => self ? 'flex-end' : 'flex-start'
+    },
+    textMessage: {
         backgroundColor: ({self}) => (self ? theme.palette.primary.main : theme.palette.grey[200]),
         color: ({self}) => (self ? '#fff' : null),
     },
@@ -96,6 +109,27 @@ const useStyle = makeStyles((theme) => ({
     videoMessage : {
         width : '100%',
         borderRadius : 'inherit'
-    }
+    },
+    fileMessage : {
+        display:'flex',
+        alignItems:'center',
+        textDecoration : 'none',
+        padding : theme.spacing(1),
+        backgroundColor : theme.palette.grey[400],
+        borderRadius : theme.spacing(1),
+        color : '#000',
+        '&>.MuiTypography-root' : {
+            marginLeft : theme.spacing(.6),
+            display:'-webkit-box',
+            '-webkit-line-clamp': 2,
+            '-webkit-box-orient': 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+        },
+        '&:hover' : {
+            backgroundColor : theme.palette.grey[500],
+        }
+    },
 }));
 export default Message;
