@@ -6,7 +6,7 @@ module.exports.socketServer = (socket) =>{
         let userListOnline = userList.filter(us => user.friendList.find(id => id === us.userID))
         
         userListOnline.forEach(us => {
-            socket.to(String(us.socketID).emit("ADD_USER_ONLINE", user._id)
+            socket.to(String(us.socketID).emit("ADD_USER_ONLINE", user._id))
         });
     })
 
