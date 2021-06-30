@@ -1,6 +1,6 @@
 import {UPDATE_USER_INFO, USER_LOGIN_SUCCESS, USER_LOGOUT} from '../actions/type'
 const initialState = {
-    isLogged : !!localStorage.getItem('token'),
+    isLogged : false,
     info : {}
 }
 const UserReducer = (state = initialState,action) => {

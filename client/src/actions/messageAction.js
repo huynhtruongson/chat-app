@@ -24,7 +24,7 @@ export const addMessage = (msg,user,socket) => async (dispatch) => {
         dispatch({type: ADD_MESSAGE,payload: {msg,user}})
         const res = await MessageApi.addMessage(msgData)
         if(res.status === 200) {
-            socket.emit('ADD-MESSAGE',{msg,user})
+            socket.emit('ADD_MESSAGE',{msg,user})
         }
     } catch (error) {
         console.log(error)

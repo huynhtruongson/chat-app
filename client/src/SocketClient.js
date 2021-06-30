@@ -10,14 +10,14 @@ const SocketClient = () => {
     //User connect
     useEffect(()=> {
         if(!info._id) return 
-        socket.emit('JOIN-USER',info._id)
-    },[info._id,socket])
+        socket.emit('JOIN_USER',info)
+    },[info,socket])
     // Add message
     useEffect(()=>{
-        socket.on('ADD-MESSAGE',({msg,user}) => {
+        socket.on('ADD_MESSAGE',({msg,user}) => {
             dispatch(addMessage(msg,user))
         })
-        return ()=> socket.off('ADD-MESSAGE') 
+        return ()=> socket.off('ADD_MESSAGE') 
     },[socket,dispatch])
     // Get user online
     useEffect(() => {
@@ -33,6 +33,7 @@ const SocketClient = () => {
     // Add user online
     useEffect(() => {
         socket.on('ADD_USER_ONLINE',userId => {
+            console.log(userId)
             dispatch(addUserOnline(userId))
         })
         return ()=> socket.off('ADD_USER_ONLINE')
@@ -44,6 +45,8 @@ const SocketClient = () => {
         })
         return ()=> socket.off('REMOVE_USER_ONLINE')
     },[socket,dispatch,info._id])
+
+    return <></>
 }
 
 export default SocketClient

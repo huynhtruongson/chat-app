@@ -12,6 +12,7 @@ import IsolateMedia from '../IsolateMedia';
 const MessageBox = ({handleShowGallery}) => {
     const style = useStyle();
     const {messages,activeConv} = useSelector(state => state.message)
+    const socket = useSelector(state => state.socket)
     const {info} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const [anchorEl, setAnchoEl] = useState(null);
@@ -50,7 +51,7 @@ const MessageBox = ({handleShowGallery}) => {
         }
         if(!data.message && !data.media)
             msg.text = ':like:'
-        dispatch(addMessage(msg,activeConv))
+        dispatch(addMessage(msg,activeConv,socket))
         reset()
     };
     return (

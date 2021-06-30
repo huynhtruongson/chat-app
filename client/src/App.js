@@ -16,23 +16,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from './actions/userAction';
 import io from 'socket.io-client'
 import SocketClient from './SocketClient'
-import { createSocket } from './actions/socketAction';
+import {createSocket} from './actions/socketAction'
 function App() {
-    const {isLogged} = useSelector(state => state.user) 
+    const {isLogged} = useSelector(state => state.user)
     const dispatch = useDispatch()
     useEffect(() => {
-        const fetchUserInfo = () => {
-            if(isLogged) {
-                dispatch(getUserInfo(localStorage.getItem('token')))
-            }
-        }
-        fetchUserInfo()
-    },[isLogged,dispatch])
-    useEffect(()=>{
+        dispatch(getUserInfo(localStorage.getItem('token')))
         const socket = io()
         dispatch(createSocket(socket))
-        return ()=>socket.close()
-    })
+        return () => socket.close()
+    },[dispatch])
     return (
         <ThemeProvider>
                 {/* <CssBaseline/> */}
