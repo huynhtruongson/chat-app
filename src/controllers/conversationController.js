@@ -32,7 +32,7 @@ module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
 
-        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id)}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party")
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id)}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party","fullname avatar email friend_list")
         
         return res.status(200).json({
                 message: 'get conversation list success',

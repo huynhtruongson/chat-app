@@ -2,15 +2,19 @@ let userList = []
 
 module.exports.socketServer = (socket) =>{
     socket.on("JOIN_USER", (user) => {
-        userList.push({userID: user._id, socketID: socket.id , friendList: user.friendList})
-        let userListOnline = userList.filter(us => user.friendList.find(id => id === us.userID))
-        
+        let userListOnline = userList.filter(us => us.friendList.find(id => id === user._id))
+        console.log('id : ',socket.id)
+        console.log(userListOnline)
         userListOnline.forEach(us => {
-            socket.to(String(us.socketID).emit("ADD_USER_ONLINE", user._id))
+            // console.log(us.socketID,typeof us.socketID)
+            socket.to(us.socketID).emit("ADD_USER_ONLINE", user._id)
         });
+        userList.push({userID: user._id, socketID: socket.id , friendList: user.friend_list})
+        console.log('list : ',userList)
     })
 
     socket.on("disconnect", ()=>{
+        console.log(socket.id)
         let userOffline  = userList.find(user => user.socketID = socket.id)
         if (userOffline) {
             let users = userList.filter(user => user.friendList.find(id => id === socket.id ))
@@ -30,10 +34,10 @@ module.exports.socketServer = (socket) =>{
             socket.to(String(userChat.socketID)).emit("ADD_MESSAGE",{msg,user})
     })
 
-    socket.on("ONLINE_USER", (id) => {
-        let user = userList.find(user => user.socketID = socket.id)
+    socket.on("ONLINE_USER", (userID) => {
+        let user = userList.find(user => user.userID === userID)
         if (user) {
-            let userListOnline = userList.filter(user => user.friendList.find(id => id === socket.id))
+            let userListOnline = userList.filter(us => us.friendList.find(id => id === user.userID))
             socket.to(user.socketID).emit("ONLINE_USER",userListOnline)
         }
     })
