@@ -11,16 +11,21 @@ export const getUserMessage = (user) => async (dispatch) => {
         console.log(error)
     }
 }
-export const addMessage = (msg,user) => async (dispatch) => {
+export const addMessage = (msg,user,socket) => async (dispatch) => {
     try {
-        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)
-        const fileArr = []
-        msgData.forEach(file => fileArr.push(file))
-        msgData.append('media',fileArr)
-        await MessageApi.addMessage(msgData)
+        msg.media.forEach(file => msgData.append('media',file))
+        msg.media = msg.media.map(md => {
+            const resource_type = md.type.split('/')[0]
+            return {url_cloud : URL.createObjectURL(md),resource_type}
+        })
+        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
+        const res = await MessageApi.addMessage(msgData)
+        if(res.status === 200) {
+            socket.emit('ADD-MESSAGE',{msg,user})
+        }
     } catch (error) {
         console.log(error)
     }
@@ -32,7 +37,7 @@ export const getConversations = (id) => async (dispatch) => {
         if (res.status === 200) {
             const formatConv = [];
             res.data.forEach((cv) => {
-                cv.recipients.forEach((user) => {
+                cv.party.forEach((user) => {
                     if (user._id !== id)
                         formatConv.push({...user, text: cv.text, media: cv.media});
                 });
@@ -42,7 +47,6 @@ export const getConversations = (id) => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
-
 }
 export const updateConversations = (convs) => ({
     type : UPDATE_CONVERSATIONS,

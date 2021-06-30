@@ -14,22 +14,29 @@ import ResetPwdPage from './pages/ResetPwd';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from './actions/userAction';
-import AuthApi from './api/authApi';
+import io from 'socket.io-client'
+import SocketClient from './SocketClient'
+import { createSocket } from './actions/socketAction';
 function App() {
     const {isLogged} = useSelector(state => state.user) 
     const dispatch = useDispatch()
     useEffect(() => {
         const fetchUserInfo = () => {
             if(isLogged) {
-                AuthApi.setHeaderAxios(localStorage.getItem('token'))
                 dispatch(getUserInfo(localStorage.getItem('token')))
             }
         }
         fetchUserInfo()
     },[isLogged,dispatch])
+    useEffect(()=>{
+        const socket = io()
+        dispatch(createSocket(socket))
+        return ()=>socket.close()
+    })
     return (
         <ThemeProvider>
                 {/* <CssBaseline/> */}
+                {isLogged && <SocketClient/>}
                 <Router>
                     <Switch>
                         <PrivateRoute path='/' exact>

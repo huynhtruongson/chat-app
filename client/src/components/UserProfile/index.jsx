@@ -1,7 +1,8 @@
 import { Box,Avatar,Typography, Button, IconButton, makeStyles } from '@material-ui/core'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-const UserProfile = ({user,handleBackClick,handleChatClick,handleRequestClick}) => {
+const UserProfile = (props) => {
+    const {user,handleBackClick,handleChatClick,handleRequestClick,isRequesting} = props
     const style = useStyle()
     return (
         <Box>
@@ -9,8 +10,8 @@ const UserProfile = ({user,handleBackClick,handleChatClick,handleRequestClick}) 
                 <IconButton    
                     classes={{root : style.backBtn}} 
                     onClick={handleBackClick} 
-                    color='secondary'>
-                    <ArrowBackIcon/>
+                    color='secondary'> 
+                    <ArrowBackIcon/> 
                 </IconButton>
                 <img className={style.backgroundImg} src='https://cover-talk.zadn.vn/0/4/b/2/3/02b40a29341081a8e6a005375f6ffcf0.jpg' alt='img' />
                 <Avatar classes={{root : style.avatar}} src={user.avatar} />
@@ -22,7 +23,13 @@ const UserProfile = ({user,handleBackClick,handleChatClick,handleRequestClick}) 
                 <Button onClick={handleChatClick} classes={{root : style.actionBtn}} variant="outlined" size='small' color='primary'>
                     Chat
                 </Button>
-                <Button onClick={handleRequestClick} classes={{root : style.actionBtn}} variant="contained" size='small' color='primary'>
+                <Button 
+                    onClick={handleRequestClick} 
+                    classes={{root : style.actionBtn}} 
+                    variant="contained" 
+                    size='small' 
+                    color='primary'
+                    disabled={isRequesting}>
                     {user.isRequest ? 'Undo' : 'Add Friend'}
                 </Button>
             </Box>

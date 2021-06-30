@@ -2,7 +2,7 @@ import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from 
 const initialState = {
     conversations: [],
     activeConv: {},
-    messages: [],
+    messages: []
 }
 const MessageReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -12,9 +12,9 @@ const MessageReducer = (state = initialState, action) => {
             const cvArr = [...state.conversations];
             const {msg, user} = action.payload;
             const index = cvArr.findIndex(
-                (cv) => cv._id === msg.sender || cv._id === msg.recipient
+                (cv) => cv._id === msg.sender || cv._id === msg.receiver
             );
-            if (index !== -1) {
+            if (index !== -1) { 
                 cvArr[index] = {...cvArr[index], text: msg.text, media: msg.media};
                 cvArr.sort((currCv, nextCv) => {
                     if (currCv._id === cvArr[index]._id) return -1;
@@ -37,10 +37,7 @@ const MessageReducer = (state = initialState, action) => {
                 isConversationLoaded: true,
             };
         case GET_MESSAGES:
-            return {
-                ...state,
-                messages: action.payload
-            };
+            return {...state,messages: action.payload};
         default:
             return state;
     }

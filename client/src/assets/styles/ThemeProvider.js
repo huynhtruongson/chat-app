@@ -9,6 +9,18 @@ const theme = createMuiTheme({
         primary : {
             main : deepPurple.A400
         }
+    },
+    overrides : {
+        MuiButton : {
+            root : {
+                textTransform : 'initial',
+            }
+        },
+        MuiIconButton : {
+            root : {
+                padding : '8px'
+            }
+        }
     }
 })
 function CustomStyle({children}) {

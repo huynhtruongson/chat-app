@@ -1,4 +1,5 @@
 import { Avatar, Badge, Box, makeStyles, Typography } from '@material-ui/core'
+import { Description } from '@material-ui/icons'
 import React from 'react'
 
 const ChatCard = ({user,handleClickUser,active}) => {
@@ -18,8 +19,15 @@ const ChatCard = ({user,handleClickUser,active}) => {
                 />
             </Badge>
             <Box flex={1} display='flex' flexDirection='column' justifyContent='center' ml={1} overflow='hidden'>
-                <Typography>{`${user.firstname} ${user.lastname}`}</Typography>
-                <Typography variant='body2' noWrap color='textSecondary'>{user.text}</Typography>
+                <Typography>{user.fullname}</Typography>
+                {(user.media || user.text) && (
+                    user.media.length ? <Box display='flex' alignItems='center' color='#757575'>
+                        <Description fontSize='small' />
+                        <Typography variant='body2' >{`${user.media.length} file media`}</Typography>
+                    </Box> :
+                    <Typography variant='body2' noWrap color='textSecondary'>{user.text === ':like:' ? '👍' : user.text}</Typography>
+                )
+                }
             </Box>
         </Box>
     )

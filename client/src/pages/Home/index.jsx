@@ -2,14 +2,14 @@ import {Avatar,Badge,Box,Button,Divider,makeStyles,Popover,} from "@material-ui/
 import {Settings,AccountCircleOutlined,VpnKeyOutlined,ExitToAppOutlined,Chat,PermContactCalendar,} from "@material-ui/icons";
 import React, {useState} from "react";
 import {userLogout} from "../../actions/userAction";
-import MessageBox from "../../components/MessageBox";
 import PasswordModal from "../../components/PwdModal";
 import UserModal from "../../components/UserModal";
 import {useHistory} from "react-router";
-import ChatUserList from "../../components/ChatUserList";
+import ConversationSidebar from "../../components/ConversationSidebar";
 import FriendRequest from '../../components/FriendRequest'
 import SearchModal from "../../components/SearchModal";
 import { useDispatch } from "react-redux";
+import Conversation from "../../components/Conversation";
 const HomePage = () => {
     console.log('home page render')
     const [userModal, setUserModal] = useState(false);
@@ -67,7 +67,8 @@ const HomePage = () => {
                         open={!!anchorEl}
                         anchorEl={anchorEl}
                         onClose={() => setAnchorEl(null)}
-                        anchorOrigin={{vertical: "top", horizontal: "right"}}>
+                        anchorOrigin={{vertical: "top", horizontal: "right"}}
+                        transformOrigin={{vertical : 'bottom',horizontal : 'left'}}>
                         <Box p={1} display="flex" flexDirection="column">
                             <Button
                                 classes={{root: style.popoverBtn}}
@@ -98,16 +99,16 @@ const HomePage = () => {
                     </Popover>
                 </Box>
             </Box>
-            <Box display="flex" position="relative" flex={1} height="100%">
+            <Box display="flex" flex={1} height="100%">
                 <Box width="336px" className={style.chatList} height="100%">
-                    <ChatUserList 
+                    <ConversationSidebar 
                         showFriendList={showFriendList} 
                         handleShowFrRequest={(val)=>setShowFrRequest(val)}
                         handleShowSearchModal={()=>setSearchModal(true)}/>
                 </Box>
                 <Box flex={1} height="100%" className={style.messageBox}>
                         {(showFrRequest && showFriendList)
-                            ? <FriendRequest/> : <MessageBox />
+                            ? <FriendRequest/> : <Conversation/>
                         }
                 </Box>
             </Box>
