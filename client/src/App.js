@@ -14,6 +14,9 @@ import ResetPwdPage from './pages/ResetPwd';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfo } from './actions/userAction';
+import io from 'socket.io-client'
+import SocketClient from './SocketClient'
+import { createSocket } from './actions/socketAction';
 function App() {
     const {isLogged} = useSelector(state => state.user) 
     const dispatch = useDispatch()
@@ -25,9 +28,15 @@ function App() {
         }
         fetchUserInfo()
     },[isLogged,dispatch])
+    useEffect(()=>{
+        const socket = io()
+        dispatch(createSocket(socket))
+        return ()=>socket.close()
+    })
     return (
         <ThemeProvider>
                 {/* <CssBaseline/> */}
+                {isLogged && <SocketClient/>}
                 <Router>
                     <Switch>
                         <PrivateRoute path='/' exact>

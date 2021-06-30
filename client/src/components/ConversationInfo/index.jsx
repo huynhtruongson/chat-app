@@ -1,11 +1,11 @@
 import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary} from '@material-ui/core';
 import { ExpandMore } from '@material-ui/icons';
-import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const ConversationInfo = () => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)
+    const {imageGallery,videoGallery,fileGallery} = useSelector(state => state.gallery)
     return (
         <Box display='flex' flexDirection='column' borderLeft='1px solid #cacaca' height='100%'>
             <Box className={style.header}>
@@ -28,10 +28,9 @@ const ConversationInfo = () => {
                             <Typography variant='subtitle2'>Photo</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography>
-                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
-                                maximus est, id dignissim quam.
-                            </Typography>
+                            <Box display='flex' flexWrap='wrap' mr={'-3px'}>
+                                {imageGallery.map(img => <img key={img} className={style.imageGalleryItem} src={img} alt ='img'/>)}
+                            </Box>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion classes={{root : style.accordion}} square>  
@@ -102,6 +101,19 @@ const useStyle = makeStyles((theme) => ({
         '&.Mui-expanded': {
             margin: '12px 0',
           },
+    },
+    imageGalleryItem : {
+        width : 'calc(106px - 3px)',
+        height : 'calc(106px - 3px)',
+        marginRight : '3px',
+        objectFit : 'cover',
+        overflow : 'hidden',
+        borderRadius : '4px',
+        border : '1px solid #cacaca',
+        cursor : 'pointer',
+        '&:hover' : {
+            filter : 'contrast(50%)'
+        }
     }
 }));
 export default ConversationInfo;

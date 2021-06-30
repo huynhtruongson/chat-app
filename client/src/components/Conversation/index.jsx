@@ -1,19 +1,20 @@
 import { Box,makeStyles, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
-import {  useSelector } from 'react-redux'
+import {  useDispatch, useSelector } from 'react-redux'
 import Images from '../../constants/Images'
 import ConversationInfo from '../ConversationInfo'
 import MessageBox from '../MessageBox'
 import ReactBnbGallery from 'react-bnb-gallery'
 import 'react-bnb-gallery/dist/style.css'
 import { useEffect } from 'react'
-import MessageApi from '../../api/messageApi'
+import { getFileGallery, getImageGallery, getVideoGallery } from '../../actions/galleryAction'
 const Conversation = () => {
     const style = useStyle()
     const {activeConv} = useSelector(state => state.message)
-    const [imageGallery,setImageGallery] = useState([])
+    const {imageGallery} = useSelector(state => state.gallery)
     const [showGallery,setShowGallery] = useState(false)
     const [galleryIndex,setGalleryIndex] = useState(0)
+    const dispatch = useDispatch()
     const handleShowGallery = (src) => {
         if(imageGallery.length === 0)
             return
@@ -23,19 +24,13 @@ const Conversation = () => {
     }
     useEffect(()=>{
         const fetchUserMedia = async (id) => {
-            try {
-                if(!id) return
-                const res = await MessageApi.getImageGalerry(id)
-                if(res.status === 200) {
-                    const imageList = res.message.map(img => img.url_cloud) 
-                    setImageGallery(imageList)
-                }
-            } catch (error) {
-                console.log(error)
-            }
+            if(!id) return
+            dispatch(getImageGallery(id))
+            dispatch(getVideoGallery(id))
+            dispatch(getFileGallery(id))
         }
         fetchUserMedia(activeConv._id)
-    },[activeConv._id])   
+    },[activeConv._id,dispatch])   
     if(!activeConv._id)
         return (
             <Box position='relative' height='100%'>

@@ -2,10 +2,7 @@ import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from 
 const initialState = {
     conversations: [],
     activeConv: {},
-    messages: [],
-    imageGallery : [],
-    videoGallery : [],
-    fileGallery : [],
+    messages: []
 }
 const MessageReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -40,10 +37,7 @@ const MessageReducer = (state = initialState, action) => {
                 isConversationLoaded: true,
             };
         case GET_MESSAGES:
-            return {
-                ...state,
-                messages: action.payload
-            };
+            return {...state,messages: action.payload};
         default:
             return state;
     }

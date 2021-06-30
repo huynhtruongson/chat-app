@@ -16,6 +16,14 @@ const MessageApi = {
     getImageGalerry(id) {
         const url = `/api/conversation/image-gallery/${id}`
         return axiosClient.get(url)
-    }
+    },
+    getVideoGalerry(id) {
+        const url = `/api/conversation/video-gallery/${id}`
+        return axiosClient.get(url)
+    },
+    getFileGalerry(id) {
+        const url = `/api/conversation/file-gallery/${id}`
+        return axiosClient.get(url)
+    },
 }
 export default MessageApi

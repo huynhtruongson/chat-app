@@ -11,7 +11,7 @@ export const getUserMessage = (user) => async (dispatch) => {
         console.log(error)
     }
 }
-export const addMessage = (msg,user) => async (dispatch) => {
+export const addMessage = (msg,user,socket) => async (dispatch) => {
     try {
         const msgData = new FormData()
         msgData.append('text',msg.text)
@@ -22,7 +22,10 @@ export const addMessage = (msg,user) => async (dispatch) => {
             return {url_cloud : URL.createObjectURL(md),resource_type}
         })
         dispatch({type: ADD_MESSAGE,payload: {msg,user}})
-        await MessageApi.addMessage(msgData)
+        const res = await MessageApi.addMessage(msgData)
+        if(res.status === 200) {
+            socket.emit('ADD-MESSAGE',{msg,user})
+        }
     } catch (error) {
         console.log(error)
     }
@@ -44,7 +47,6 @@ export const getConversations = (id) => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
-
 }
 export const updateConversations = (convs) => ({
     type : UPDATE_CONVERSATIONS,
