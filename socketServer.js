@@ -3,6 +3,11 @@ let userList = []
 module.exports.socketServer = (socket) =>{
     socket.on("JOIN-USER", (user) => {
         userList.push({userID: user._id, socketID: socket.id , friendList: user.friendList})
+        let userListOnline = userList.filter(us => user.friendList.find(id => id === us.userID))
+        
+        userListOnline.forEach(us => {
+            socket.to(String(us.socketID).emit("ADD-USER-ONLINE", user._id)
+        });
     })
 
     socket.on("disconnect", ()=>{
@@ -14,7 +19,7 @@ module.exports.socketServer = (socket) =>{
             )
             
             users.forEach(user => {
-                socket.to(String(user.socketID)).emit("OFFLINE-USER", userOffline.userID)
+                socket.to(String(user.socketID)).emit("REMOVE_ONLINE-USER", userOffline.userID)
             });
         }
     })
