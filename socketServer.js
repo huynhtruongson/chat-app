@@ -19,7 +19,7 @@ module.exports.socketServer = (socket) =>{
             )
             
             users.forEach(user => {
-                socket.to(String(user.socketID)).emit("REMOVE_ONLINE-USER", userOffline.userID)
+                socket.to(String(user.socketID)).emit("REMOVE-ONLINE-USER", userOffline.userID)
             });
         }
     })
