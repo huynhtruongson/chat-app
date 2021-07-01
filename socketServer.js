@@ -28,7 +28,7 @@ module.exports.socketServer = (socket) =>{
         }
     })
 
-    socket.on("ADD_MESSAGE", ({msg,user})=>{
+    socket.on("ADD_MESSAGE", ({msg,user}) => {
         let userChat = userList.find(({userID})=> userID === user._id)
         if(userChat)
             socket.to(String(userChat.socketID)).emit("ADD_MESSAGE",{msg,user})
@@ -41,4 +41,11 @@ module.exports.socketServer = (socket) =>{
             socket.to(user.socketID).emit("ONLINE_USER",userListOnline)
         }
     })
+
+    socket.on("REMOVE_MESSAGE",(msg,user) => {
+        let userChat = userList.find(({userID})=> userID === user._id)
+        if(userChat)
+            socket.to(String(userChat.socketID)).emit("REMOVE_MESSAGE",{msg,user})
+    })
+
 }

@@ -1,6 +1,7 @@
 const accountModel = require("../models/AccountModel")
 const messageModel = require("../models/messageModel")
 const mongoose = require('mongoose')
+const cloudinary = require('../config/cloudinary')
 
 module.exports.getMessage = async (req, res) =>{
     try {
@@ -45,13 +46,20 @@ module.exports.deleteMessage = async (req, res) =>{
         }
 
         if(typeDelete === "text") {
-            messageDel = await messageModel.findByIdAndUpdate(id, {text: ""}, {safe: true })
-        } 
+            messageDel = await messageModel.findByIdAndUpdate(id, {text: ""}, {new: true })
+        } else if (typeDelete === "image") {
+            messageDel = await messageModel.findOne({_id: id, "media.resource_type": "image"},"media")
+            messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
+            messageDel = await messageModel.findByIdAndUpdate(id,{$pull: {media: {resource_type: "image"}}}, {new: true })
+        } else {
+            messageDel = await messageModel.findOne({_id: id, "media.resource_type": "raw"},"media")
+            messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
+            messageDel = await messageModel.findByIdAndUpdate(id,{$pull: {media: {resource_type: "raw"}}}, {new: true })
+        }
 
         if(!messageDel.text && !messageDel.media.length){
             await messageModel.findByIdAndDelete(id)
         }
-
 
         return res.status(200).json({message:"success"})
     } catch (err) {
