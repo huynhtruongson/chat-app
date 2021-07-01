@@ -3,19 +3,17 @@ let userList = []
 module.exports.socketServer = (socket) =>{
     socket.on("JOIN_USER", (user) => {
         let userListOnline = userList.filter(us => us.friendList.find(id => id === user._id))
-        console.log('id : ',socket.id)
-        console.log(userListOnline)
+
         userListOnline.forEach(us => {
-            // console.log(us.socketID,typeof us.socketID)
             socket.to(us.socketID).emit("ADD_USER_ONLINE", user._id)
         });
         userList.push({userID: user._id, socketID: socket.id , friendList: user.friend_list})
-        console.log('list : ',userList)
+
     })
 
     socket.on("disconnect", ()=>{
-        console.log(socket.id)
-        let userOffline  = userList.find(user => user.socketID = socket.id)
+
+        let userOffline  = userList.find(user => user.socketID === socket.id)
         if (userOffline) {
             let users = userList.filter(user => user.friendList.find(id => id === socket.id ))
             userList = userList.filter(user => 
