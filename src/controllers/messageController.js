@@ -5,7 +5,7 @@ const cloudinary = require('../config/cloudinary')
 
 module.exports.getMessage = async (req, res) =>{
     try {
-        let {pageSkip} = req.query.pageSkip*1 || 0
+        let pageSkip = req.query.pageSkip*1 || 0
         let {receiver} = req.params
         if (!receiver) {
             throw new Error ("Missing receiver ID")
@@ -16,15 +16,11 @@ module.exports.getMessage = async (req, res) =>{
             { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
         ]})
 
-        if(Math.ceil(countMessage/10) < pageSkip){
-            return res.status(200).json({message:"End of list"})
-        }
-
         let messageList = await messageModel.find({$or: [
             { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
             { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
         ]}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party","email avatar fullname ")
-        
+        console.log(messageList)
         return res.status(200).json({
             message: 'get conversation list success',
             data: messageList
