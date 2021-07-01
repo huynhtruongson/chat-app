@@ -11,7 +11,6 @@ import SearchModal from "../../components/SearchModal";
 import { useDispatch } from "react-redux";
 import Conversation from "../../components/Conversation";
 const HomePage = () => {
-    console.log('home page render')
     const [userModal, setUserModal] = useState(false);
     const [pwdModal, setPwdModal] = useState(false);
     const [searchModal,setSearchModal] = useState(false)

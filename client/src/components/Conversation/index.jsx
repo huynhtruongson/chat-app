@@ -45,7 +45,7 @@ const Conversation = () => {
             <Box className={style.messageBox}>
                 <MessageBox handleShowGallery={handleShowGallery}/>
             </Box>
-            <Box className={style.infoBox}>
+            <Box className={style.infoBox} display='none'>
                 <ConversationInfo handleShowGallery={handleShowGallery}/>
             </Box>
             <ReactBnbGallery 

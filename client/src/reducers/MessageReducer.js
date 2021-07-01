@@ -1,4 +1,4 @@
-import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from '../actions/type';
+import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, GET_MORE_MESSAGES} from '../actions/type';
 const initialState = {
     conversations: [],
     activeConv: {},
@@ -38,6 +38,8 @@ const MessageReducer = (state = initialState, action) => {
             };
         case GET_MESSAGES:
             return {...state,messages: action.payload};
+        case GET_MORE_MESSAGES :
+            return {...state,messages : [...state.messages,...action.payload]}
         default:
             return state;
     }

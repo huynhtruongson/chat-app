@@ -1,5 +1,5 @@
 import MessageApi from "../api/messageApi";
-import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from "./type";
+import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, GET_MORE_MESSAGES} from "./type";
 
 export const getUserMessage = (user) => async (dispatch) => {
     try {
@@ -48,6 +48,10 @@ export const getConversations = (id) => async (dispatch) => {
         console.log(error);
     }
 }
+export const getMoreMessages = (messages) => ({
+    type : GET_MORE_MESSAGES,
+    payload : messages
+})
 export const updateConversations = (convs) => ({
     type : UPDATE_CONVERSATIONS,
     payload : convs

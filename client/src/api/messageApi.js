@@ -25,5 +25,9 @@ const MessageApi = {
         const url = `/api/conversation/file-gallery/${id}`
         return axiosClient.get(url)
     },
+    getMoreMessages(id,params) {
+        const url = `/api/message/${id}`
+        return axiosClient.get(url,{params})
+    }
 }
 export default MessageApi

@@ -2,6 +2,14 @@
     width: 8px;
 }
 ::-webkit-scrollbar-thumb {
-    background: #bdbdbd; 
+    background: #bdbdbd;
     border-radius: 100px;
+}
+.gallery-figcaption
+    .gallery-figcaption--thumbnails
+    .caption-thumbnails
+    ul.thumbnails-list
+    li
+    button.thumbnail-button {
+    border: 0;
 }

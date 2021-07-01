@@ -1,14 +1,16 @@
-import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
+import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,CircularProgress} from '@material-ui/core';
 import {Info,PhotoLibrary,AttachFile,EmojiEmotionsRounded} from '@material-ui/icons';
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
 import Message from '../Mesage';
-import { addMessage } from '../../actions/messageAction';
+import { addMessage, getMoreMessages } from '../../actions/messageAction';
 import { useDispatch, useSelector } from 'react-redux';
 import IsolateSubmitBtn from '../IsolateSubmitBtn';
 import IsolateMedia from '../IsolateMedia';
+import { useEffect } from 'react';
+import MessageApi from '../../api/messageApi';
 const MessageBox = ({handleShowGallery}) => {
     const style = useStyle();
     const {messages,activeConv} = useSelector(state => state.message)
@@ -18,6 +20,8 @@ const MessageBox = ({handleShowGallery}) => {
     const [anchorEl, setAnchoEl] = useState(null);
     const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
     const chatFileRef = useRef();
+    const messageEnd = useRef()
+    const [isLoadMore,setIsLoadMore] = useState(false)
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
     const handleClickIcon = (icon) => {
@@ -54,6 +58,36 @@ const MessageBox = ({handleShowGallery}) => {
         dispatch(addMessage(msg,activeConv,socket))
         reset()
     };
+    useEffect(()=>{
+        const observer = new IntersectionObserver(entries => {
+            console.log(entries)
+            if(entries[0].isIntersecting) {
+                setIsLoadMore(true)
+            }
+        },{
+            threshold : 0.8
+        })
+        observer.observe(messageEnd.current)
+    },[])
+    useEffect(()=> {
+        const fetchMoreMessages = async () => {
+            try {
+                if(isLoadMore && messages.length > 0) {
+                    const res = await MessageApi.getMoreMessages(activeConv._id,{pageSkip : messages.length})
+                    if(res.status === 200) {
+                        dispatch(getMoreMessages(res.data))
+                        setIsLoadMore(false)
+                        if(res.data.length < 10)
+                            messageEnd.current.style.display = 'none'
+                    }
+                }
+            } catch (error) {
+                console.log(error)
+                setIsLoadMore(false)
+            }
+        }
+        fetchMoreMessages()
+    },[isLoadMore,activeConv._id,dispatch,messages.length])
     return (
         <Box display="flex" flexDirection="column" height="100%">
             <Box
@@ -69,7 +103,7 @@ const MessageBox = ({handleShowGallery}) => {
                         <Typography
                             classes={{ root: style.username }}
                             variant="subtitle2">
-                            {`${activeConv.firstname} ${activeConv.lastname}`}
+                            {activeConv.fullname}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                             Active now
@@ -96,6 +130,9 @@ const MessageBox = ({handleShowGallery}) => {
                         noAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
                         handleShowGallery={handleShowGallery}/>
                 ))}
+                <div className={style.messageEnd} ref={messageEnd}>
+                    {isLoadMore && <CircularProgress/>}
+                </div>
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Box display="flex" alignItems="flex-end" pb={0.8} borderTop='1px solid #bdbdbd'>
@@ -201,5 +238,9 @@ const useStyle = makeStyles((theme) => ({
         fontSize: '1.2rem',
         cursor: 'pointer',
     },
+    messageEnd : {
+        textAlign : 'center',
+        padding : '12px 0',
+    }
 }));
 export default MessageBox;
