@@ -11,16 +11,11 @@ module.exports.getMessage = async (req, res) =>{
             throw new Error ("Missing receiver ID")
         }
 
-        let countMessage = await messageModel.find({$or: [
-            { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
-            { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
-        ]})
-
         let messageList = await messageModel.find({$or: [
             { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
             { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
         ]}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party","email avatar fullname ")
-        console.log(messageList)
+
         return res.status(200).json({
             message: 'get conversation list success',
             data: messageList
