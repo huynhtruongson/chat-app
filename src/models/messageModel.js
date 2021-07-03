@@ -2,6 +2,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const messageSchema = new Schema({
+    conversation: {
+        type: Schema.Types.ObjectId,
+        ref: "conversation"
+    },
     sender:{
         type: Schema.Types.ObjectId,
         ref: "Account",
@@ -10,6 +14,12 @@ const messageSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref:"Account",
     },
+    delete: [
+        {
+            type: Schema.Types.ObjectId,
+            ref:"Account",
+        }
+    ],
     text: String,
     media: [{
         id_cloud: String,
