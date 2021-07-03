@@ -32,7 +32,7 @@ module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
 
-        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id)}).sort({'createdAt': 'desc'}).limit(10).skip(pageSkip).populate("party","fullname avatar email friend_list")
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'createdAt': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email friend_list")
         
         return res.status(200).json({
                 message: 'get conversation list success',
@@ -161,6 +161,7 @@ module.exports.addMessage = async (req, res) => {
         )
 
         let new_message = new messageModel({
+            conversation: mongoose.Types.ObjectId(conversationUpdate._id),
             sender: mongoose.Types.ObjectId(req.user.id),
             receiver: mongoose.Types.ObjectId(receiver),
             text: text,
@@ -242,6 +243,35 @@ module.exports.fileGallery = async (req, res) =>{
         return res.status(200).json({message: "Get image gallery success", data: imageList})
 
     } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+}
+
+module.exports.delConversation = async (req, res) =>{
+    try {
+        let {id} = req.params
+        let checkExist = await conversationModel.findById(id)
+
+        if(!checkExist || checkExist.delete.includes(req.user.id)) {
+            throw new Error ("Opps something went wrong ...")
+        }
+       
+        let updateConversation = await conversationModel.findByIdAndUpdate(id, {$push: {delete: req.user.id}}, {new: true})
+        
+        let receiver = updateConversation.party.find(user => String(user) !== req.user.id)
+
+        let updateMessage = await messageModel.updateMany({
+            $or: [
+                { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
+                { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+            ],
+            delete: {$ne: [req.user.id]}
+
+        }, {$push: {delete: req.user.id}})
+        
+        return res.send(updateConversation)
+       
+    } catch (err){
         return res.status(400).json({message: err.message})
     }
 }

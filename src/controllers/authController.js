@@ -239,7 +239,6 @@ module.exports.forgotPasswordController = async(req, res) => {
     }
 }
 
-
 module.exports.verifyResetpassword = async(req, res) =>{
     try {
         let {token, password} = req.body

@@ -8,6 +8,13 @@ const conversationSchema = new Schema({
             ref:"Account",
         }
     ],
+    delete: [
+        {
+            type: Schema.Types.ObjectId,
+            ref:"Account",
+        }
+    ],
+    name: String,
     text: String,
     media: [{
         id_cloud: String,
