@@ -20,6 +20,12 @@ const messageSchema = new Schema({
             ref:"Account",
         }
     ],
+    seen: [
+        {
+            type: Schema.Types.ObjectId,
+            ref:"Account",
+        }
+    ], 
     text: String,
     media: [{
         id_cloud: String,

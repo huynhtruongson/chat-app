@@ -2,6 +2,7 @@ const accountModel = require("../models/AccountModel")
 const messageModel = require("../models/messageModel")
 const mongoose = require('mongoose')
 const cloudinary = require('../config/cloudinary')
+const conversationModel = require('../models/conversationModel')
 
 module.exports.getMessage = async (req, res) =>{
     try {
@@ -54,6 +55,21 @@ module.exports.deleteMessage = async (req, res) =>{
         if(!messageDel.text && !messageDel.media.length){
             await messageModel.findByIdAndDelete(id)
         }
+
+        let messageLast = await messageModel.findOne({
+            $or: [
+                { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(messageDel.receiver) }, 
+                { sender: mongoose.Types.ObjectId(messageDel.receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+            ],
+            delete: {$ne: [req.user.id]}
+        }).sort({'createdAt': 'desc'})
+        console.log(messageLast)
+        console.log(messageDel)
+
+        await conversationModel.findOneAndUpdate({$or: [
+            { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(messageDel.receiver) }, 
+            { sender: mongoose.Types.ObjectId(messageDel.receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+        ]},{text: messageLast.text, media: messageLast.media})
 
         return res.status(200).json({message:"success"})
     } catch (err) {
