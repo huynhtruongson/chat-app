@@ -1,65 +1,56 @@
+import React from 'react';
 import {Avatar, Box, makeStyles, Typography} from '@material-ui/core';
 import {ThumbUp,Description} from '@material-ui/icons';
-const formatImages = (images) => {
-    const row = Math.ceil(images.length / 3);
-    const imgArr = images.map((img, index) => {
-        let imgSize = 375 / images.length;
-        if (row === 2) {
-            imgSize = 375 / 3;
-            if (index > 2 && images.length - 3 === 2) imgSize = 375 / 2;
-        }
-        return {
-            src: img.url_cloud,
-            style: {
-                width: images.length !== 1 ? imgSize+'px' : '100%',
-                height: images.length !== 1 ? imgSize+'px' : 'initial',
-                objectFit: 'cover',
-            },
-        };
-    });
-    return imgArr;
-};
-const Message = ({user, self, msg, noAvatar, handleShowGallery}) => {
-    const style = useStyle({self});
+import { useDispatch } from 'react-redux';
+import { getActiveImage } from '../../actions/galleryAction';
+const Message = React.forwardRef(({user, self, msg, noAvatar},ref) => {
+    const imageList = msg.media.filter((md) => md.resource_type === 'image')
+    const videoList = msg.media.filter((md) => md.resource_type === 'video')
+    const fileList = msg.media.filter((md) => md.resource_type === 'raw')
+    const style = useStyle({self,imgLength : imageList.length});
+    const dispatch = useDispatch()
+    const handleShowGallery = (url) => {
+        dispatch(getActiveImage(url))
+    }
     return (
         <Box
             mx={1}
             alignSelf={self ? 'flex-end' : 'flex-start'}
             display='flex'
             alignItems='flex-end'>
-            <Box minWidth='40px' mr={1} mb={1.5}>
+            <Box minWidth='40px' mr={1} mt={1.5}>
                 {!self && noAvatar && <Avatar src={user.avatar} />}
             </Box>
             <Box className={style.messageContainer}>
                 {msg.text &&
                     (msg.text === ':like:' ? (
-                        <ThumbUp fontSize='large' color='primary' />
+                        <Box mt={1.5}><ThumbUp fontSize='large' color='primary' /></Box>
                     ) : (
                         <Box
                             className={style.textMessage}
                             p={1}
                             borderRadius='6px'
                             maxWidth='500px'
-                            mb={1.5}>
+                            mt={1.5}>
                             <Typography variant='body1'>{msg.text}</Typography>
                         </Box>
                     ))}
                 {msg.media.length > 0 && (
                     <>
-                        <Box className={style.imageContainer}>
-                            {formatImages(msg.media.filter((md) => md.resource_type === 'image'))
-                                .map(img => 
-                                    <img onClick={()=>handleShowGallery(img.src)} key={img.src} src={img.src} style={img.style} alt='img'/>
+                        {imageList.length > 0  &&
+                        <Box className={style.imageContainer} mt={1.5}>
+                            {imageList.map(img => 
+                                    <img onClick={()=>handleShowGallery(img.url_cloud)} key={img.url_cloud} src={img.url_cloud} className={style.imgMessage} alt='img'/>
                                 )
                             }
-                        </Box>
-                        {msg.media.filter((md) => md.resource_type === 'video')
-                            .map(video => <Box key={video.url_cloud} className={style.videoContainer}>
+                        </Box>}
+                        {videoList.length > 0 && videoList.map(video => 
+                            <Box key={video.url_cloud} className={style.videoContainer} mt={1.5}>
                                 <video src={video.url_cloud} className={style.videoMessage} controls />
                             </Box>)
                         }
-                        {msg.media.filter((md) => md.resource_type === 'raw')
-                            .map(file => <Box key={file.url_cloud} mb={1.5} maxWidth='250px'>
+                        {fileList.length > 0 && fileList.map(file => 
+                            <Box key={file.url_cloud} mt={1.5} maxWidth='250px'>
                                 <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
                                     <Description/>
                                     <Typography variant='inherit'>{file.name}</Typography>
@@ -69,9 +60,10 @@ const Message = ({user, self, msg, noAvatar, handleShowGallery}) => {
                     </>
                 )}
             </Box>
+            {ref && <div ref={ref}></div>}
         </Box>
     );
-};
+});
 const useStyle = makeStyles((theme) => ({
     messageContainer : {
         display:'flex',
@@ -83,15 +75,14 @@ const useStyle = makeStyles((theme) => ({
         color: ({self}) => (self ? '#fff' : null),
     },
     imgMessage: {
-        width: '100%',
-        height: '100%',
+        width: ({imgLength}) => imgLength === 1 ? '100%' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
+        height: ({imgLength}) => imgLength === 1 ? 'initial' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
         objectFit: 'cover',
     },
     imageContainer : {
         maxWidth:'380px',
         display:'flex' ,
         flexWrap:'wrap',
-        marginBottom : theme.spacing(1.5),
         borderRadius : theme.spacing(1),
         overflow : 'hidden',
         '&>img' : {

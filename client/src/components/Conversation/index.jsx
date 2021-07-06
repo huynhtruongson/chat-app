@@ -7,20 +7,24 @@ import MessageBox from '../MessageBox'
 import ReactBnbGallery from 'react-bnb-gallery'
 import 'react-bnb-gallery/dist/style.css'
 import { useEffect } from 'react'
-import { getFileGallery, getImageGallery, getVideoGallery } from '../../actions/galleryAction'
+import { getFileGallery, getImageGallery, getVideoGallery, removeActiveImage } from '../../actions/galleryAction'
 const Conversation = () => {
     const style = useStyle()
     const {activeConv} = useSelector(state => state.message)
-    const {imageGallery} = useSelector(state => state.gallery)
-    const [showGallery,setShowGallery] = useState(false)
-    const [galleryIndex,setGalleryIndex] = useState(0)
+    const {imageGallery,activeImage} = useSelector(state => state.gallery)
     const dispatch = useDispatch()
     const handleShowGallery = (src) => {
-        if(imageGallery.length === 0)
-            return
         const imgIndex = imageGallery.findIndex(img => img === src)
-        setGalleryIndex(imgIndex)
-        setShowGallery(true)
+        if(imageGallery.length === 0 || imgIndex === -1)
+            return false
+        return true
+    }
+    const handleShowIndex = (src) => {
+        const imgIndex = imageGallery.findIndex(img => img === src)
+        return imgIndex !== -1 ? imgIndex : 0
+    }
+    const handleClose = () => {
+        dispatch(removeActiveImage())
     }
     useEffect(()=>{
         const fetchUserMedia = async (id) => {
@@ -43,16 +47,17 @@ const Conversation = () => {
     return (
         <Box className={style.container}>
             <Box className={style.messageBox}>
-                <MessageBox handleShowGallery={handleShowGallery}/>
+                <MessageBox />
             </Box>
             <Box className={style.infoBox} display='none'>
-                <ConversationInfo handleShowGallery={handleShowGallery}/>
+                <ConversationInfo />
             </Box>
             <ReactBnbGallery 
-                show={showGallery} 
+                show={handleShowGallery(activeImage)} 
+                activePhotoIndex={handleShowIndex(activeImage)}
                 photos={imageGallery}
-                activePhotoIndex={galleryIndex}
-                onClose={()=>setShowGallery(false)} backgroundColor='rgb(0 0 0 / 90%)'/> 
+                onClose={handleClose} 
+                backgroundColor='rgb(0 0 0 / 90%)'/> 
         </Box>
     )
 }
