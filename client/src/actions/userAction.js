@@ -5,6 +5,7 @@ export const getUserInfo = (token) => async (dispatch) => {
     try {
         const res = await UserApi.getInfo(token)
         if(res.status === 200) {
+            dispatch(userLoginSuccess())
             dispatch(updateUserInfo(res.data))
         }
     } catch (error) {

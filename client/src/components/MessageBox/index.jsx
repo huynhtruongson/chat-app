@@ -1,22 +1,43 @@
-import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,} from '@material-ui/core';
+import {Avatar,Box,IconButton,InputAdornment,makeStyles,Popover,TextField,Typography,CircularProgress} from '@material-ui/core';
 import {Info,PhotoLibrary,AttachFile,EmojiEmotionsRounded} from '@material-ui/icons';
 import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import ICONS from '../../constants/Icons';
 import useAlert from '../../hooks/alert';
 import Message from '../Mesage';
-import { addMessage } from '../../actions/messageAction';
+import { addMessage, updateLastMessage } from '../../actions/messageAction';
 import { useDispatch, useSelector } from 'react-redux';
 import IsolateSubmitBtn from '../IsolateSubmitBtn';
 import IsolateMedia from '../IsolateMedia';
-const MessageBox = ({handleShowGallery}) => {
+import { useEffect } from 'react';
+import MessageApi from '../../api/messageApi';
+import useLoadMessage from '../../hooks/useLoadMessage';
+import { useCallback } from 'react';
+import React from 'react';
+const MessageBox = () => {
+    console.log('message box reredenr')
     const style = useStyle();
-    const {messages,activeConv} = useSelector(state => state.message)
+    const {activeConv,messages} = useSelector(state => state.message)
+    const socket = useSelector(state => state.socket)
     const {info} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const [anchorEl, setAnchoEl] = useState(null);
-    const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
+    const { register, handleSubmit, setValue, getValues, control,reset,formState : {isSubmitting,isSubmitSuccessful} } = useForm();
     const chatFileRef = useRef();
+    const observer = useRef()
+    const [page,setPage] = useState(1)
+    const {loading,hasMore} = useLoadMessage(page)
+    const messageEndRef = useCallback(node => {
+        if(loading) return
+        if(observer.current) observer.current.disconnect()
+        observer.current = new IntersectionObserver(entries => {
+            if(entries[0].isIntersecting && hasMore) {
+                setPage(prevPage => prevPage + 1)
+            }
+        })
+        if(node) observer.current.observe(node)
+    },[loading,hasMore])
+    const [isSending,setIsSending] = useState(false)
     const { _alert } = useAlert();
     const { ref: inputRef, ...inputRest } = register('message');
     const handleClickIcon = (icon) => {
@@ -41,7 +62,8 @@ const MessageBox = ({handleShowGallery}) => {
         currentFiles.splice(index,1)
         setValue('media',currentFiles)
     }  
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+        setIsSending(true)
         const msg = {
             sender : info._id,
             receiver : activeConv._id,
@@ -50,25 +72,30 @@ const MessageBox = ({handleShowGallery}) => {
         }
         if(!data.message && !data.media)
             msg.text = ':like:'
-        dispatch(addMessage(msg,activeConv))
+        dispatch(addMessage({...msg},activeConv))
+        const msgData = new FormData()
+        msgData.append('text',msg.text)
+        msgData.append('receiver',msg.receiver)
+        msg.media.forEach(file => msgData.append('media',file))
         reset()
+        const res =  await MessageApi.addMessage(msgData)
+        if(res.status === 200) {
+            setIsSending(false)
+            dispatch(updateLastMessage(res.data.new_message))
+            socket.emit('ADD_MESSAGE',{msg : res.data.new_message,activeConv})
+        }
     };
+    useEffect(()=>{setPage(1)},[activeConv._id])
     return (
         <Box display="flex" flexDirection="column" height="100%">
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                borderBottom="1px solid #cacaca"
-                height='65px'
-                px={1}>
+            <Box className={style.messageHeader}>
                 <Box display="flex" alignItems="center">
                     <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
                     <Box ml={0.8}>
                         <Typography
                             classes={{ root: style.username }}
                             variant="subtitle2">
-                            {`${activeConv.firstname} ${activeConv.lastname}`}
+                            {activeConv.fullname}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                             Active now
@@ -80,12 +107,23 @@ const MessageBox = ({handleShowGallery}) => {
                         <Info />
                     </IconButton>
                 </Box>
+                <Box className={style.loading}>
+                    {loading && <CircularProgress/>}
+                </Box> 
             </Box>
-            <Box
-                flex={1}
-                display="flex"
-                overflow="auto"
-                flexDirection="column-reverse">
+            <Box className={style.messagesContainer}>
+                {/* {
+                    messages[0]?.sender === info._id && <Box alignSelf='flex-end' p={1}>
+                        <Typography color='primary'>{isSubmitting ? 'Sending...' : 'Sent ✔'}</Typography>
+                        <Typography color='primary'>{isSubmitting ? 'Sending...' : 'Sent ✔'}</Typography>
+                    </Box>
+                } */}
+                {isSubmitting && 
+                    <Typography color='primary'>Sending...</Typography>
+                }
+                {isSubmitSuccessful && 
+                    <Typography color='primary'>Sent</Typography>
+                }
                 {messages && messages.map((msg,index) => (
                     <Message 
                         key={msg+Math.random()} 
@@ -93,7 +131,7 @@ const MessageBox = ({handleShowGallery}) => {
                         user={activeConv}
                         self={msg.sender === info._id}
                         noAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
-                        handleShowGallery={handleShowGallery}/>
+                        ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -200,5 +238,29 @@ const useStyle = makeStyles((theme) => ({
         fontSize: '1.2rem',
         cursor: 'pointer',
     },
+    loading : {
+        textAlign : 'center',
+        padding : '12px 0',
+        position : 'absolute',
+        bottom : 0,
+        left : 0,
+        width : '100%',
+        transform : 'translateY(100%)'
+    },
+    messagesContainer : {
+        flex: 1,
+        display:"flex",
+        overflow:"auto",
+        flexDirection:"column-reverse",
+    },
+    messageHeader : {
+        display:"flex",
+        justifyContent:"space-between",
+        alignItems:"center",
+        borderBottom:"1px solid #cacaca",
+        height:'65px',
+        padding : '0 8px',
+        position : 'relative'
+    }
 }));
-export default MessageBox;
+export default React.memo(MessageBox);

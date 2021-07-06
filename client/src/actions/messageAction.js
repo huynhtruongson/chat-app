@@ -1,34 +1,19 @@
 import MessageApi from "../api/messageApi";
-import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE} from "./type";
+import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE} from "./type";
 
-export const getUserMessage = (user) => async (dispatch) => {
-    try {
-        dispatch({type: GET_USER_MESSAGE,payload: user});
-        const res = await MessageApi.getMessages(user._id)
-        if(res.status === 200)
-            dispatch(getMessages(res.data))
-    } catch (error) {
-        console.log(error)
-    }
-}
-export const addMessage = (msg,user,socket) => async (dispatch) => {
-    try {
-        const msgData = new FormData()
-        msgData.append('text',msg.text)
-        msgData.append('receiver',msg.receiver)
-        msg.media.forEach(file => msgData.append('media',file))
-        msg.media = msg.media.map(md => {
-            const resource_type = md.type.split('/')[0]
+export const getUserMessage = (user) => ({
+    type: GET_USER_MESSAGE,
+    payload: user
+})
+export const addMessage = (msg,user) => {
+    msg.media = msg.media.map(md => {
+        const resource_type = md.type.split('/')[0]
+        if(resource_type === 'application')
+            return {name : md.name,url_cloud : null,resource_type : 'raw'}
+        else
             return {url_cloud : URL.createObjectURL(md),resource_type}
-        })
-        dispatch({type: ADD_MESSAGE,payload: {msg,user}})
-        const res = await MessageApi.addMessage(msgData)
-        if(res.status === 200) {
-            socket.emit('ADD-MESSAGE',{msg,user})
-        }
-    } catch (error) {
-        console.log(error)
-    }
+    })
+    return ({type: ADD_MESSAGE,payload: {msg,user}})
 };
 export const getConversations = (id) => async (dispatch) => {
     try {
@@ -48,6 +33,10 @@ export const getConversations = (id) => async (dispatch) => {
         console.log(error);
     }
 }
+export const updateLastMessage = (msg) => ({
+    type : UPDATE_LAST_MESSAGE,
+    payload : msg
+})
 export const updateConversations = (convs) => ({
     type : UPDATE_CONVERSATIONS,
     payload : convs

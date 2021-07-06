@@ -5,13 +5,13 @@ const MessageApi = {
         const url = '/api/conversation/list'
         return axiosClient.get(url)
     },
-    getMessages(id) {
+    getMessages(id,params) {
         const url = `/api/message/${id}`
-        return axiosClient.get(url)
+        return axiosClient.get(url,{params})
     },
-    addMessage(msg) {
+    addMessage(msg,options) {
         const url = '/api/conversation/add-message'
-        return axiosClient.post(url,msg)
+        return axiosClient.post(url,msg,options)
     },
     getImageGalerry(id) {
         const url = `/api/conversation/image-gallery/${id}`

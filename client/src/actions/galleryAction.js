@@ -1,5 +1,5 @@
 import MessageApi from "../api/messageApi";
-import { GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY } from "./type";
+import { GET_ACTIVE_IMAGE, GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY, REMOVE_ACTIVE_IMAGE } from "./type";
 
 export const getImageGallery = (id) => async (dispatch) => {
     try {
@@ -34,3 +34,10 @@ export const getFileGallery = (id) => async (dispatch) => {
         console.log(error);
     }
 }
+export const getActiveImage = (url) => ({
+    type : GET_ACTIVE_IMAGE,
+    payload : url
+})
+export const removeActiveImage = () => ({
+    type : REMOVE_ACTIVE_IMAGE,
+})

@@ -2,10 +2,10 @@ import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,Accordion
 import { ExpandMore } from '@material-ui/icons';
 import { useSelector } from 'react-redux';
 
-const ConversationInfo = () => {
+const ConversationInfo = ({handleShowGallery}) => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)
-    const {imageGallery,videoGallery,fileGallery} = useSelector(state => state.gallery)
+    const {imageGallery} = useSelector(state => state.gallery)
     return (
         <Box display='flex' flexDirection='column' borderLeft='1px solid #cacaca' height='100%'>
             <Box className={style.header}>
@@ -29,7 +29,7 @@ const ConversationInfo = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Box display='flex' flexWrap='wrap' mr={'-3px'}>
-                                {imageGallery.map(img => <img key={img} className={style.imageGalleryItem} src={img} alt ='img'/>)}
+                                {imageGallery.map(img => <img key={img} onClick={()=>handleShowGallery(img)} className={style.imageGalleryItem} src={img} alt ='img'/>)}
                             </Box>
                         </AccordionDetails>
                     </Accordion>
