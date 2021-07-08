@@ -34,7 +34,7 @@ const SearchModal = ({open, onClose}) => {
     };
     const handleCloseModal = () => {
         setSearchInput('');
-        setSearchList('');
+        setSearchList([]);
         setLoading(false);
         setUserDetail(null);
     };

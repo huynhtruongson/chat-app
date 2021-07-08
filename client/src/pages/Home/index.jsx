@@ -8,25 +8,31 @@ import {useHistory} from "react-router";
 import ConversationSidebar from "../../components/ConversationSidebar";
 import FriendRequest from '../../components/FriendRequest'
 import SearchModal from "../../components/SearchModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Conversation from "../../components/Conversation";
+import { useCallback } from "react";
 const HomePage = () => {
     const [userModal, setUserModal] = useState(false);
     const [pwdModal, setPwdModal] = useState(false);
     const [searchModal,setSearchModal] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const [showFriendList,setShowFriendList] = useState(false)
-    const [showFrRequest,setShowFrRequest] = useState(false) 
+    const [showFrRequest,setShowFrRequest] = useState(false)
+    const [showConversation,setShowConversation] = useState(false)  // Mobile breakpoint
+    const {info} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const history = useHistory();
-    const style = useStyle();
+    const style = useStyle({showConversation});
     const handleLogOut = () => {
         dispatch(userLogout());
         localStorage.removeItem("token");
         history.push("/login");
     };
+    const handleShowConversation = useCallback((val) => {
+        setShowConversation(val)
+    },[])
     return (
-        <Box height="100vh" display="flex">
+        <Box height="100vh" display="flex" overflow='hidden'>
             <Box
                 className={style.sidebar}
                 py={1}
@@ -41,18 +47,26 @@ const HomePage = () => {
                         }}>
                         <Avatar
                             classes={{root: style.avatar}}
-                            src="https://picsum.photos/200/300"
+                            src={info.avatar}
                             onClick={() => setUserModal(true)}
                         />
                     </Badge>
                 </Box>
                 <Box mt={2}>
                     <Button classes={{root: style.settingBtn}}
-                        onClick={()=>setShowFriendList(false)}>
+                        onClick={()=>{
+                            if(showFriendList) 
+                                handleShowConversation(false)
+                            setShowFriendList(false)
+                            }}>
                         <Chat fontSize="large" />
                     </Button>
                     <Button classes={{root: style.settingBtn}}
-                        onClick={()=>setShowFriendList(true)}>
+                        onClick={()=>{
+                            if(!showFriendList)
+                                handleShowConversation(false)
+                            setShowFriendList(true)
+                        }}>
                         <PermContactCalendar fontSize="large" />
                     </Button>
                 </Box>
@@ -98,16 +112,18 @@ const HomePage = () => {
                     </Popover>
                 </Box>
             </Box>
-            <Box display="flex" flex={1} height="100%">
-                <Box width="336px" className={style.chatList} height="100%">
-                    <ConversationSidebar 
+            <Box display="flex" flex={1} height="100%" position='relative'>
+                <Box className={style.conversationSidebar}>
+                    <ConversationSidebar
+                        handleShowConversation={handleShowConversation}
                         showFriendList={showFriendList} 
                         handleShowFrRequest={(val)=>setShowFrRequest(val)}
                         handleShowSearchModal={()=>setSearchModal(true)}/>
                 </Box>
-                <Box flex={1} height="100%" className={style.messageBox}>
+                <Box className={style.conversation}>
                         {(showFrRequest && showFriendList)
-                            ? <FriendRequest/> : <Conversation/>
+                            ? <FriendRequest handleShowConversation={handleShowConversation}/> : 
+                            <Conversation handleShowConversation={handleShowConversation}/>
                         }
                 </Box>
             </Box>
@@ -140,16 +156,27 @@ const useStyle = makeStyles((theme) => ({
         top: "8px",
         right: "6px",
     },
-    chatList: {
+    conversationSidebar: {
         borderRight: "1px solid #cacaca",
+        width:"336px",
+        height:"100%",
+        [theme.breakpoints.down('sm')] : {
+            width : '100%'
+        }
     },
-    messageBox: {
+    conversation: {
+        backgroundColor : '#fff',
+        flex:1,
+        height:"100%",
         [theme.breakpoints.down("sm")]: {
+            display : ({showConversation}) => showConversation ? 'block' : 'none',
             position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
             height: "100%",
+            zIndex : 2,
+            animation : '$slideIn 150ms linear'
         },
     },
     settingBtn: {
@@ -167,5 +194,13 @@ const useStyle = makeStyles((theme) => ({
             color: "red",
         },
     },
+    '@keyframes slideIn' : {
+        '0%' : {
+            transform : 'translateX(100%)'
+        },
+        '100%' : {
+            transform : 'initial'
+        }
+    }
 }));
 export default HomePage;
