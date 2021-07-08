@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-
+const mongoose = require('mongoose')
 const cloudinary = require('../config/cloudinary')
 const AccountModel = require('../models/AccountModel')
 
@@ -70,8 +70,8 @@ module.exports.acceptFriend = async (req, res) => {
             throw new Error ("This user not already add friend you")
         }
 
-        await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_request_list: id}, friend_list: id},{ safe: true })
-        await AccountModel.findByIdAndUpdate(id, {$pull: {friend_invite_list: req.user.id}, friend_list: req.user.id}, { safe: true })
+        await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_request_list: id},$push: {friend_list: id}},{ safe: true })
+        await AccountModel.findByIdAndUpdate(id, {$pull: {friend_invite_list: req.user.id}, $push: {friend_list: req.user.id}}, { safe: true })
 
         return res.status(200).json({message: "Accept success"})
 
@@ -104,7 +104,7 @@ module.exports.addFriend = async (req, res) => {
         await AccountModel.findByIdAndUpdate(req.user.id, {$push: {friend_invite_list: id} })
 
         userAddFriend.friend_request_list.push(req.user.id)
-        userAddFriend.save()
+        await userAddFriend.save()
 
         return res.status(200).json({message:"Sent a friend request"})
     } catch (err) {
@@ -115,10 +115,9 @@ module.exports.addFriend = async (req, res) => {
 module.exports.search = async(req, res) =>{
     try{
         let {fullname} = req.query
-        let userCurrent = await AccountModel.findById( req.user.id)
+        let userCurrent = await AccountModel.findById( req.user.id).lean()
         let {friend_list, friend_invite_list} = userCurrent
-        
-        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"}, _id: {$ne: friend_list, $ne: req.user.id}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").limit(10).lean()
+        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"},$and: [{_id: {$ne: req.user.id}}, {_id: {$ne: friend_list}}]}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").limit(10).lean()
 
         searchList = searchList.map(user => friend_invite_list && friend_invite_list.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
         
