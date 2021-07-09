@@ -4,8 +4,8 @@ const Schema = mongoose.Schema
 const AccountSchema = new Schema({
     email:{
         type:String,
-        unique: true
     },
+    type_account: String,
     fullname:String,
     firstname:String,
     lastname:String,

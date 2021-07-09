@@ -33,28 +33,11 @@ module.exports.getMessage = async (req, res) =>{
 module.exports.deleteMessage = async (req, res) =>{
     try{
         let {id} = req.params
-        let {typeDelete} = req.body
         let messageDel = undefined
 
-        if(!typeDelete) {
-            throw new Error ("Oops something went wrong")
-        }
-
-        if(typeDelete === "text") {
-            messageDel = await messageModel.findByIdAndUpdate(id, {text: ""}, {new: true })
-        } else if (typeDelete === "image") {
-            messageDel = await messageModel.findOne({_id: id, "media.resource_type": "image"},"media")
-            messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
-            messageDel = await messageModel.findByIdAndUpdate(id,{$pull: {media: {resource_type: "image"}}}, {new: true })
-        } else {
-            messageDel = await messageModel.findOne({_id: id, "media.resource_type": "raw"},"media")
-            messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
-            messageDel = await messageModel.findByIdAndUpdate(id,{$pull: {media: {resource_type: "raw"}}}, {new: true })
-        }
-
-        if(!messageDel.text && !messageDel.media.length){
-            await messageModel.findByIdAndDelete(id)
-        }
+        messageDel = await messageModel.findById(id,"media")
+        messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
+        await messageModel.findByIdAndDelete(id)
 
         let messageLast = await messageModel.findOne({
             $or: [
@@ -63,8 +46,6 @@ module.exports.deleteMessage = async (req, res) =>{
             ],
             delete: {$ne: [req.user.id]}
         }).sort({'createdAt': 'desc'})
-        console.log(messageLast)
-        console.log(messageDel)
 
         await conversationModel.findOneAndUpdate({$or: [
             { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(messageDel.receiver) }, 
