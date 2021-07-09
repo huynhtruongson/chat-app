@@ -3,8 +3,12 @@ const jwt = require('jsonwebtoken')
 const {validationResult} = require('express-validator')
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
+const mongoose = require('mongoose')
+const {OAuth2Client} =  require('google-auth-library')
+const client = new OAuth2Client("713987113089-v6kssliis8c1m004jdlbfumnd4b51chd.apps.googleusercontent.com")
 
 const AccountModel = require('../models/AccountModel')
+const cloudinary = require('../config/cloudinary')
 
 module.exports.loginController =  async(req, res) => {
     try{
@@ -12,7 +16,7 @@ module.exports.loginController =  async(req, res) => {
         let result = validationResult(req)
         if(result.errors.length === 0){
             let {email, password} = req.body
-            let account = await AccountModel.findOne({email: email})
+            let account = await AccountModel.findOne({email: email, type_account: "email"})
             
             if (!account){
                 throw new Error("Wrong email or password")
@@ -56,15 +60,16 @@ module.exports.loginController =  async(req, res) => {
     }
 }
 
-module,exports.googleLoginController = (req, res) =>{
+module,exports.googleLoginController = async (req, res) =>{
     const{tokenId}=req.body
-    let original_id = mongoose.Types.ObjectId()
-    client.verifyIdToken({idToken :tokenId,audience:"173768816222-a3th16lqbckuej5epilhsnv3tg0l031q.apps.googleusercontent.com"})
+    client.verifyIdToken({idToken :tokenId, audience:"713987113089-v6kssliis8c1m004jdlbfumnd4b51chd.apps.googleusercontent.com"})
     .then(response=>{
-        const {email_verified,name,email,picture}= response.payload
+        const {email_verified, name, given_name, family_name, email, picture}= response.payload
+        let firstname = given_name || ""
+        let lastname = family_name || "" 
 
         if(email_verified){        
-            AccountModel.findOne({email:email}).exec((err,user)=>{
+            AccountModel.findOne({email: email, type_account: "google"}).exec((err,user)=>{
                 if(err){
                     return res.status(400).json({message:err.message})
                 } else{
@@ -80,10 +85,11 @@ module,exports.googleLoginController = (req, res) =>{
                         cloudinary.uploader.upload(picture)
                         .then(imageCloud=>{
                         let newAccount = new AccountModel({
-                            _id: original_id,
                             email: email,
+                            fullname: name,
                             firstname: firstname,
                             lastname: lastname,
+                            type_account: "google",
                             avatar: imageCloud.secure_url,
                             id_avatar: imageCloud.public_id,
                             
@@ -95,13 +101,13 @@ module,exports.googleLoginController = (req, res) =>{
                                 })
                             }
 
-                            const {JWT_SECRET} = process.env
-                            const token = jwt.sign({
-                                id:data.id,
-                                },JWT_SECRET,{expiresIn:"3d"})
-                                res.status(200).json({message:"Login success",token:token})
+                                const {JWT_SECRET} = process.env
+                                const token = jwt.sign({
+                                    id:data.id,
+                                    },JWT_SECRET,{expiresIn:"3d"})
+                                    res.status(200).json({message:"Login success",data:token})
+                            })
                         })
-                    })
                     }
                 }
             })
@@ -126,7 +132,7 @@ module.exports.registerController = async (req, res) =>{
         var token = crypto.randomBytes(48).toString('hex')
         let fullname = firstname + " " + lastname
         
-        let checkExist = await AccountModel.findOne({email: email})
+        let checkExist = await AccountModel.findOne({email: email, type_account: "emai"})
 
         if (checkExist) {
             throw new Error ('This account is registered')
@@ -138,6 +144,7 @@ module.exports.registerController = async (req, res) =>{
             fullname: fullname,
             firstname: firstname,
             lastname: lastname,
+            type_account: "email",
             password: password_hash,
             tokenVerify: token,
         })
