@@ -12,38 +12,33 @@ module.exports.socketServer = (socket) =>{
     })
 
     socket.on("disconnect", ()=>{
-
         let userOffline  = userList.find(user => user.socketID === socket.id)
         if (userOffline) {
-            let users = userList.filter(user => user.friendList.find(id => id === socket.id ))
-            userList = userList.filter(user => 
-                user.socketID !== socket.id
-            )
-            
-            users.forEach(user => {
-                socket.to(String(user.socketID)).emit("REMOVE_ONLINE_USER", userOffline.userID)
-            });
+            let users = userList.filter(user => user.friendList.find(id => id === userOffline.userID ))
+            userList = userList.filter(user => user.socketID !== socket.id)
+            users.forEach(user => {socket.to(user.socketID).emit("REMOVE_ONLINE_USER", userOffline.userID)});
         }
     })
 
     socket.on("ADD_MESSAGE", ({msg,user}) => {
-        let userChat = userList.find(({userID})=> userID === user._id)
+        let userChat = userList.find(({userID})=> userID === msg.reciver)
         if(userChat)
-            socket.to(String(userChat.socketID)).emit("ADD_MESSAGE",{msg,user})
+            socket.to(userChat.socketID).emit("ADD_MESSAGE",{msg,user})
     })
 
     socket.on("ONLINE_USER", (userID) => {
-        let user = userList.find(user => user.userID === userID)
+        let user = userList.find(us => us.userID === userID)
         if (user) {
-            let userListOnline = userList.filter(us => us.friendList.find(id => id === user.userID))
-            socket.to(user.socketID).emit("ONLINE_USER",userListOnline)
+            let userListOnline = userList.filter(us => us.friendList.find(id => id === userID))
+            userListOnline = userListOnline.map(us => us.userID)
+            socket.emit("ONLINE_USER",userListOnline)
         }
     })
 
     socket.on("REMOVE_MESSAGE",(msg,user) => {
         let userChat = userList.find(({userID})=> userID === user._id)
         if(userChat)
-            socket.to(String(userChat.socketID)).emit("REMOVE_MESSAGE",{msg,user})
+            socket.to(userChat.socketID).emit("REMOVE_MESSAGE",{msg,user})
     })
 
 }
