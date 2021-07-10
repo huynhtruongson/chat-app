@@ -1,4 +1,4 @@
-import { ADD_USER_ONLINE, ONLINE_USER, REMOVE_USER_ONLINE } from "./type";
+import { ADD_USER_ONLINE, ONLINE_USER, REMOVE_ONLINE_USER } from "./type";
 
 export const getUserOnline = (users) => ({
     type : ONLINE_USER,
@@ -9,6 +9,6 @@ export const addUserOnline = (userId) => ({
     payload : userId
 })
 export const removeUserOnline = (userId) => ({
-    type : REMOVE_USER_ONLINE,
+    type : REMOVE_ONLINE_USER,
     payload : userId
 })

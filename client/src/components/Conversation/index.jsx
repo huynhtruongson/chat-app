@@ -8,11 +8,14 @@ import ReactBnbGallery from 'react-bnb-gallery'
 import 'react-bnb-gallery/dist/style.css'
 import { useEffect } from 'react'
 import { getFileGallery, getImageGallery, getVideoGallery, removeActiveImage } from '../../actions/galleryAction'
-const Conversation = () => {
-    const style = useStyle()
+import { useCallback } from 'react'
+const Conversation = ({handleShowConversation}) => {
+    console.log('conversation render')
+    const [showInfo,setShowInfo] = useState(false)
     const {activeConv} = useSelector(state => state.message)
     const {imageGallery,activeImage} = useSelector(state => state.gallery)
     const dispatch = useDispatch()
+    const style = useStyle({showInfo})
     const handleShowGallery = (src) => {
         const imgIndex = imageGallery.findIndex(img => img === src)
         if(imageGallery.length === 0 || imgIndex === -1)
@@ -26,6 +29,9 @@ const Conversation = () => {
     const handleClose = () => {
         dispatch(removeActiveImage())
     }
+    const handleShowInfo = useCallback(() => {
+        setShowInfo(prev => !prev)
+    },[])
     useEffect(()=>{
         const fetchUserMedia = async (id) => {
             if(!id) return
@@ -47,10 +53,10 @@ const Conversation = () => {
     return (
         <Box className={style.container}>
             <Box className={style.messageBox}>
-                <MessageBox />
+                <MessageBox handleShowInfo={handleShowInfo} handleShowConversation={handleShowConversation}/>
             </Box>
-            <Box className={style.infoBox} display='none'>
-                <ConversationInfo />
+            <Box className={style.infoBox}>
+                <ConversationInfo handleShowInfo={handleShowInfo}/>
             </Box>
             <ReactBnbGallery 
                 show={handleShowGallery(activeImage)} 
@@ -64,14 +70,27 @@ const Conversation = () => {
 const useStyle = makeStyles(theme => ({
     container : {
         display : 'flex',
-        height : '100%'
+        height : '100%',
+        overflow : 'hidden',
+        position : 'relative',
+        backgroundColor : '#fff'
     },
     messageBox : {
         flex : 1,
         height : '100%'
     },
     infoBox : {
-        width : '350px',
+        display : ({showInfo}) => showInfo ? 'block' : 'none',
+        width : '352px',
+        height : '100%',
+        [theme.breakpoints.down('sm')] : {
+            position : 'absolute',
+            top : 0,
+            right : 0,
+            zIndex : 2,
+            backgroundColor : '#fff',
+            animation : '$slideIn 150ms linear'
+        }
     },
     bgcGreeting : {
         position : 'absolute',
@@ -82,6 +101,14 @@ const useStyle = makeStyles(theme => ({
     bgcImage : {
         width : '450px',
     },
+    '@keyframes slideIn' : {
+        '0%' : {
+            transform : 'translateX(100%)'
+        },
+        '100%' : {
+            transform : 'initial'
+        }
+    }
 }))
 
-export default Conversation
+export default React.memo(Conversation)

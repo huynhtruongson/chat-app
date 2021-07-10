@@ -30,7 +30,7 @@ const UserProfile = (props) => {
                     size='small' 
                     color='primary'
                     disabled={isRequesting}>
-                    {user.isRequest ? 'Undo' : 'Add Friend'}
+                    {user.isRequest ? 'Cancel Request' : 'Add Friend'}
                 </Button>
             </Box>
             <Box mt={3}>

@@ -9,6 +9,10 @@ const AuthApi = {
         const url = '/api/auth/login'
         return axiosClient.post(url,credentials)
     },
+    googleLogin(token) {
+        const url = '/api/auth/login/google'
+        return axiosClient.post(url,token)
+    },
     verifyEmail(data) {
         const url = '/api/auth/verify-user'
         return axiosClient.post(url,data)

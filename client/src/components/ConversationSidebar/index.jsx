@@ -6,23 +6,42 @@ import {getConversations, getUserMessage} from "../../actions/messageAction";
 import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
-const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal}) => {
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal,handleShowConversation}) => {
     const style = useStyle();
     const {info : {_id : userId}} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
+    const onlineUser = useSelector(state => state.onlineUser)
     const [friendList,setFriendList] = useState([])
+    const [search,setSearch] = useState('')
     const dispatch = useDispatch()
+    const friendListSearch = friendList.filter(f => f.fullname.toLowerCase().includes(search.toLowerCase()))
+    const ConvListSearch = conversations.filter(cv => cv.fullname.toLowerCase().includes(search.toLowerCase()))
+    const isMobileBp = useMediaQuery(theme => theme.breakpoints.down('sm'))
     const handleClickUserConversations = (id) => {
+        if(isMobileBp)
+            handleShowConversation(true)
         if (activeConv._id === id) return;
         const user = conversations[conversations.findIndex((cv) => cv._id === id)];
         dispatch(getUserMessage(user));
     };
     const handleClickUserFriends = (id) => {
+        if(isMobileBp)
+            handleShowConversation(true)
         handleShowFrRequest(false);
         if (activeConv._id === id) return;
         const user = friendList[friendList.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
     };
+    const handleClickFriendRq = () => {
+        if(isMobileBp)
+            handleShowConversation(true)
+        handleShowFrRequest(true)
+        
+    }
+    const handleSearch = (e) => {
+        setSearch(e.target.value)
+    }
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -44,6 +63,8 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                     fullWidth 
                     size='small'
                     placeholder='Search'
+                    value={search}
+                    onChange={handleSearch}
                     InputProps={{
                         classes:{root : style.searchInput},
                         startAdornment : <Search color='disabled'/>,
@@ -53,27 +74,30 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                 </IconButton>
             </Box>
             {showFriendList && (
-                <Box className={style.friendRequestBtn} onClick={() => handleShowFrRequest(true)}>
+                <Box className={style.friendRequestBtn} onClick={handleClickFriendRq}>
                     <img className={style.friendRequestIcon} src={Images.ADDFR_ICON} alt="icon" />
                     <Typography>Friend Request</Typography>
                 </Box>
             )}
             <Box display="flex" flexDirection="column">
                 {!showFriendList
-                    ? conversations?.map((cv) => (
+                    ? ConvListSearch?.map((cv) => (
                           <ChatCard
                               active={cv._id === activeConv._id}
                               key={cv._id}
                               user={cv}
                               handleClickUser={() => handleClickUserConversations(cv._id)}
+                              isConv
+                              isOnline={onlineUser.includes(cv._id)}
                           />
                       ))
-                    : friendList?.map((user) => (
+                    : friendListSearch?.map((user) => (
                           <ChatCard
                               active={user._id === activeConv._id}
                               key={user._id}
                               user={user}
                               handleClickUser={() => handleClickUserFriends(user._id)}
+                              isOnline={onlineUser.includes(user._id)}
                           />
                       ))}
             </Box>

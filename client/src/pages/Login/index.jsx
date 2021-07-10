@@ -1,6 +1,7 @@
 import { TextField, Box, Button, Backdrop, CircularProgress } from '@material-ui/core';
 import {ArrowRightAlt,Facebook} from '@material-ui/icons';
 import React from 'react';
+import GoogleLogin from 'react-google-login';
 import { Link, useHistory } from 'react-router-dom';
 import AuthForm from '../../components/AuthForm';
 import Images from '../../constants/Images';
@@ -48,22 +49,53 @@ function LoginPage() {
                 })
             }
     }
+    const responseGoogleSuccess = async (response) => {
+        try {
+            console.log(response)
+            // const res = await AuthApi.googleLogin({tokenId :response.tokenId})
+            // if(res.status === 200) {
+            //     localStorage.setItem('token',res.data)
+            //     AuthApi.setHeaderAxios(res.data)
+            //     dispatch(userLoginSuccess())
+            //     history.push('/')
+            // }
+        } catch (error) {
+            const {data : {message},status} = error.response
+            if(status === 400) {
+                _alert({
+                    icon : 'error',
+                    msg : message
+                })
+            }
+        }
+    }
+    const responseGoogleFail = (response) => {
+        console.log(response)
+    }
     return (
         <AuthForm title='Welcome Back' logo={Images.CHAT_LOGO2}>
             <Box className={style.container} width="76%" mt={2.5}>
-                <Button
-                    classes={{
-                        root : style.button,
-                        startIcon : style.startIcon,
-                        endIcon : style.endIcon,
-                    }}
-                    variant="contained"
-                    fullWidth
-                    startIcon={<img className={style.googleIcon} src={Images.GOOGLE_ICON} alt=""></img>}
-                    endIcon={<div></div>}
-                >
-                    Login with Google
-                </Button>
+                <GoogleLogin
+                    clientId='713987113089-v6kssliis8c1m004jdlbfumnd4b51chd.apps.googleusercontent.com'
+                    onSuccess={responseGoogleSuccess}
+                    onFailure={responseGoogleFail}
+                    cookiePolicy={'single_host_origin'}
+                    render={(props) => 
+                        <Button
+                            {...props}
+                            classes={{
+                                root : style.button,
+                                startIcon : style.startIcon,
+                                endIcon : style.endIcon,
+                            }}
+                            variant="contained"
+                            fullWidth
+                            startIcon={<img className={style.googleIcon} src={Images.GOOGLE_ICON} alt=""></img>}
+                            endIcon={<div></div>}
+                        >
+                            Login with Google
+                        </Button>}
+                />
                 <Button
                     classes={{
                         root : style.button,

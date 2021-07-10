@@ -31,7 +31,6 @@ function App() {
     },[dispatch,isLogged])
     useEffect(() => {
         if(isLogged) {
-            console.log('create socket')
             socketRef.current = io()
             dispatch(createSocket(socketRef.current))
         }

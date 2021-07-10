@@ -16,7 +16,7 @@ const UserCard = ({user,handleClick,handleRequestClick,isRequesting}) => {
                 color="primary" 
                 size='small'
                 disabled={isRequesting}>
-                {user.isRequested ? 'Undo' : 'Add friend'}
+                {user.isRequested ? 'Cancel Request' : 'Add friend'}
             </Button>
         </Box>
     )

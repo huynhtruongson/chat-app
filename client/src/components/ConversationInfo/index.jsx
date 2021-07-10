@@ -1,14 +1,17 @@
-import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary} from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons';
+import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary, IconButton} from '@material-ui/core';
+import { ExpandMore,ArrowBack } from '@material-ui/icons';
 import { useSelector } from 'react-redux';
 
-const ConversationInfo = ({handleShowGallery}) => {
+const ConversationInfo = ({handleShowGallery,handleShowInfo}) => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)
     const {imageGallery} = useSelector(state => state.gallery)
     return (
         <Box display='flex' flexDirection='column' borderLeft='1px solid #cacaca' height='100%'>
             <Box className={style.header}>
+                <IconButton onClick={()=>handleShowInfo(false)} className={style.backBtn}>
+                    <ArrowBack color='primary'/>
+                </IconButton>
                 <Box>
                     <Typography classes={{root: style.title}} variant='subtitle2' color='initial'>
                         Conversation Info
@@ -27,8 +30,8 @@ const ConversationInfo = ({handleShowGallery}) => {
                         <AccordionSummary expandIcon={<ExpandMore/>} classes={{root : style.accordionSummary,content : style.accordionSummaryContent}}>
                             <Typography variant='subtitle2'>Photo</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>
-                            <Box display='flex' flexWrap='wrap' mr={'-3px'}>
+                        <AccordionDetails classes={{root : style.accordionDetail}}>
+                            <Box display='flex' flexWrap='wrap' mr='-3px'>
                                 {imageGallery.map(img => <img key={img} onClick={()=>handleShowGallery(img)} className={style.imageGalleryItem} src={img} alt ='img'/>)}
                             </Box>
                         </AccordionDetails>
@@ -66,7 +69,8 @@ const useStyle = makeStyles((theme) => ({
         display : 'flex',
         justifyContent : 'center',
         alignItems : 'center',
-        borderBottom : '1px solid #cacaca'
+        borderBottom : '1px solid #cacaca',
+        position : 'relative'
     },
     title: {
         fontSize: '1.1rem',
@@ -102,10 +106,14 @@ const useStyle = makeStyles((theme) => ({
             margin: '12px 0',
           },
     },
+    accordionDetail : {
+        padding : theme.spacing(1)
+    },
     imageGalleryItem : {
-        width : 'calc(106px - 3px)',
-        height : 'calc(106px - 3px)',
+        width : 'calc(110px - 3px)',    
+        height : 'calc(110px - 3px)',
         marginRight : '3px',
+        marginBottom : '3px',
         objectFit : 'cover',
         overflow : 'hidden',
         borderRadius : '4px',
@@ -113,6 +121,16 @@ const useStyle = makeStyles((theme) => ({
         cursor : 'pointer',
         '&:hover' : {
             filter : 'contrast(50%)'
+        }
+    },
+    backBtn : {
+        display : 'none',
+        position : 'absolute',
+        top : '50%',
+        left : 0,
+        transform : 'translateY(-50%)',
+        [theme.breakpoints.down('sm')] : {
+            display : 'block'
         }
     }
 }));

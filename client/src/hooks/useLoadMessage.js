@@ -1,28 +1,34 @@
 import { useEffect,useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMessages } from '../actions/messageAction'
+import { getMoreMessage } from '../actions/messageAction'
 import MessageApi from '../api/messageApi'
 
 const useLoadMessage = (page) => {
-    const {activeConv} = useSelector(state => state.message)
+    const {activeConv,messages} = useSelector(state => state.message)
     const dispatch = useDispatch()
     const [loading,setLoading] = useState(false)
-    const [hasMore,setHasMore] = useState(false)
-    const [skip,setSkip] = useState(0)
+    const [hasMore,setHasMore] = useState(true)
+    // const [skip,setSkip] = useState(0)
     useEffect(()=>{
+        // setSkip(messages.length)
         setHasMore(true)
     },[activeConv._id])
     useEffect(()=>{
         const fetchMoreMessage = async ()=>{
             try {
-                // if(page <=1) return
+                if(page <=1) return
                 setLoading(true)
-                const res = await MessageApi.getMessages(activeConv._id,{pageSkip : skip})
+                const res = await MessageApi.getMessages(activeConv._id,{pageSkip : messages.length})
                 if(res.status === 200) {
-                    setHasMore(res.data.length > 0)
-                    setSkip(prevSkip => prevSkip+res.data.length)
-                    dispatch(getMessages(res.data))
+                    console.log(res.data.lenhgth)
                     setLoading(false)
+                    // setSkip(prevSkip => prevSkip+res.data.length)
+                    if(res.data.length > 0)
+                        dispatch(getMoreMessage(res.data))
+                    if(res.data.length === 0 || res.data.length < 20) {
+                        console.log('done')
+                        setHasMore(false)
+                    }
                 }
             } catch (error) {
                 console.log(error)
@@ -31,7 +37,7 @@ const useLoadMessage = (page) => {
         }
         fetchMoreMessage()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[page,dispatch,activeConv._id])
+    },[page,dispatch])
     return {loading,hasMore}
 }
 
