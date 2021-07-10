@@ -4,7 +4,7 @@ var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 
 const checkLogin = require('../middlewares/checkLogin')
-const {current, updateUser, addFriend, acceptFriend, search, friendRequestList, friendList, refuseFriend} = require('../controllers/accountController');
+const {current, updateUser, addFriend, acceptFriend, search, friendRequestList, friendList, refuseFriend, changePassword} = require('../controllers/accountController');
 
 
 Router.route('/current').get(checkLogin, current)
@@ -22,5 +22,7 @@ Router.route('/search').get(checkLogin, search)
 Router.route('/friend-request-list').get(checkLogin, friendRequestList)
 
 Router.route('/friend-list').get(checkLogin, friendList)
+
+Router.route('/change-password').put(changePassword)
 
 module.exports = Router

@@ -4,7 +4,7 @@ const Router = express.Router()
 const loginValidator = require('./Validators/LoginValidator')
 const registerValidator = require('./Validators/RegisterValidator')
 
-const {loginController,registerController,verifyController,forgotPasswordController,verifyResetpassword,googleLoginController} = require('../controllers/authController')
+const {loginController, registerController, verifyController, forgotPasswordController, verifyResetpassword, googleLoginController, changePassword} = require('../controllers/authController')
 
 Router.route('/login').post(loginValidator,loginController)
 
