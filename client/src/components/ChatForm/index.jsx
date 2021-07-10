@@ -61,7 +61,7 @@ const ChatForm = () => {
         const res =  await MessageApi.addMessage(msgData)
         if(res.status === 200) {
             dispatch(updateLastMessage({...res.data.new_message,status : 'Sent ✔'},id))
-            socket.emit('ADD_MESSAGE',{msg : res.data.new_message,user:activeConv})
+            socket.emit('ADD_MESSAGE',{msg : res.data.new_message,user:info})
         }
     };
     return (

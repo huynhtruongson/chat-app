@@ -21,30 +21,31 @@ const SocketClient = () => {
     },[socket,dispatch])
     // Get user online
     useEffect(() => {
+        if(!info._id) return 
         socket.emit('ONLINE_USER',info._id)
-    },[socket,dispatch,info._id])
+    },[socket,info])
     // Get user online
     useEffect(() => {
         socket.on('ONLINE_USER',userList => {
+            console.log('123123',userList)
             dispatch(getUserOnline(userList))
         })
         return ()=> socket.off('ONLINE_USER')
-    },[socket,dispatch,info._id])
+    },[socket,dispatch])
     // Add user online
     useEffect(() => {
         socket.on('ADD_USER_ONLINE',userId => {
-            console.log(userId)
             dispatch(addUserOnline(userId))
         })
         return ()=> socket.off('ADD_USER_ONLINE')
-    },[socket,dispatch,info._id])
+    },[socket,dispatch])
     // Remove user online
     useEffect(() => {
-        socket.on('REMOVE_USER_ONLINE',userId => {
+        socket.on('REMOVE_ONLINE_USER',userId => {
             dispatch(removeUserOnline(userId))
         })
-        return ()=> socket.off('REMOVE_USER_ONLINE')
-    },[socket,dispatch,info._id])
+        return ()=> socket.off('REMOVE_ONLINE_USER')
+    },[socket,dispatch])
 
     return <></>
 }

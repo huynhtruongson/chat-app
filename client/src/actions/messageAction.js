@@ -1,5 +1,5 @@
 import MessageApi from "../api/messageApi";
-import {ADD_MESSAGE, UPDATE_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE} from "./type";
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION} from "./type";
 
 export const getUserMessage = (user) => async (dispatch) => {
     try {
@@ -39,7 +39,7 @@ export const getConversations = (id) => async (dispatch) => {
                         formatConv.push({...user, text: cv.text, media: cv.media});
                 });
             });
-            dispatch(updateConversations(formatConv));
+            dispatch({type : GET_CONVERSATIONS,payload : formatConv});
         }
     } catch (error) {
         console.log(error);
@@ -49,9 +49,9 @@ export const updateLastMessage = (message,id) => ({
     type : UPDATE_LAST_MESSAGE,
     payload : {message,id}
 })
-export const updateConversations = (convs) => ({
-    type : UPDATE_CONVERSATIONS,
-    payload : convs
+export const updateConversation = (msg) => ({
+    type : UPDATE_CONVERSATION,
+    payload : msg
 })
 export const getMessages = (messages) => ({
     type: GET_MESSAGES,

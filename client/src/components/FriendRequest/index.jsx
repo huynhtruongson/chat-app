@@ -16,6 +16,17 @@ const FriendRequest = () => {
             console.log(error);
         }
     };
+    const handleRefuseFriend = async (id) => {
+        try {
+            const newRequestArr = requestList.filter((user) =>
+                user._id !== id
+            );
+            setRequestList(newRequestArr)
+            // await UserApi.acceptAddFriend(id);
+        } catch (error) {
+            console.log(error);
+        }
+    } 
     useEffect(() => {
         const fetchFriendRequest = async () => {
             try {
@@ -50,7 +61,10 @@ const FriendRequest = () => {
                         <Box>
                             {user.isAccepted ? <Typography color='primary'>Accepted successfully !</Typography> : 
                                 <>
-                                    <Button color='primary' size='small'>
+                                    <Button 
+                                        onClick={()=>handleRefuseFriend(user._id)}
+                                        color='primary' 
+                                        size='small'>
                                         Skip
                                     </Button>
                                     <Button

@@ -3,9 +3,7 @@ import {Avatar, Box, makeStyles, Typography, IconButton} from '@material-ui/core
 import {ThumbUp,Description,DeleteForever} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
-import MessageApi from '../../api/messageApi';
-import { deleteMessage } from '../../actions/messageAction';
-const Message = React.forwardRef(({user, self, msg, isAvatar},ref) => {
+const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage},ref) => {
     const imageList = msg.media.filter((md) => md.resource_type === 'image')
     const videoList = msg.media.filter((md) => md.resource_type === 'video')
     const fileList = msg.media.filter((md) => md.resource_type === 'raw')
@@ -14,15 +12,6 @@ const Message = React.forwardRef(({user, self, msg, isAvatar},ref) => {
     const handleShowGallery = (url) => {
         dispatch(getActiveImage(url))
     }
-    const handleDeleteMessage = async (id)=> {
-        try {
-            // const res = await MessageApi.deleteMessage(id)
-            // if(res.status === 200) 
-                dispatch(deleteMessage(id))
-        } catch (error) {
-            console.log(error)
-        }
-    }
     return (
         <Box className={style.messageContainer}>
             {!self &&<Box minWidth='40px' mr={1}>
@@ -30,7 +19,7 @@ const Message = React.forwardRef(({user, self, msg, isAvatar},ref) => {
             </Box>}
             {self &&
                 <Box className={style.deleteBtn}>
-                    <IconButton onClick={()=> handleDeleteMessage(msg._id)} color='secondary'>
+                    <IconButton onClick={handleDeleteMessage} color='secondary'>
                         <DeleteForever/>
                     </IconButton>
                 </Box>

@@ -22,7 +22,7 @@ const HomePage = () => {
     const {info} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const history = useHistory();
-    const style = useStyle({showConversation});
+    const style = useStyle({showConversation,showFriendList});
     const handleLogOut = () => {
         dispatch(userLogout());
         localStorage.removeItem("token");
@@ -53,7 +53,7 @@ const HomePage = () => {
                     </Badge>
                 </Box>
                 <Box mt={2}>
-                    <Button classes={{root: style.settingBtn}}
+                    <Button classes={{root: `${style.settingBtn} ${!showFriendList && style.settingBtnActive}`}}
                         onClick={()=>{
                             if(showFriendList) 
                                 handleShowConversation(false)
@@ -61,7 +61,7 @@ const HomePage = () => {
                             }}>
                         <Chat fontSize="large" />
                     </Button>
-                    <Button classes={{root: style.settingBtn}}
+                    <Button classes={{root: `${style.settingBtn} ${showFriendList && style.settingBtnActive}`}}
                         onClick={()=>{
                             if(!showFriendList)
                                 handleShowConversation(false)
@@ -186,6 +186,9 @@ const useStyle = makeStyles((theme) => ({
         "&:hover": {
             backgroundColor: "rgb(255 255 255 / 40%)",
         },
+    },
+    settingBtnActive : {
+        backgroundColor: "rgb(255 255 255 / 40%)",
     },
     popoverBtn: {
         textTransform: "initial",

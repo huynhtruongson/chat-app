@@ -11,6 +11,7 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
     const style = useStyle();
     const {info : {_id : userId}} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
+    const onlineUser = useSelector(state => state.onlineUser)
     const [friendList,setFriendList] = useState([])
     const [search,setSearch] = useState('')
     const dispatch = useDispatch()
@@ -86,6 +87,8 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                               key={cv._id}
                               user={cv}
                               handleClickUser={() => handleClickUserConversations(cv._id)}
+                              isConv
+                              isOnline={onlineUser.includes(cv._id)}
                           />
                       ))
                     : friendListSearch?.map((user) => (
@@ -94,6 +97,7 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                               key={user._id}
                               user={user}
                               handleClickUser={() => handleClickUserFriends(user._id)}
+                              isOnline={onlineUser.includes(user._id)}
                           />
                       ))}
             </Box>

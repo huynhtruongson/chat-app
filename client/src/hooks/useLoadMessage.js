@@ -18,15 +18,16 @@ const useLoadMessage = (page) => {
             try {
                 if(page <=1) return
                 setLoading(true)
-                console.log(messages.length)
                 const res = await MessageApi.getMessages(activeConv._id,{pageSkip : messages.length})
                 if(res.status === 200) {
+                    console.log(res.data.lenhgth)
                     setLoading(false)
                     // setSkip(prevSkip => prevSkip+res.data.length)
-                    dispatch(getMoreMessage(res.data))
+                    if(res.data.length > 0)
+                        dispatch(getMoreMessage(res.data))
                     if(res.data.length === 0 || res.data.length < 20) {
+                        console.log('done')
                         setHasMore(false)
-                        return
                     }
                 }
             } catch (error) {

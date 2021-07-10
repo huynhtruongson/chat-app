@@ -3,16 +3,18 @@ import {Info,ArrowBack} from '@material-ui/icons';
 import { useState, useRef } from 'react';
 import Message from '../Mesage';
 import ChatForm from '../ChatForm'
-import {  useSelector } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import useLoadMessage from '../../hooks/useLoadMessage';
 import { useCallback } from 'react';
 import React from 'react';
+import { deleteMessage, updateConversation } from '../../actions/messageAction';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
     console.log('message box reredenr')
     const style = useStyle();
     const {activeConv,messages} = useSelector(state => state.message)
     const {info} = useSelector(state => state.user)
+    const dispatch = useDispatch()
     const observer = useRef()
     const [page,setPage] = useState(1)
     const {loading,hasMore} = useLoadMessage(page)
@@ -28,6 +30,18 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
         })
         if(node) observer.current.observe(node)
     },[loading,hasMore])
+    const handleDeleteMessage = async (id)=> {
+        try {
+            if(messages.findIndex(msg => msg._id === id) === 0) {
+                dispatch(updateConversation(messages[1]))
+            }
+            dispatch(deleteMessage(id))
+            // const res = await MessageApi.deleteMessage(id)
+            // if(res.status === 200) 
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(()=>{setPage(1)},[activeConv._id])
     return (
         <Box display="flex" flexDirection="column" height="100%">
@@ -65,6 +79,7 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         user={activeConv}
                         self={msg.sender === info._id}
                         isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
+                        handleDeleteMessage={()=>handleDeleteMessage(msg._id)}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}
             </Box>

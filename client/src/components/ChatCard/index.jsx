@@ -2,8 +2,8 @@ import { Avatar, Badge, Box, makeStyles, Typography } from '@material-ui/core'
 import { Description } from '@material-ui/icons'
 import React from 'react'
 
-const ChatCard = ({user,handleClickUser,active}) => {
-    const style = useStyle({active})
+const ChatCard = ({user,handleClickUser,active,isConv,isOnline}) => {
+    const style = useStyle({active,isOnline})
     return (
         <Box onClick={handleClickUser} className={style.chatCard} display='flex' p={1} alignItems='center'>
             <Badge
@@ -20,7 +20,7 @@ const ChatCard = ({user,handleClickUser,active}) => {
             </Badge>
             <Box flex={1} display='flex' flexDirection='column' justifyContent='center' ml={1} overflow='hidden'>
                 <Typography>{user.fullname}</Typography>
-                {(user.media || user.text) && (
+                {(isConv) && (
                     user.media.length ? <Box display='flex' alignItems='center' color='#757575'>
                         <Description fontSize='small' />
                         <Typography variant='body2' >{`${user.media.length} file media`}</Typography>
@@ -46,6 +46,7 @@ const useStyle = makeStyles(theme => ({
         border : '2px solid #fff'
     },
     badgeDot: {
+        display : ({isOnline}) => isOnline ? 'block' : 'none',
         backgroundColor: '#15A85F',
         width: '12px',
         height: '12px',

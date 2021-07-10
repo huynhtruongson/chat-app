@@ -51,13 +51,14 @@ function LoginPage() {
     }
     const responseGoogleSuccess = async (response) => {
         try {
-            const res = await AuthApi.googleLogin({tokenId :response.tokenId})
-            if(res.status === 200) {
-                localStorage.setItem('token',res.data)
-                AuthApi.setHeaderAxios(res.data)
-                dispatch(userLoginSuccess())
-                history.push('/')
-            }
+            console.log(response)
+            // const res = await AuthApi.googleLogin({tokenId :response.tokenId})
+            // if(res.status === 200) {
+            //     localStorage.setItem('token',res.data)
+            //     AuthApi.setHeaderAxios(res.data)
+            //     dispatch(userLoginSuccess())
+            //     history.push('/')
+            // }
         } catch (error) {
             const {data : {message},status} = error.response
             if(status === 400) {
