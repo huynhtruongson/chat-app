@@ -3,11 +3,10 @@ import {Box, makeStyles} from '@material-ui/core';
 import Images from '../../constants/Images';
 import { useHistory, useParams } from 'react-router';
 import AuthApi from '../../api/authApi';
-import useAlert from '../../hooks/alert'
+import _alert from '../../utils/alert'
 const VerifyEmailPage = () => {
     const style = useStyle()
     const {token} = useParams()
-    const {_alert} = useAlert()
     const history = useHistory()
     useEffect(() => {
         const verifyEmail= async () => {
@@ -21,19 +20,10 @@ const VerifyEmailPage = () => {
                         callback : (result) => result.isConfirmed &&  history.push('/')
                     })
                 }
-            } catch (error) {
-                const {data : {message},status} = error.response
-                if(status === 400)
-                    _alert({
-                        icon : 'error',
-                        msg : message,
-                        confirmButtonText : 'Continue to Chat-app',
-                        callback : (result) => result.isConfirmed &&  history.push('/login')
-                    })
-                }
+            } catch (error) {}
         }
         verifyEmail()
-    },[_alert,token,history])
+    },[token,history])
     return (
         <Box className={style.container}>
             {/* <Box display='flex' flexDirection='column' alignItems='center'>

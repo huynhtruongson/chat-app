@@ -1,4 +1,4 @@
-import {Avatar,Box,IconButton,makeStyles,Typography,CircularProgress} from '@material-ui/core';
+import {Avatar,Box,IconButton,makeStyles,Typography,CircularProgress, Badge} from '@material-ui/core';
 import {Info,ArrowBack} from '@material-ui/icons';
 import { useState, useRef } from 'react';
 import Message from '../Mesage';
@@ -9,11 +9,16 @@ import useLoadMessage from '../../hooks/useLoadMessage';
 import { useCallback } from 'react';
 import React from 'react';
 import { deleteMessage, updateConversation } from '../../actions/messageAction';
+import _alert from '../../utils/alert';
+import MessageApi from '../../api/messageApi';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
     console.log('message box reredenr')
-    const style = useStyle();
     const {activeConv,messages} = useSelector(state => state.message)
     const {info} = useSelector(state => state.user)
+    const socket = useSelector(state => state.socket)
+    const onlineUser = useSelector(state => state.onlineUser)
+    const isUserOnline = onlineUser.includes(activeConv._id)
+    const style = useStyle({isUserOnline});
     const dispatch = useDispatch()
     const observer = useRef()
     const [page,setPage] = useState(1)
@@ -31,16 +36,33 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
         if(node) observer.current.observe(node)
     },[loading,hasMore])
     const handleDeleteMessage = async (id)=> {
-        try {
-            if(messages.findIndex(msg => msg._id === id) === 0) {
-                dispatch(updateConversation(messages[1]))
+        _alert({
+            title : 'Delete message',
+            msg : 'Are you sure you want to delete this message.',
+            icon : 'warning',
+            showCancelButton : true,
+            confirmButtonText : 'Delete',
+            callback : async ({isConfirmed}) => {
+                if(isConfirmed) {
+                    try {
+                        const msgIndex = messages.findIndex(msg => msg._id === id)
+                        const receiver = messages[msgIndex].receiver
+                        const preLastMsg = messages[1]
+                        dispatch(deleteMessage(id))
+                        socket.emit('DELETE_MESSAGE',{id,receiver})
+                        // const res = await MessageApi.deleteMessage(id)
+                        // if(res.status === 200) {
+                            if(msgIndex === 0) {
+                                dispatch(updateConversation(preLastMsg))
+                                socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver})
+                            }
+                        // }
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
             }
-            dispatch(deleteMessage(id))
-            // const res = await MessageApi.deleteMessage(id)
-            // if(res.status === 200) 
-        } catch (error) {
-            console.log(error)
-        }
+        })
     }
     useEffect(()=>{setPage(1)},[activeConv._id])
     return (
@@ -50,7 +72,18 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                     <IconButton onClick={()=>handleShowConversation(false)} className={style.backBtn}>
                         <ArrowBack color='primary'/>
                     </IconButton>
-                    <Avatar classes={{ root: style.avatar }} src={activeConv.avatar} />
+                    <Badge
+                        variant="dot"
+                        classes={{
+                            dot: style.badgeDot,
+                            anchorOriginTopRightRectangle : style.badgeAnchor
+                        }}
+                    >
+                        <Avatar
+                            classes={{ root: style.avatar }}
+                            src={activeConv.avatar}
+                        />
+                    </Badge>
                     <Box ml={0.8}>
                         <Typography
                             classes={{ root: style.username }}
@@ -58,7 +91,9 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                             {activeConv.fullname}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                            Active now
+                            {
+                                isUserOnline ? 'Active now' : 'Offline'
+                            }
                         </Typography>
                     </Box>
                 </Box>
@@ -80,6 +115,7 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         self={msg.sender === info._id}
                         isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
                         handleDeleteMessage={()=>handleDeleteMessage(msg._id)}
+                        isLast={index === 0}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}
             </Box>
@@ -91,6 +127,7 @@ const useStyle = makeStyles((theme) => ({
     avatar: {
         width: '48px',
         height: '48px',
+        border : '2px solid #fff'
     },
     username: {
         fontSize: '1.1rem',
@@ -109,7 +146,7 @@ const useStyle = makeStyles((theme) => ({
         display:"flex",
         overflow:"auto",
         flexDirection:"column-reverse",
-        padding : '8px 0'
+        padding : '16px 0'
     },
     messageHeader : {
         display:"flex",
@@ -125,6 +162,18 @@ const useStyle = makeStyles((theme) => ({
         [theme.breakpoints.down('sm')] : {
             display : 'block'
         }
+    },
+    badgeDot: {
+        display : ({isUserOnline}) => isUserOnline ? 'block' : 'none',
+        backgroundColor: '#15A85F',
+        width: '12px',
+        height: '12px',
+        border: '1.5px solid #fff',
+        borderRadius: '100rem',
+    },
+    badgeAnchor: {
+        top: '8px',
+        right: '6px',
     }
 }));
 export default React.memo(MessageBox);

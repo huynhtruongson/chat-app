@@ -90,6 +90,9 @@ const useStyle = makeStyles(theme => ({
             zIndex : 2,
             backgroundColor : '#fff',
             animation : '$slideIn 150ms linear'
+        },
+        [theme.breakpoints.down('420')] : {
+            width : '100%'
         }
     },
     bgcGreeting : {

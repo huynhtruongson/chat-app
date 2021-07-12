@@ -22,7 +22,7 @@ const FriendRequest = () => {
                 user._id !== id
             );
             setRequestList(newRequestArr)
-            // await UserApi.acceptAddFriend(id);
+            await UserApi.refuseAddFriend(id);
         } catch (error) {
             console.log(error);
         }
@@ -48,7 +48,7 @@ const FriendRequest = () => {
             </Box>
             <Box p={2}>
                 {requestList.map((user) => (
-                    <Box className={style.requestItem}>
+                    <Box key={user._id} className={style.requestItem}>
                         <Box display='flex' alignItems='center'>
                             <Avatar classes={{root: style.requestAvatar}} src={user.avatar} />
                             <Box>

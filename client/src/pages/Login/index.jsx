@@ -10,7 +10,6 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
 import AuthApi from '../../api/authApi';
-import useAlert from '../../hooks/alert'
 import { useDispatch } from 'react-redux';
 import { userLoginSuccess } from '../../actions/userAction';
 const schema = yup.object().shape({
@@ -23,7 +22,6 @@ function LoginPage() {
     const {register,handleSubmit, formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
-    const {_alert} =useAlert()
     const history = useHistory()
     const onSubmit = async (data) => {
         try {
@@ -35,39 +33,19 @@ function LoginPage() {
                 history.push('/')
             }
         } catch (error) {
-            const {data : {message},status} = error.response
-            if(status === 401)
-                _alert({
-                    icon : 'error',
-                    title : 'Unverified Account',
-                    msg : message,
-                })
-            else if(status === 400) 
-                _alert({
-                    icon : 'error',
-                    msg : message
-                })
-            }
+            console.log(error)
+        }
     }
     const responseGoogleSuccess = async (response) => {
         try {
-            console.log(response)
-            // const res = await AuthApi.googleLogin({tokenId :response.tokenId})
-            // if(res.status === 200) {
-            //     localStorage.setItem('token',res.data)
-            //     AuthApi.setHeaderAxios(res.data)
-            //     dispatch(userLoginSuccess())
-            //     history.push('/')
-            // }
-        } catch (error) {
-            const {data : {message},status} = error.response
-            if(status === 400) {
-                _alert({
-                    icon : 'error',
-                    msg : message
-                })
+            const res = await AuthApi.googleLogin({tokenId :response.tokenId})
+            if(res.status === 200) {
+                localStorage.setItem('token',res.data)
+                AuthApi.setHeaderAxios(res.data)
+                dispatch(userLoginSuccess())
+                history.push('/')
             }
-        }
+        } catch (error) {}
     }
     const responseGoogleFail = (response) => {
         console.log(response)
@@ -96,21 +74,6 @@ function LoginPage() {
                             Login with Google
                         </Button>}
                 />
-                <Button
-                    classes={{
-                        root : style.button,
-                        startIcon : style.startIcon,
-                        endIcon : style.endIcon,
-                        iconSizeMedium : style.icon,
-                        label : style.facebookBtnLabel
-                    }}
-                    variant="contained"
-                    fullWidth
-                    startIcon={<Facebook    />}
-                    endIcon={<div></div>}
-                >
-                    Login with Facebook
-                </Button>
                 <div className={style.divider}><span>OR LOGIN WITH EMAIL</span></div>
                 <form className={style.formContainer} onSubmit={handleSubmit(onSubmit)}>
                     <TextField

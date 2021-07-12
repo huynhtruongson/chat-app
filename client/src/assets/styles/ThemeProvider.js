@@ -7,8 +7,9 @@ const theme = createMuiTheme({
     },
     palette : {
         primary : {
-            main : deepPurple.A400
-        }
+            main : deepPurple.A400,
+        },
+        type:'light'
     },
     overrides : {
         MuiButton : {
@@ -20,7 +21,7 @@ const theme = createMuiTheme({
             root : {
                 padding : '8px'
             }
-        }
+        },
     }
 })
 function CustomStyle({children}) {

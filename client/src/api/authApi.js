@@ -18,12 +18,12 @@ const AuthApi = {
         return axiosClient.post(url,data)
     },
     forgotPwd(email) {
-        const url = '/api/auth/forgot-passsword'
+        const url = '/api/auth/forgot-password'
         return axiosClient.post(url,email)
     },
     resetPwd(data) {
         const url = '/api/auth/reset-password'
-        return axiosClient.post(url,data)
+        return axiosClient.put(url,data)
     },
     setHeaderAxios(token) {
         axiosClient.defaults.headers.common['Authorization'] = 'Bearer ' + token

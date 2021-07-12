@@ -2,10 +2,9 @@ import React, { useEffect } from 'react'
 import {Box, makeStyles} from '@material-ui/core';
 import Images from '../../constants/Images';
 import { useHistory} from 'react-router';
-import useAlert from '../../hooks/alert'
+import _alert from '../../utils/alert'
 const VerifyEmailPage = () => {
     const style = useStyle()
-    const {_alert} = useAlert()
     const history = useHistory()
     useEffect(() => {
         _alert({
@@ -14,7 +13,7 @@ const VerifyEmailPage = () => {
             confirmButtonText : 'Continue to Chat-app',
             callback : ({isConfirmed}) => isConfirmed && history.push('/')
         })    
-    },[_alert,history])
+    },[history])
     return (
         <Box className={style.container}></Box>
     )

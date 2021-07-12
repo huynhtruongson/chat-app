@@ -30,3 +30,12 @@
     background: grey;
     /* margin-bottom: 30px; */
   }
+  .sweet-alert-title {
+    padding : 0 1rem !important
+  }
+  .sweet-alert-msg {
+    padding : 0 1rem !important
+  }
+  .sweet-alert-container {
+    z-index: 1301 !important;
+  }
