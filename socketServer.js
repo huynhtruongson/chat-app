@@ -21,7 +21,7 @@ module.exports.socketServer = (socket) =>{
     })
 
     socket.on("ADD_MESSAGE", ({msg,user}) => {
-        let userChat = userList.find(({userID})=> userID === msg.reciver)
+        let userChat = userList.find(({userID})=> userID === msg.receiver)
         if(userChat)
             socket.to(userChat.socketID).emit("ADD_MESSAGE",{msg,user})
     })
@@ -35,10 +35,16 @@ module.exports.socketServer = (socket) =>{
         }
     })
 
-    socket.on("REMOVE_MESSAGE",(msg,user) => {
-        let userChat = userList.find(({userID})=> userID === user._id)
-        if(userChat)
-            socket.to(userChat.socketID).emit("REMOVE_MESSAGE",{msg,user})
+    socket.on("DELETE_MESSAGE",({id,receiver}) => {
+        let receiveUser = userList.find(({userID}) => userID === receiver)
+        if(receiveUser)
+            socket.to(receiveUser.socketID).emit("DELETE_MESSAGE",id)
+    })
+    
+    socket.on('UPDATE_CONVERSATION',({msg,receiver}) => {
+        const receiveUser = userList.find(({userID}) => userID === receiver)
+        if(receiveUser)
+            socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
     })
 
 }
