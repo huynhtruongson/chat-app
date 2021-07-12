@@ -5,10 +5,9 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.current = async(req,res)=>{
     try{
-        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar fullname')
+        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar fullname friend_list')
     
-        return res.json({
-            code:0,
+        return res.status(200).json({
             message: 'Get login session data successfully',
             data: data
         })
@@ -180,7 +179,7 @@ module.exports.changePassword = async (req, res) =>{
     try {
         let {password, new_password, confirm_password} = req.body
 
-        if (!id && !new_password && !password && !confirm_password){
+        if (!new_password || !password || !confirm_password){
             throw new Error("Opps something went wrong....")
         }
 
@@ -191,7 +190,7 @@ module.exports.changePassword = async (req, res) =>{
             throw new Error("Your old password is not correct")
         }
 
-        if(new_password === confirm_password ){
+        if(new_password !== confirm_password ){
             throw new Error("Confirm password is not match")
         }
 
@@ -199,7 +198,7 @@ module.exports.changePassword = async (req, res) =>{
         account.password = newPassword
         await account.save()
         
-        return res.status(400).json({message:"Change password success"})
+        return res.status(200).json({message:"Change password success"})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }

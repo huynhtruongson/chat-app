@@ -235,7 +235,7 @@ module.exports.fileGallery = async (req, res) =>{
                 ],
                 "media.resource_type": "raw"
             },
-            "media.url_cloud"
+            "media.url_cloud media.name"
         ).sort({'createdAt': 'desc'})
 
         imageListQuery.forEach(element => imageList = imageList.concat(element.media))

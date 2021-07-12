@@ -23,6 +23,6 @@ Router.route('/friend-request-list').get(checkLogin, friendRequestList)
 
 Router.route('/friend-list').get(checkLogin, friendList)
 
-Router.route('/change-password').put(changePassword)
+Router.route('/change-password').put(checkLogin,changePassword)
 
 module.exports = Router

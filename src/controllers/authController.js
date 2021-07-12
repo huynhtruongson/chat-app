@@ -79,7 +79,7 @@ module,exports.googleLoginController = async (req, res) =>{
                         const token = jwt.sign({
                             id:user.id,
                         },JWT_SECRET,{expiresIn:"3h"})
-                        res.json({code:0,message:"Login success",token:token})
+                        res.status(200).json({message:"Login success", data:token})
                         
                     }else{
                         cloudinary.uploader.upload(picture)
@@ -148,7 +148,7 @@ module.exports.registerController = async (req, res) =>{
             password: password_hash,
             tokenVerify: token,
         })
-        account.save()
+        await account.save()
 
         var transporter = nodemailer.createTransport({
             service: 'Gmail',
@@ -212,7 +212,7 @@ module.exports.forgotPasswordController = async(req, res) => {
         let email = req.body.email
         var token = crypto.randomBytes(48).toString('hex')
 
-        await AccountModel.findOneAndUpdate({email:email},{token:token})
+        await AccountModel.findOneAndUpdate({email:email},{tokenVerify:token})
 
         var transporter = nodemailer.createTransport({
             service: 'Gmail',
@@ -235,7 +235,7 @@ module.exports.forgotPasswordController = async(req, res) => {
         
         transporter.sendMail(mainOptions, function(err, info){
             if (err) {
-                return res.send("error message: "+err.message)
+                throw new Error(err.message)
             } else {
                 res.status(200).json({message:"A reset password link has seen to your email account. Please click the link to change your password and continue the registration process."})
             }
@@ -255,13 +255,13 @@ module.exports.verifyResetpassword = async(req, res) =>{
         }    
         
         let password_hash = await bcrypt.hash(password, 10)
-        let user = await AccountModel.findOneAndUpdate({token: token}, {password: password_hash})
+        let user = await AccountModel.findOneAndUpdate({tokenVerify: token}, {password: password_hash})
         
         if (!user) {
             throw new Error('Opss, something went wrong...')
         }
 
-        return res.status(400).json({message:"Change password success"})
+        return res.status(200).json({message:"Change password success"})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }

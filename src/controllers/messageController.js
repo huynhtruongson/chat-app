@@ -35,7 +35,7 @@ module.exports.deleteMessage = async (req, res) =>{
         let {id} = req.params
         let messageDel = undefined
 
-        messageDel = await messageModel.findById(id,"media")
+        messageDel = await messageModel.findById(id)
         messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
         await messageModel.findByIdAndDelete(id)
 
@@ -44,13 +44,15 @@ module.exports.deleteMessage = async (req, res) =>{
                 { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(messageDel.receiver) }, 
                 { sender: mongoose.Types.ObjectId(messageDel.receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
             ],
-            delete: {$ne: [req.user.id]}
+            // delete: {$ne: [req.user.id]}
         }).sort({'createdAt': 'desc'})
 
-        await conversationModel.findOneAndUpdate({$or: [
-            { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(messageDel.receiver) }, 
-            { sender: mongoose.Types.ObjectId(messageDel.receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+        let check = await conversationModel.findOneAndUpdate({$or: [
+            { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(messageDel.receiver)] }, 
+            { party: [mongoose.Types.ObjectId(messageDel.receiver), mongoose.Types.ObjectId(req.user.id)] }
         ]},{text: messageLast.text, media: messageLast.media})
+
+        console.log(messageLast,check)
 
         return res.status(200).json({message:"success"})
     } catch (err) {
