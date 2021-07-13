@@ -10,7 +10,6 @@ import { useEffect } from 'react'
 import { getFileGallery, getImageGallery, getVideoGallery, removeActiveImage } from '../../actions/galleryAction'
 import { useCallback } from 'react'
 const Conversation = ({handleShowConversation}) => {
-    console.log('conversation render')
     const [showInfo,setShowInfo] = useState(false)
     const {activeConv} = useSelector(state => state.message)
     const {imageGallery,activeImage} = useSelector(state => state.gallery)
@@ -46,7 +45,7 @@ const Conversation = ({handleShowConversation}) => {
             <Box position='relative' height='100%'>
                 <Box className={style.bgcGreeting} textAlign='center'>
                     <img src={Images.CHAT_LOGO2} className={style.bgcImage} alt='img'/>
-                    <Typography variant='h5'>Welcome to Chat App</Typography>
+                    <Typography variant='h5'>Welcome to Lượm Message</Typography>
                 </Box>
             </Box>
         )
@@ -90,6 +89,9 @@ const useStyle = makeStyles(theme => ({
             zIndex : 2,
             backgroundColor : '#fff',
             animation : '$slideIn 150ms linear'
+        },
+        [theme.breakpoints.down('420')] : {
+            width : '100%'
         }
     },
     bgcGreeting : {

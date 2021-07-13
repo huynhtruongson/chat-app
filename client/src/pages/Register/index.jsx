@@ -9,7 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup'
 import Images from '../../constants/Images';
 import AuthApi from '../../api/authApi';
-import useAlert from '../../hooks/alert';
+import _alert from '../../utils/alert';
 const schema = yup.object().shape({
     firstname : yup.string().max(10,'Firstname must at most 10 characters long!').required('Firstname is required!'),
     lastname : yup.string().max(10,'Lastname must at most 10 characters long!').required('Lastname is required!'),
@@ -22,7 +22,6 @@ const RegisterPage = () => {
     const {register,handleSubmit,formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
-    const {_alert} = useAlert()
     const onSubmit = async (data) => {
         try {
             const res = await AuthApi.register(data)
@@ -33,14 +32,7 @@ const RegisterPage = () => {
                     msg  : res.message
                 })
             }
-        } catch (error) {
-            const {data : {message},status} = error.response
-            if(status === 400)
-                _alert({
-                    icon : 'error',
-                    msg : message
-                })
-        }
+        } catch (error) {}
     };  
     return (
         <AuthForm title='Create Account' logo={Images.CHAT_LOGO}>

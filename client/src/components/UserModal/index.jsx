@@ -6,14 +6,10 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import useStyle from './style'
 import { updateUserInfo } from '../../actions/userAction';
-import { readFileAsBase64 } from '../../utils';
 import UserApi from '../../api/userApi';
-import useAlert from '../../hooks/alert';
+import _alert from '../../utils/alert';
 import ModalBase from '../ModalBase';
 import { useDispatch, useSelector } from 'react-redux';
-const Transition = React.forwardRef((props, ref) => {
-    return <Zoom ref={ref} {...props} />;
-});
 const SUPPORTED_FORMATS = ["image/jpg","image/jpeg","image/gif","image/png"];
 const schema = yup.object().shape({
     firstname : yup.string().max(10,'Firstname must at most 10 characters long!'),
@@ -23,7 +19,6 @@ const UserModal = ({ open, onClose }) => {
     const [edit, setEdit] = useState({firstname: false,lastname: false});
     const [avatar,setAvatar] = useState(null)
     const {info} = useSelector(state => state.user)
-    const {_alert} = useAlert()
     const style = useStyle(edit);
     const {register,handleSubmit,formState : {errors,isDirty,isSubmitting},reset,setValue,watch} = useForm({
         mode : 'onChange',
@@ -52,8 +47,7 @@ const UserModal = ({ open, onClose }) => {
             })
         }
         else {
-            const src = await readFileAsBase64(e.target.files[0])
-            setAvatar(src)
+            setAvatar(URL.createObjectURL(e.target.files[0]))
             setValue('avatar',e.target.files)
         }
     }
@@ -73,7 +67,6 @@ const UserModal = ({ open, onClose }) => {
             }
             const res = await UserApi.updateInfo(userData)
             if(res.status === 200) {
-                console.log(res)
                 onClose()
                 dispatch(updateUserInfo(res.data))
                 _alert({
@@ -81,14 +74,7 @@ const UserModal = ({ open, onClose }) => {
                     msg : res.message
                 })
             }
-        } catch (error) {
-            const {data : {message},status} = error.response
-            if(status === 400)
-                _alert({
-                    icon : 'error',
-                    msg : message,
-                })
-        }
+        } catch (error) {}
     }
     useEffect(()=>{
         reset({           //set defaultValue to hook-form 
@@ -100,7 +86,6 @@ const UserModal = ({ open, onClose }) => {
     return (
         <ModalBase
             open={open}
-            TransitionComponent={Transition}
             onClose={onClose}
             onExited={handleModalClose}
             disableBackdropClick
@@ -117,7 +102,7 @@ const UserModal = ({ open, onClose }) => {
                     <Box height="150px" mx={-1.5} position="relative">
                         <img
                             className={style.backgroundImg}
-                            src="https://cover-talk.zadn.vn/0/4/b/2/3/02b40a29341081a8e6a005375f6ffcf0.jpg"
+                            src="https://picsum.photos/600/300"
                             alt="img"
                         />
                         <Box

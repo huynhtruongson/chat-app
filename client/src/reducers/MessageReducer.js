@@ -54,7 +54,7 @@ const MessageReducer = (state = initialState, action) => {
             return {...state,messages : [...state.messages,...action.payload]}
         case DELETE_MESSAGE :
             const msgArr = [...state.messages]
-            const delIndex =  msgArr.find(msg => msg._id === action.payload)
+            const delIndex = msgArr.findIndex(msg => msg._id === action.payload)
             if(delIndex !== -1) {
                 msgArr.splice(delIndex,1)
                 return {...state,messages : msgArr}

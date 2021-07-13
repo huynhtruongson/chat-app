@@ -8,34 +8,26 @@ import Images from '../../constants/Images'
 import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import AuthApi from '../../api/authApi'
-import useAlert from '../../hooks/alert'
+import _alert from '../../utils/alert'
 const schema = yup.object().shape({
     email : yup.string().email('Invalid email!').required('Email is required!'),
 })
 const ForgotPwdPage = () => {
     const style = useStyle()
-    const {_alert} = useAlert()
     const {register,handleSubmit,formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
     const onSubmit = async (data) => {
         try {
             const {email} = data
-            const res = await AuthApi.forgotPwd(email)
+            const res = await AuthApi.forgotPwd({email})
             if(res.status === 200) {
                 _alert({
                     icon : 'success',
                     msg : res.message
                 })
             }
-        } catch (error) {
-            const {data : {message},status} = error.response
-                if(status === 400)
-                    _alert({
-                        icon : 'error',
-                        msg : message,
-                    })
-        }
+        } catch (error) {}
     }
     return (
         <AuthForm title='Forgot Password' logo={Images.FORGOT_LOGO}>
@@ -118,5 +110,10 @@ const useStyle =  makeStyles(theme => ({
     endIcon : {
         marginLeft : 'auto'
     },
+    backdrop : {
+        zIndex : theme.zIndex.drawer  + 1,
+        color : '#fff',
+        backgroundColor : 'rgba(0, 0, 0, 0.2)'
+    }
 }))
 export default ForgotPwdPage

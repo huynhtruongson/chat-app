@@ -28,6 +28,14 @@ const UserApi = {
     acceptAddFriend(id) {
         const url = `api/user/accept-friend/${id}`
         return axiosClient.put(url)
+    },
+    refuseAddFriend(id) {
+        const url = `api/user/refuse-friend/${id}`
+        return axiosClient.put(url)
+    },
+    changePassword(data) {
+        const url = `api/user/change-password`
+        return axiosClient.put(url,data)
     }
 }
 export default UserApi

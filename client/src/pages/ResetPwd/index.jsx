@@ -1,4 +1,4 @@
-import { Box, Button, makeStyles, TextField, Typography } from '@material-ui/core'
+import { Backdrop, Box, Button, CircularProgress, makeStyles, TextField, Typography } from '@material-ui/core'
 import { ArrowRightAlt } from '@material-ui/icons'
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -8,23 +8,22 @@ import Images from '../../constants/Images'
 import * as yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import AuthApi from '../../api/authApi'
-import useAlert from '../../hooks/alert'
+import _alert from '../../utils/alert'
 const schema = yup.object().shape({
     password : yup.string().min(6,'Password must at least 6 characters long!').required('Password is required!'),
     confirm_password : yup.string().oneOf([yup.ref('password'),null],'Incorrect confirm password!').required('Confirm password is required!'),
 })
 const ResetPwdPage = () => {
     const style = useStyle()
-    const {register,handleSubmit,formState : {errors}} = useForm({
+    const {register,handleSubmit,formState : {errors,isSubmitting}} = useForm({
         resolver : yupResolver(schema)
     })
     const {token} = useParams()
     const history = useHistory()
-    const {_alert} = useAlert()
     const onSubmit = async (data) => {
         try {
             const res = await AuthApi.resetPwd({...data,token})
-            if(res === 200) {
+            if(res.status === 200) {
                 _alert({
                     icon : 'success',
                     msg : res.message,
@@ -32,14 +31,7 @@ const ResetPwdPage = () => {
                     callback : (result) => result.isConfirmed &&  history.push('/login')
                 })
             }
-        } catch (error) {
-            const {data : {message},status} = error.response
-            if(status === 400)
-                _alert({
-                    icon : 'error',
-                    msg : message,
-                })
-        }
+        } catch (error) {}
     }
     return (
         <AuthForm title='Reset Password' logo={Images.RESET_LOGO}>
@@ -93,6 +85,9 @@ const ResetPwdPage = () => {
                     <Link to='/login' className={style.link}>Login</Link>
                 </Box>
             </Box>
+            <Backdrop open={isSubmitting} classes={{root : style.backdrop}}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </AuthForm>
     )
 }
@@ -131,5 +126,10 @@ const useStyle =  makeStyles(theme => ({
     endIcon : {
         marginLeft : 'auto'
     },
+    backdrop : {
+        zIndex : theme.zIndex.drawer  + 1,
+        color : '#fff',
+        backgroundColor : 'rgba(0, 0, 0, 0.2)'
+    }
 }))
 export default ResetPwdPage

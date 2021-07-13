@@ -3,7 +3,7 @@ import {Avatar, Box, makeStyles, Typography, IconButton} from '@material-ui/core
 import {ThumbUp,Description,DeleteForever} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
-const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage},ref) => {
+const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast},ref) => {
     const imageList = msg.media.filter((md) => md.resource_type === 'image')
     const videoList = msg.media.filter((md) => md.resource_type === 'video')
     const fileList = msg.media.filter((md) => md.resource_type === 'raw')
@@ -63,8 +63,11 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
                         }
                     </>
                 )}
-                {msg.status && <Typography color='primary'>{msg.status}</Typography>}
             </Box>
+            {(isLast && msg.status) && <Box className={style.messageStatus}>
+                <Typography color='primary'>{msg.status}</Typography>
+            </Box>
+            }
         </Box>
     );
 });
@@ -74,6 +77,7 @@ const useStyle = makeStyles((theme) => ({
         alignSelf:({self}) => self ? 'flex-end' : 'flex-start',
         display:'flex',
         alignItems:'center',
+        position : 'relative',
         '&:hover $deleteBtn' : {
             display : 'block'
         },
@@ -104,6 +108,7 @@ const useStyle = makeStyles((theme) => ({
         width: ({imgLength}) => imgLength === 1 ? '100%' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
         height: ({imgLength}) => imgLength === 1 ? 'initial' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
         objectFit: 'cover',
+        backgroundColor : theme.palette.grey[200]
     },
     imageContainer : {
         maxWidth:'380px',
@@ -132,7 +137,7 @@ const useStyle = makeStyles((theme) => ({
         alignItems:'center',
         textDecoration : 'none',
         padding : theme.spacing(1),
-        backgroundColor : theme.palette.grey[400],
+        backgroundColor : theme.palette.grey[300],
         borderRadius : theme.spacing(1),
         color : '#000',
         '&>.MuiTypography-root' : {
@@ -148,5 +153,13 @@ const useStyle = makeStyles((theme) => ({
             backgroundColor : theme.palette.grey[500],
         }
     },
+    messageStatus : {
+        position :'absolute',
+        minWidth : '60px',
+        textAlign : 'end',
+        bottom : 0,
+        right : 0,
+        transform : 'translateY(100%)',
+    }
 }));
 export default Message;

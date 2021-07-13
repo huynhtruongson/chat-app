@@ -1,11 +1,13 @@
-import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary, IconButton} from '@material-ui/core';
+import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary, IconButton, Paper} from '@material-ui/core';
 import { ExpandMore,ArrowBack } from '@material-ui/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getActiveImage } from '../../actions/galleryAction';
 
-const ConversationInfo = ({handleShowGallery,handleShowInfo}) => {
+const ConversationInfo = ({handleShowInfo}) => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)
-    const {imageGallery} = useSelector(state => state.gallery)
+    const {imageGallery,videoGallery,fileGallery} = useSelector(state => state.gallery)
+    const dispatch = useDispatch()
     return (
         <Box display='flex' flexDirection='column' borderLeft='1px solid #cacaca' height='100%'>
             <Box className={style.header}>
@@ -31,9 +33,14 @@ const ConversationInfo = ({handleShowGallery,handleShowInfo}) => {
                             <Typography variant='subtitle2'>Photo</Typography>
                         </AccordionSummary>
                         <AccordionDetails classes={{root : style.accordionDetail}}>
-                            <Box display='flex' flexWrap='wrap' mr='-3px'>
-                                {imageGallery.map(img => <img key={img} onClick={()=>handleShowGallery(img)} className={style.imageGalleryItem} src={img} alt ='img'/>)}
-                            </Box>
+                            { imageGallery.length ? 
+                                <Box display='flex' flexWrap='wrap' mr='-3px'>
+                                    {imageGallery.map(img => <img key={img} onClick={()=>dispatch(getActiveImage(img))} className={style.imageGalleryItem} src={img} alt ='img'/>)}
+                                </Box> : 
+                                <Box width='100%' textAlign='center'>
+                                    <Typography variant="body2">No Image</Typography>
+                                </Box>
+                            }
                         </AccordionDetails>
                     </Accordion>
                     <Accordion classes={{root : style.accordion}} square>  
@@ -41,10 +48,14 @@ const ConversationInfo = ({handleShowGallery,handleShowInfo}) => {
                             <Typography variant='subtitle2'>Video</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography>
-                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
-                                maximus est, id dignissim quam.
-                            </Typography>
+                            {videoGallery.length ? 
+                                <Box display='flex' flexWrap='wrap' mr='-3px' width='100%'>
+                                    {videoGallery.map(vd => <video key={vd} className={style.videoGalleryItem} src={vd} controls/>)}
+                                </Box> : 
+                                <Box width='100%' textAlign='center'>
+                                    <Typography variant="body2">No Video</Typography>
+                                </Box>
+                            }
                         </AccordionDetails>
                     </Accordion>
                     <Accordion classes={{root : style.accordion}} square>  
@@ -52,10 +63,18 @@ const ConversationInfo = ({handleShowGallery,handleShowInfo}) => {
                             <Typography variant='subtitle2'>File</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography>
-                                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis feugiat. Aliquam eget
-                                maximus est, id dignissim quam.
-                            </Typography>
+                        {fileGallery.length ? 
+                                <Box width='100%'>
+                                    {fileGallery.map(vd => 
+                                        <a key={vd.url_cloud} href={vd.url_cloud} className={style.fileGalleryItem} target='_blank' rel='noreferrer'>
+                                            <Typography>{vd.name}</Typography>
+                                        </a>
+                                    )}
+                                </Box> : 
+                                <Box width='100%' textAlign='center'>
+                                    <Typography variant="body2">No File</Typography>
+                                </Box>
+                            }
                         </AccordionDetails>
                     </Accordion>
                 </Box>
@@ -86,6 +105,9 @@ const useStyle = makeStyles((theme) => ({
     accordion : {
         boxShadow : 'none',
         borderTop: '5px solid rgba(0, 0, 0, .1)',
+        '&:last-child' : {
+            borderBottom: '5px solid rgba(0, 0, 0, .1)',
+        },
         '&:before': {
             display: 'none',
         },
@@ -122,6 +144,33 @@ const useStyle = makeStyles((theme) => ({
         '&:hover' : {
             filter : 'contrast(50%)'
         }
+    },
+    videoGalleryItem : {
+        width : 'calc((100%/2) - 3px)',
+        height : '100px',
+        marginRight : '3px',
+        marginBottom : '3px',
+        borderRadius : '6px',
+        objectFit : 'cover'
+    },
+    fileGalleryItem :  {
+        display : 'block',
+        textDecoration : 'none',
+        padding : '8px 4px',  
+        borderRadius  : '8px',
+        color : theme.palette.grey[900],
+        marginBottom : '3px',
+        '&:hover' : {
+            backgroundColor : theme.palette.grey[300]
+        },
+        '& .MuiTypography-root' : {
+            display:'-webkit-box',
+            '-webkit-line-clamp': 2,
+            '-webkit-box-orient': 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+        },
     },
     backBtn : {
         display : 'none',

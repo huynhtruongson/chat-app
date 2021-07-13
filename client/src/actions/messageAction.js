@@ -17,15 +17,17 @@ export const getMoreMessage = (messages) => ({
     type : GET_MORE_MESSAGES,
     payload : messages
 })
-export const addMessage = (msg,user) => {
-    msg.media = msg.media.map(md => {
-        const resource_type = md.type.split('/')[0]
-        if(resource_type === 'application')
-            return {name : md.name,url_cloud : null,resource_type : 'raw'}
-        else
-            return {url_cloud : URL.createObjectURL(md),resource_type}
-    })
-    return ({type: ADD_MESSAGE,payload: {msg,user}})
+export const addMessage = (msg,user) =>  {
+    if(msg.status === 'Sending...') {
+        msg.media = msg.media.map(md => {
+            const resource_type = md.type.split('/')[0]
+            if(resource_type === 'application')
+                return {name : md.name,url_cloud : null,resource_type : 'raw'}
+            else
+                return {url_cloud : URL.createObjectURL(md),resource_type}
+        })
+    }
+    return {type: ADD_MESSAGE,payload: {msg,user}}
 };
 export const getConversations = (id) => async (dispatch) => {
     try {

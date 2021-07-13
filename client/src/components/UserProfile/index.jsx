@@ -13,7 +13,7 @@ const UserProfile = (props) => {
                     color='secondary'> 
                     <ArrowBackIcon/> 
                 </IconButton>
-                <img className={style.backgroundImg} src='https://cover-talk.zadn.vn/0/4/b/2/3/02b40a29341081a8e6a005375f6ffcf0.jpg' alt='img' />
+                <img className={style.backgroundImg} src='https://picsum.photos/600/300' alt='img' />
                 <Avatar classes={{root : style.avatar}} src={user.avatar} />
             </Box>
             <Box textAlign="center" mt={6.5}>

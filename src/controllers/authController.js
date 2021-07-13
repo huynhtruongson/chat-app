@@ -29,7 +29,7 @@ module.exports.loginController =  async(req, res) => {
             }
             
             if(account.verify === false){
-                return res.status(401).json({message: "Unverified account. Please check your email for email verification"})
+                return res.status(400).json({message: "Unverified account. Please check your email for email verification"})
             }
             
             const {JWT_SECRET} = process.env
@@ -166,7 +166,10 @@ module.exports.registerController = async (req, res) =>{
             from: process.env.EMAIL,
             to: email,
             subject: 'Account verification',
-            html: '<p>Chào mừng bạn đến với <b>LƯỢM message</b>. <br>Để kích hoạt tài khoản và sử dụng dịch vụ của chúng tôi, vui lòng nhấn <a href="'+link_verify+'">vào đây</a> để xác thực tài khoản</p>'
+            html: `<div style="border:6px solid #d500f9;padding:16px">
+            <h1>Welcome to Lượm Message!</h1>
+            <p style="font-size:20px">To activate your account on the new website, click on the “activate my account” button.</p>
+            <a href=${link_verify} target=_blank style="display:inline-block;color:#fff;text-decoration:none;font-weight:600;font-size:20px;padding:12px 6px;border-radius:4px;background-color:#d500f9;box-shadow:5px 4px 12px 1px rgba(0,0,0,0.28)">Activate my account</a>`
         }
         
         transporter.sendMail(mainOptions, function(err, info){
@@ -230,7 +233,10 @@ module.exports.forgotPasswordController = async(req, res) => {
             from: process.env.EMAIL,
             to: email,
             subject: 'Reset password account',
-            html: '<p>Đây là tin nhắn của<b>LƯỢM message</b> giúp bạn reset password. <br>Để kích đổi lại mật khẩu và sử dụng dịch vụ của chúng tôi, vui lòng nhấn <a href="'+link_verify+'">vào đây</a> để thay đổi mật khẩu tài khoản</p>'
+            html: `<div style="border:6px solid #d500f9;padding:16px">
+            <h1>Reset your password!</h1>
+            <p style="font-size:20px">Need to reset your password?No problem!Just click the button below and you'll be on your way.If you did not make this request, please ignore this email.</p>
+            <a href=${link_verify} target=_blank style="display:inline-block;color:#fff;text-decoration:none;font-weight:600;font-size:20px;padding:12px 6px;border-radius:4px;background-color:#d500f9;box-shadow:5px 4px 12px 1px rgba(0,0,0,0.28)">Reset my password</a>`
         }
         
         transporter.sendMail(mainOptions, function(err, info){

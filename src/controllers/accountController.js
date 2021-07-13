@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const cloudinary = require('../config/cloudinary')
 const AccountModel = require('../models/AccountModel')
 
@@ -92,7 +93,9 @@ module.exports.addFriend = async (req, res) => {
         if (!userAddFriend) {
             throw new Error ("Id user not found, please check id again")
         }
-
+        if(userAddFriend.friend_invite_list.includes(req.user.id)) {
+            return res.status(201).json({message : 'This user has sent friend request to you.You can check your friend request!'})
+        }
         if (userAddFriend.friend_request_list.includes(req.user.id)) {
             await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_invite_list: id}}, {safe: true})
             await AccountModel.findByIdAndUpdate(id, {$pull: {friend_request_list: req.user.id}}, {safe: true})
@@ -114,12 +117,15 @@ module.exports.addFriend = async (req, res) => {
 module.exports.search = async(req, res) =>{
     try{
         let {fullname} = req.query
-        let userCurrent = await AccountModel.findById( req.user.id).lean()
+        let userCurrent = await AccountModel.findById(req.user.id)
         let {friend_list, friend_invite_list} = userCurrent
-        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"},_id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").limit(10).lean()
-
-        searchList = searchList.map(user => friend_invite_list && friend_invite_list.includes(user._id) ? {...user,isRequested : true} : {...user,isRequested : false})
-        
+        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"},_id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
+        searchList = searchList.map(user => {
+            if(friend_invite_list)
+                if(friend_invite_list.includes(user._id)) 
+                    return {...user,isRequested : true}
+                return {...user,isRequested : false}
+        })
         return res.status(200).json({message:"success", data: searchList})
     } catch (err) {
         return res.status(400).json({message: err.message})
@@ -184,6 +190,8 @@ module.exports.changePassword = async (req, res) =>{
         }
 
         let account = await AccountModel.findById(req.user.id)
+        if(account.type_account === 'google')
+            return res.status(400).json({message: 'You can not change password,you can do this action via your google account.'})
         let passwordMatch = await bcrypt.compare(password, account.password)
 
         if(!passwordMatch ) {

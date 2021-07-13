@@ -1,7 +1,7 @@
 import {Box,IconButton,InputAdornment,makeStyles,Popover,TextField} from '@material-ui/core';
 import {PhotoLibrary,AttachFile,EmojiEmotionsRounded} from '@material-ui/icons';
 import IsolateSubmitBtn from '../IsolateSubmitBtn';
-import useAlert from '../../hooks/alert';
+import _alert from '../../utils/alert';
 import IsolateMedia from '../IsolateMedia';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { addMessage, updateLastMessage } from '../../actions/messageAction';
 import MessageApi from '../../api/messageApi';
 import ICONS from '../../constants/Icons';
+import { updateGallery } from '../../actions/galleryAction';
 const ChatForm = () => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)
@@ -19,23 +20,25 @@ const ChatForm = () => {
     const { register, handleSubmit, setValue, getValues, control,reset } = useForm();
     const { ref: inputRef, ...inputRest } = register('message');
     const chatFileRef = useRef();
-    const { _alert } = useAlert();
     const handleClickIcon = (icon) => {
         setValue('message', getValues('message') + icon);
     };
     const handleChangeMedia = (e) => {
         const files = [...e.target.files];
         const fileArr = [];
+        const fileErrorArr = []
         if (!files.length) return;
         files.forEach((file) => {
             if (file.size > 1024 * 1024 * 10) {
-                _alert({ icon: 'error', msg: 'File is too large!' });
-                return;
+                fileErrorArr.push(file.name)
             }
-            fileArr.push(file);
+            else
+                fileArr.push(file);
         });
         const currentFile = [].concat(getValues('media') || []);
         setValue('media', [...currentFile, ...fileArr]);
+        if(fileErrorArr.length)
+            _alert({icon:'error',title:'File is too large!',msg:fileErrorArr.join(',')})
     };
     const handleRemoveMedia = (index) => {
         const currentFiles = [...getValues('media')]
