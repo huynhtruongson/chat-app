@@ -4,10 +4,11 @@ import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {getUserMessage} from '../../actions/messageAction';
 import UserApi from '../../api/userApi';
+import _alert from '../../utils/alert';
 import ModalBase from '../ModalBase';
 import UserCard from '../UserCard';
 import UserProfile from '../UserProfile';
-const SearchModal = ({open, onClose}) => {
+const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest}) => {
     const style = useStyle();
     const [searchInput, setSearchInput] = useState('');
     const [searchList, setSearchList] = useState([]);
@@ -40,6 +41,8 @@ const SearchModal = ({open, onClose}) => {
     };
     const handleChatClick = () => {
         dispatch(getUserMessage(userDetail));
+        handleShowConversation(true)
+        handleShowFrRequest(false)
         onClose();
     };
     const handleRequestClick = async (id) => {
@@ -53,8 +56,16 @@ const SearchModal = ({open, onClose}) => {
                 setSearchList(newSearchList)
                 if(userDetail)
                     setUserDetail({...userDetail,isRequested: !userDetail.isRequested})
-                setIsRequesting(false)
             }
+            if(res.status === 201) {
+                _alert({icon:'success',title:'Coincidentally',msg:res.message,
+                    callback : ({isConfirmed}) => {
+                        if(isConfirmed) {
+                            handleShowFrRequest(false)
+                        }
+                    }})
+            }
+            setIsRequesting(false)
         } catch (error) {
             console.log(error)
         }

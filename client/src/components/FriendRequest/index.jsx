@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {Box, makeStyles, Typography, Button, Avatar} from '@material-ui/core';
+import {Box, makeStyles, Typography, Button, Avatar, IconButton} from '@material-ui/core';
+import { ArrowBack } from '@material-ui/icons';
 import Images from '../../constants/Images';
 import UserApi from '../../api/userApi';
-const FriendRequest = () => {
+const FriendRequest = ({handleShowConversation}) => {
     const style = useStyle();
     const [requestList, setRequestList] = useState([]);
     const handleAcceptFriend = async (id) => {
@@ -41,10 +42,15 @@ const FriendRequest = () => {
         fetchFriendRequest();
     }, []);
     return (
-        <Box display='flex' flexDirection='column' height='100%'>
+        <Box height='100%'>
             <Box display='flex' alignItems='center' borderBottom='1px solid #cacaca' p={1}>
-                <img className={style.addFrIcon} src={Images.ADDFR_ICON} alt='img' />
-                <Typography variant='h6'>Friend Requests ({requestList.length})</Typography>
+                <IconButton onClick={()=>handleShowConversation(false)} className={style.backBtn}>
+                    <ArrowBack color='primary'/>
+                </IconButton>
+                <Box display='flex' alignItems='center'>
+                    <img className={style.addFrIcon} src={Images.ADDFR_ICON} alt='img' />
+                    <Typography variant='h6'>Friend Requests ({requestList.length})</Typography>
+                </Box>
             </Box>
             <Box p={2}>
                 {requestList.map((user) => (
@@ -104,6 +110,12 @@ const useStyle = makeStyles((theme) => ({
         alignItems: 'center',
         boxShadow: theme.shadows[1],
         borderRadius: theme.spacing(1),
+    },
+    backBtn : {
+        display : 'none',
+        [theme.breakpoints.down('sm')] : {
+            display : 'block'
+        }
     },
 }));
 export default FriendRequest;

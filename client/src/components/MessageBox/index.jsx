@@ -49,14 +49,16 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         const receiver = messages[msgIndex].receiver
                         const preLastMsg = messages[1]
                         dispatch(deleteMessage(id))
-                        socket.emit('DELETE_MESSAGE',{id,receiver})
-                        // const res = await MessageApi.deleteMessage(id)
-                        // if(res.status === 200) {
+                        if(msgIndex === 0) {
+                            dispatch(updateConversation(preLastMsg))
+                        }
+                        const res = await MessageApi.deleteMessage(id)
+                        if(res.status === 200) {
+                            socket.emit('DELETE_MESSAGE',{id,receiver})
                             if(msgIndex === 0) {
-                                dispatch(updateConversation(preLastMsg))
                                 socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver})
                             }
-                        // }
+                        }
                     } catch (error) {
                         console.log(error)
                     }

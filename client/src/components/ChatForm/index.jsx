@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { addMessage, updateLastMessage } from '../../actions/messageAction';
 import MessageApi from '../../api/messageApi';
 import ICONS from '../../constants/Icons';
+import { updateGallery } from '../../actions/galleryAction';
 const ChatForm = () => {
     const style = useStyle();
     const {activeConv} = useSelector(state => state.message)

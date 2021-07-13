@@ -27,7 +27,6 @@ const SocketClient = () => {
     // Get user online
     useEffect(() => {
         socket.on('ONLINE_USER',userList => {
-            console.log('123123',userList)
             dispatch(getUserOnline(userList))
         })
         return ()=> socket.off('ONLINE_USER')

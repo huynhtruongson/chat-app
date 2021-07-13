@@ -6,7 +6,6 @@ import {getConversations, getUserMessage} from "../../actions/messageAction";
 import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal,handleShowConversation}) => {
     const style = useStyle();
     const {info : {_id : userId}} = useSelector(state => state.user)
@@ -17,25 +16,21 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
     const dispatch = useDispatch()
     const friendListSearch = friendList.filter(f => f.fullname.toLowerCase().includes(search.toLowerCase()))
     const ConvListSearch = conversations.filter(cv => cv.fullname.toLowerCase().includes(search.toLowerCase()))
-    const isMobileBp = useMediaQuery(theme => theme.breakpoints.down('sm'))
     const handleClickUserConversations = (id) => {
-        if(isMobileBp)
-            handleShowConversation(true)
+        handleShowConversation(true)
         if (activeConv._id === id) return;
         const user = conversations[conversations.findIndex((cv) => cv._id === id)];
         dispatch(getUserMessage(user));
     };
     const handleClickUserFriends = (id) => {
-        if(isMobileBp)
-            handleShowConversation(true)
+        handleShowConversation(true)
         handleShowFrRequest(false);
         if (activeConv._id === id) return;
         const user = friendList[friendList.findIndex((user) => user._id === id)];
         dispatch(getUserMessage(user));
     };
     const handleClickFriendRq = () => {
-        if(isMobileBp)
-            handleShowConversation(true)
+        handleShowConversation(true)
         handleShowFrRequest(true)
         
     }

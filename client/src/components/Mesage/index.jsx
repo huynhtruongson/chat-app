@@ -155,7 +155,7 @@ const useStyle = makeStyles((theme) => ({
     },
     messageStatus : {
         position :'absolute',
-        minWidth : '55px',
+        minWidth : '60px',
         textAlign : 'end',
         bottom : 0,
         right : 0,

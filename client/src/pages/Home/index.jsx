@@ -10,6 +10,7 @@ import FriendRequest from '../../components/FriendRequest'
 import SearchModal from "../../components/SearchModal";
 import { useDispatch, useSelector } from "react-redux";
 import Conversation from "../../components/Conversation";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useCallback } from "react";
 const HomePage = () => {
     const [userModal, setUserModal] = useState(false);
@@ -23,14 +24,16 @@ const HomePage = () => {
     const dispatch = useDispatch()
     const history = useHistory();
     const style = useStyle({showConversation,showFriendList});
+    const isMobileBp = useMediaQuery(theme => theme.breakpoints.down('sm'))
     const handleLogOut = () => {
         dispatch(userLogout());
         localStorage.removeItem("token");
         history.push("/login");
     };
     const handleShowConversation = useCallback((val) => {
-        setShowConversation(val)
-    },[])
+        if(isMobileBp)
+            setShowConversation(val)
+    },[isMobileBp])
     return (
         <Box height="100vh" display="flex" overflow='hidden'>
             <Box
@@ -129,7 +132,9 @@ const HomePage = () => {
             </Box>
             <UserModal open={userModal} onClose={() => setUserModal(false)} />
             <PasswordModal open={pwdModal} onClose={() => setPwdModal(false)} />
-            <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} />
+            <SearchModal open={searchModal} onClose={()=>setSearchModal(false)} 
+                handleShowConversation={handleShowConversation}
+                handleShowFrRequest={(val)=>setShowFrRequest(val)}/>
         </Box>
     );
 };
