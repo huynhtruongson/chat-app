@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const mongoose = require('mongoose')
 const {OAuth2Client} =  require('google-auth-library')
 const client = new OAuth2Client("713987113089-v6kssliis8c1m004jdlbfumnd4b51chd.apps.googleusercontent.com")
+// const oAuth2Client = require('../config/googleapis')
 
 const AccountModel = require('../models/AccountModel')
 const cloudinary = require('../config/cloudinary')
@@ -138,23 +139,38 @@ module.exports.registerController = async (req, res) =>{
             throw new Error ('This account is registered')
         }
 
-        let password_hash = await bcrypt.hash(password,10)
-        let account = await new AccountModel({
-            email: email,
-            fullname: fullname,
-            firstname: firstname,
-            lastname: lastname,
-            type_account: "email",
-            password: password_hash,
-            tokenVerify: token,
-        })
-        await account.save()
+        // let password_hash = await bcrypt.hash(password,10)
+        // let account = await new AccountModel({
+        //     email: email,
+        //     fullname: fullname,
+        //     firstname: firstname,
+        //     lastname: lastname,
+        //     type_account: "email",
+        //     password: password_hash,
+        //     tokenVerify: token,
+        // })
+        // await account.save()
+        const {google} = require("googleapis")
+
+        const CLIENT_ID = process.env.GG_ID
+        const CLIENT_SECRET = process.env.GG_SECRET
+        const REDIRECT_URI = process.env.REDIRECT_URI
+        const REDIRECT_TOKEN = process.env.REDIRECT_TOKEN
+
+        const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+        oAuth2Client.setCredentials({ refresh_token: REDIRECT_TOKEN})
+
+        const accessToken = await oAuth2Client.getAccessToken()
 
         var transporter = nodemailer.createTransport({
-            service: 'Gmail',
+            service: 'gmail',
             auth: {
+                type: 'OAuth2',
                 user: process.env.EMAIL,
-                pass: process.env.PASS_EMAIL
+                clientId: process.env.GG_ID,
+                clientSecret: process.env.GG_SECRET,
+                refreshToken: process.env.REDIRECT_TOKEN,
+                accessToken: accessToken
             },
             tls: {
                 rejectUnauthorized: false
@@ -172,13 +188,10 @@ module.exports.registerController = async (req, res) =>{
             <a href=${link_verify} target=_blank style="display:inline-block;color:#fff;text-decoration:none;font-weight:600;font-size:20px;padding:12px 6px;border-radius:4px;background-color:#d500f9;box-shadow:5px 4px 12px 1px rgba(0,0,0,0.28)">Activate my account</a>`
         }
         
-        transporter.sendMail(mainOptions, function(err, info){
-            if (err) {
-                return res.send("error message: "+err.message)
-            } else {
-                res.status(200).json({message:"A verification link has seen to your email account. Please click the link to verify your email and continue the registration process."})
-            }
-        }) 
+        await transporter.sendMail(mainOptions)
+           
+        res.status(200).json({message:"A verification link has seen to your email account. Please click the link to verify your email and continue the registration process."})
+        
     } catch (err) {
         return res.status(400).json({message:err.message})
     }
@@ -217,11 +230,18 @@ module.exports.forgotPasswordController = async(req, res) => {
 
         await AccountModel.findOneAndUpdate({email:email},{tokenVerify:token})
 
+        const accessToken = await oAuth2Client.getAccessToken()
+
         var transporter = nodemailer.createTransport({
-            service: 'Gmail',
+            service: 'gmail',
             auth: {
+                type: 'OAuth2',
                 user: process.env.EMAIL,
-                pass: process.env.PASS_EMAIL
+                pass: process.env.PASS_EMAIL,
+                clientId: process.env.GG_ID,
+                clientSecret: process.env.GG_SECRET,
+                refreshToken: process.env.REDIRECT_TOKEN,
+                accessToken: accessToken
             },
             tls: {
                 rejectUnauthorized: false
@@ -239,13 +259,9 @@ module.exports.forgotPasswordController = async(req, res) => {
             <a href=${link_verify} target=_blank style="display:inline-block;color:#fff;text-decoration:none;font-weight:600;font-size:20px;padding:12px 6px;border-radius:4px;background-color:#d500f9;box-shadow:5px 4px 12px 1px rgba(0,0,0,0.28)">Reset my password</a>`
         }
         
-        transporter.sendMail(mainOptions, function(err, info){
-            if (err) {
-                throw new Error(err.message)
-            } else {
-                res.status(200).json({message:"A reset password link has seen to your email account. Please click the link to change your password and continue the registration process."})
-            }
-        })
+        await transporter.sendMail(mainOptions)
+        res.status(200).json({message:"A reset password link has seen to your email account. Please click the link to change your password and continue the registration process."})
+        
 
     } catch(err) {
         return res.status(400).json({message:'Verify failed: '+ err.message})
