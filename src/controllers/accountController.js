@@ -6,7 +6,7 @@ const AccountModel = require('../models/AccountModel')
 
 module.exports.current = async(req,res)=>{
     try{
-        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar fullname friend_list')
+        let data = await AccountModel.findById(req.user.id,'email firstname lastname avatar fullname friend_list type_account')
     
         return res.status(200).json({
             message: 'Get login session data successfully',

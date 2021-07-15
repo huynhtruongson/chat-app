@@ -21,7 +21,6 @@ const conversationSchema = new Schema({
         url_cloud: String,
         name: String,
         resource_type: String
-
-    }]
+    }],
 },{timestamps:true})
 module.exports = mongoose.model('conversation',conversationSchema)
