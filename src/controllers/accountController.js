@@ -136,7 +136,7 @@ module.exports.search = async(req, res) =>{
 
         console.log(invite_to_me)
 
-        return res.status(200).json({message:"success", data: searchList})
+        return res.status(200).json({message:"success", data: {searchList : searchList, invite_to_me: invite_to_me}})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }
