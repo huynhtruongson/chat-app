@@ -94,7 +94,7 @@ module.exports.addFriend = async (req, res) => {
             throw new Error ("Id user not found, please check id again")
         }
         if(userAddFriend.friend_invite_list.includes(req.user.id)) {
-            return res.status(201).json({message : 'This user has sent friend request to you.You can check your friend request!'})
+            return res.status(201).json({message : 'This user has sent friend request to you. You can check your friend request!'})
         }
         if (userAddFriend.friend_request_list.includes(req.user.id)) {
             await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_invite_list: id}}, {safe: true})
@@ -116,16 +116,26 @@ module.exports.addFriend = async (req, res) => {
 
 module.exports.search = async(req, res) =>{
     try{
-        let {fullname} = req.query
+        let search = req.query
+        
+        if(Object.keys(search)[0]==="fullname")
+            search.fullname = {...search.fullname, "$options":"i"}
+
         let userCurrent = await AccountModel.findById(req.user.id)
         let {friend_list, friend_invite_list} = userCurrent
-        let searchList = await AccountModel.find({fullname: {"$regex":fullname,"$options":"i"},_id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
+
+        let searchList = await AccountModel.find({email: 'thaonhi8a8@gmail.com', _id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
         searchList = searchList.map(user => {
             if(friend_invite_list)
                 if(friend_invite_list.includes(user._id)) 
                     return {...user,isRequested : true}
                 return {...user,isRequested : false}
         })
+
+        let invite_to_me = await AccountModel.find({...search, friend_invite_list: req.user.id, _id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
+
+        console.log(invite_to_me)
+
         return res.status(200).json({message:"success", data: searchList})
     } catch (err) {
         return res.status(400).json({message: err.message})
