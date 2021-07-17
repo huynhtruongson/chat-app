@@ -34,8 +34,14 @@ const ConversationInfo = ({handleShowInfo}) => {
                         </AccordionSummary>
                         <AccordionDetails classes={{root : style.accordionDetail}}>
                             { imageGallery.length ? 
-                                <Box display='flex' flexWrap='wrap' mr='-3px'>
-                                    {imageGallery.map(img => <img key={img} onClick={()=>dispatch(getActiveImage(img))} className={style.imageGalleryItem} src={img} alt ='img'/>)}
+                                <Box className={style.imageGalleryContainer}>
+                                    {imageGallery.map(img => 
+                                        <Box className={style.imageGalleryItem}>
+                                            <Box className={style.imageGalleryRatio}>
+                                                <img key={img} onClick={()=>dispatch(getActiveImage(img))} className={style.imageItem} src={img} alt ='img'/>
+                                            </Box>
+                                        </Box>
+                                    )}
                                 </Box> : 
                                 <Box width='100%' textAlign='center'>
                                     <Typography variant="body2">No Image</Typography>
@@ -131,15 +137,30 @@ const useStyle = makeStyles((theme) => ({
     accordionDetail : {
         padding : theme.spacing(1)
     },
+    imageGalleryContainer : {
+        width : '100%',
+        display :'grid',
+        gridTemplateColumns : 'repeat(3,1fr)',
+        gridGap : '3px'
+    },
     imageGalleryItem : {
-        width : 'calc(110px - 3px)',    
-        height : 'calc(110px - 3px)',
-        marginRight : '3px',
-        marginBottom : '3px',
-        objectFit : 'cover',
-        overflow : 'hidden',
+        width : '100%',
+        paddingTop : '100%',
+        position : 'relative'
+    },
+    imageGalleryRatio : {   
+        position : 'absolute',
+        top : 0,
+        left : 0,
+        width : '100%',
+        height : '100%',
         borderRadius : '4px',
-        border : '1px solid #cacaca',
+        overflow : 'hidden'
+    },
+    imageItem : {
+        width : '100%',
+        height : '100%',
+        objectFit : 'cover',
         cursor : 'pointer',
         '&:hover' : {
             filter : 'contrast(50%)'

@@ -32,37 +32,34 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
                     ) : (
                         <Box
                             className={style.textMessage}
-                            p={1}
-                            borderRadius='6px'
-                            maxWidth='500px'
                         >
                             <Typography variant='body1'>{msg.text}</Typography>
                         </Box>
                     ))}
-                {msg.media.length > 0 && (
-                    <>
-                        {imageList.length > 0  &&
-                        <Box className={style.imageContainer}>
-                            {imageList.map(img => 
+                    {imageList.length > 0  &&
+                    <Box className={style.imageContainer}>
+                        {imageList.map(img => 
+                            <Box className={style.imgMessageItem}>
+                                <Box className={style.imgMessageRatio}>
                                     <img onClick={()=>handleShowGallery(img.url_cloud)} key={img.url_cloud} src={img.url_cloud} className={style.imgMessage} alt='img'/>
-                                )
-                            }
-                        </Box>}
-                        {videoList.length > 0 && videoList.map(video => 
-                            <Box key={video.url_cloud} className={style.videoContainer}>
-                                <video src={video.url_cloud} className={style.videoMessage} controls />
-                            </Box>)
+                                </Box>
+                            </Box>
+                            )
                         }
-                        {fileList.length > 0 && fileList.map(file => 
-                            <Box key={file.url_cloud} maxWidth='250px'>
-                                <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
-                                    <Description/>
-                                    <Typography variant='inherit'>{file.name}</Typography>
-                                </a>
-                            </Box>)
-                        }
-                    </>
-                )}
+                    </Box>}
+                    {videoList.length > 0 && videoList.map(video => 
+                        <Box key={video.url_cloud} className={style.videoContainer}>
+                            <video src={video.url_cloud} className={style.videoMessage} controls />
+                        </Box>)
+                    }
+                    {fileList.length > 0 && fileList.map(file => 
+                        <Box key={file.url_cloud} className={style.fileContainer}>
+                            <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
+                                <Description/>
+                                <Typography variant='inherit'>{file.name}</Typography>
+                            </a>
+                        </Box>)
+                    }
             </Box>
             {(isLast && msg.status) && <Box className={style.messageStatus}>
                 <Typography color='primary'>{msg.status}</Typography>
@@ -76,7 +73,7 @@ const useStyle = makeStyles((theme) => ({
         margin: `0 ${theme.spacing(1)}px  ${theme.spacing(1.5)}px`,
         alignSelf:({self}) => self ? 'flex-end' : 'flex-start',
         display:'flex',
-        alignItems:'center',
+        alignItems:'flex-end',
         position : 'relative',
         '&:hover $deleteBtn' : {
             display : 'block'
@@ -88,7 +85,7 @@ const useStyle = makeStyles((theme) => ({
         '&:hover' : {
             '&+$contentContainer' : {
                 border : '1px solid red',
-                borderRadius : theme.spacing(1)
+                borderRadius : theme.spacing(1),
             }
         }
     },
@@ -103,34 +100,96 @@ const useStyle = makeStyles((theme) => ({
     textMessage: {
         backgroundColor: ({self}) => (self ? theme.palette.primary.main : theme.palette.grey[200]),
         color: ({self}) => (self ? '#fff' : null),
+        padding : theme.spacing(1),
+        borderRadius:'6px',
+        maxWidth: '560px',
+        [theme.breakpoints.down('1100')] : {
+            maxWidth : '460px'
+        },
+        [theme.breakpoints.down('xs')] : {
+            maxWidth : '360px'
+        },
+        [theme.breakpoints.down('520')] : {
+            maxWidth : '280px'
+        },
+        [theme.breakpoints.down('440')] : {
+            maxWidth : '200px'
+        }
+
     },
     imgMessage: {
-        width: ({imgLength}) => imgLength === 1 ? '100%' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
-        height: ({imgLength}) => imgLength === 1 ? 'initial' : imgLength > 3 ? `${375/3}px` : `${375/imgLength}px`,
+        width : '100%',
+        height : '100%',
+        maxHeight : '400px',
         objectFit: 'cover',
-        backgroundColor : theme.palette.grey[200]
-    },
-    imageContainer : {
-        maxWidth:'380px',
-        display:'flex' ,
-        flexWrap:'wrap',
-        borderRadius : theme.spacing(1),
-        overflow : 'hidden',
-        '&>img' : {
-            cursor : 'pointer'
-        },
-        '&>img:hover': {
-            filter : 'contrast(50%)'
+        cursor : 'pointer',
+        '&:hover' : {
+            filter : 'contrast(50%)',
         }
     },
+    imgMessageItem : ({imgLength}) => (
+        imgLength > 1 && {
+            // width : ({imgLength}) => imgLength > 3 ? 'calc(100%/3)' : `calc(100%/${imgLength})`,
+            position : 'relative',
+            width : '100%',
+            paddingTop : '100%'
+        }
+    ),
+    imgMessageRatio : ({imgLength}) => (
+        imgLength > 1 && {
+            position: 'absolute',   
+            top : 0,
+            left : 0,
+            width : '100%',
+            height : '100%'
+        }
+    ),
+    imageContainer : ({imgLength}) => (
+        imgLength > 1 ?
+        {   
+            width:'380px',
+            display : 'grid',
+            gridTemplateColumns : imgLength > 3 ? 'repeat(3,1fr)' : `repeat(${imgLength},1fr)`,
+            borderRadius : theme.spacing(1),
+            overflow : 'hidden',
+            [theme.breakpoints.down('xs')] : {
+                width : '300px'
+            },
+            [theme.breakpoints.down('440')] : {
+                maxWidth : '200px'
+            }
+        } : 
+        {
+            maxWidth : '380px',
+            [theme.breakpoints.down('xs')] : {
+                maxWidth : '300px'
+            },
+            [theme.breakpoints.down('440')] : {
+                maxWidth : '200px'
+            }
+        }
+    ),
     videoContainer : {
         maxWidth : '380px',
         borderRadius : theme.spacing(1),
-        overflow : 'hidden'
+        // overflow : 'hidden',
+        [theme.breakpoints.down('xs')] : {
+            maxWidth : '300px'
+        },
+        [theme.breakpoints.down('440')] : {
+            maxWidth : '200px'
+        }
     },
     videoMessage : {
         width : '100%',
-        borderRadius : 'inherit'
+        borderRadius : 'inherit',
+        objectFit : 'cover'
+    },
+    fileContainer : {
+        maxWidth:'250px',
+        [theme.breakpoints.down('440')] : {
+            maxWidth : '200px'
+        }
     },
     fileMessage : {
         display:'flex',

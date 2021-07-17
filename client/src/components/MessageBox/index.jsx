@@ -141,7 +141,8 @@ const useStyle = makeStyles((theme) => ({
         bottom : 0,
         left : 0,
         width : '100%',
-        transform : 'translateY(100%)'
+        transform : 'translateY(100%)',
+        zIndex : 10
     },
     messagesContainer : {
         flex: 1,

@@ -1,4 +1,4 @@
-import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress,} from '@material-ui/core';
+import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress, Select, MenuItem, Divider,} from '@material-ui/core';
 import {Search} from '@material-ui/icons';
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
@@ -11,6 +11,7 @@ import UserProfile from '../UserProfile';
 const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest}) => {
     const style = useStyle();
     const [searchInput, setSearchInput] = useState('');
+    const [searchType,setSearchType] = useState('Name')
     const [searchList, setSearchList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [userDetail, setUserDetail] = useState(null);
@@ -38,6 +39,7 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
         setSearchList([]);
         setLoading(false);
         setUserDetail(null);
+        setSearchType('Name')
     };
     const handleChatClick = () => {
         dispatch(getUserMessage(userDetail));
@@ -91,18 +93,29 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
                     />
                 ) : (
                     <Box>
-                        <TextField
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                            variant='outlined'
-                            size='small'
-                            fullWidth
-                            placeholder='Search friend'
-                            InputProps={{
-                                classes: {root: style.searchInput},
-                                startAdornment: <Search color='disabled' />,
-                            }}
-                        />
+                        <Box display='flex' alignItems='flex-end'>
+                            <Select 
+                                className={style.searchSelect} 
+                                value={searchType} 
+                                variant='standard'
+                                onChange={e => setSearchType(e.target.value)}
+                            >
+                                <MenuItem value='Name'>Name</MenuItem>
+                                <MenuItem value='Email'>Email</MenuItem>
+                            </Select>
+                            <TextField
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                variant='standard'
+                                // size='small'
+                                fullWidth
+                                placeholder='Search friend...'
+                                InputProps={{
+                                    classes: {root: style.searchInput},
+                                    endAdornment: <Search color='disabled' />,
+                                }}
+                            />
+                        </Box>
                         <Box mt={1}>
                             <Typography variant='subtitle2' color='textSecondary'>
                                 Searching result
@@ -166,5 +179,10 @@ const useStyle = makeStyles((theme) => ({
         top: 0,
         left: 0,
     },
+    searchSelect : {
+        fontSize : '.9rem',
+        color : theme.palette.grey[700],
+        marginRight : theme.spacing(1)
+    }
 }));
 export default SearchModal;
