@@ -117,14 +117,13 @@ module.exports.addFriend = async (req, res) => {
 module.exports.search = async(req, res) =>{
     try{
         let search = req.query
-        
         if(Object.keys(search)[0]==="fullname")
-            search.fullname = {...search.fullname, "$options":"i"}
+            search.fullname = {"$regex": search.fullname, "$options":"i"}
 
         let userCurrent = await AccountModel.findById(req.user.id)
         let {friend_list, friend_invite_list} = userCurrent
 
-        let searchList = await AccountModel.find({email: 'thaonhi8a8@gmail.com', _id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
+        let searchList = await AccountModel.find({...search, friend_invite_list: {$nin: req.user.id},_id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
         searchList = searchList.map(user => {
             if(friend_invite_list)
                 if(friend_invite_list.includes(user._id)) 
@@ -133,8 +132,6 @@ module.exports.search = async(req, res) =>{
         })
 
         let invite_to_me = await AccountModel.find({...search, friend_invite_list: req.user.id, _id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
-
-        console.log(invite_to_me)
 
         return res.status(200).json({message:"success", data: {searchList : searchList, invite_to_me: invite_to_me}})
     } catch (err) {
