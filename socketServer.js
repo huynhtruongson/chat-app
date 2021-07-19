@@ -47,4 +47,9 @@ module.exports.socketServer = (socket) =>{
             socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
     })
 
+    socket.on('TYPING',({receiver}) => {
+        let userChat = userList.find(({userID})=> userID === receiver)
+        if(userChat)
+            socket.to(userChat.socketID).emit("TYPING",{receiver})
+    })
 }

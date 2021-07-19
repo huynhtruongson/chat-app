@@ -93,9 +93,7 @@ module.exports.addFriend = async (req, res) => {
         if (!userAddFriend) {
             throw new Error ("Id user not found, please check id again")
         }
-        if(userAddFriend.friend_invite_list.includes(req.user.id)) {
-            return res.status(201).json({message : 'This user has sent friend request to you. You can check your friend request!'})
-        }
+        
         if (userAddFriend.friend_request_list.includes(req.user.id)) {
             await AccountModel.findByIdAndUpdate(req.user.id, {$pull: {friend_invite_list: id}}, {safe: true})
             await AccountModel.findByIdAndUpdate(id, {$pull: {friend_request_list: req.user.id}}, {safe: true})
@@ -132,8 +130,9 @@ module.exports.search = async(req, res) =>{
         })
 
         let invite_to_me = await AccountModel.find({...search, friend_invite_list: req.user.id, _id: {$nin: [...friend_list,req.user.id]}}, "-verify -password -tokenVerify -friend_request_list -friend_invite_list").lean()
+        invite_to_me = invite_to_me.map(user => ({ ...user, isInvited: true}))
+        return res.status(200).json({message:"success", data:  [...invite_to_me,...searchList]})
 
-        return res.status(200).json({message:"success", data: {searchList : searchList, invite_to_me: invite_to_me}})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }
