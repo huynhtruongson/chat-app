@@ -156,6 +156,7 @@ module.exports.addMessage = async (req, res) => {
                 party: [ mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] ,
                 text: text,
                 media: messageMedia
+                
             },
             { new: true, upsert: true }
         )
@@ -255,7 +256,7 @@ module.exports.delConversation = async (req, res) =>{
         if(!checkExist || checkExist.delete.includes(req.user.id)) {
             throw new Error ("Opps something went wrong ...")
         }
-       
+        
         let updateConversation = await conversationModel.findByIdAndUpdate(id, {$push: {delete: req.user.id}}, {new: true})
         
         let receiver = updateConversation.party.find(user => String(user) !== req.user.id)
