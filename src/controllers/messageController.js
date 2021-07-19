@@ -33,11 +33,35 @@ module.exports.getMessage = async (req, res) =>{
 module.exports.deleteMessage = async (req, res) =>{
     try{
         let {id} = req.params
+        let {typeDelete} = req.body        
         let messageDel = undefined
 
-        messageDel = await messageModel.findById(id)
-        messageDel.media.forEach(async ({id_cloud}) => await cloudinary.uploader.destroy(id_cloud))
-        await messageModel.findByIdAndDelete(id)
+        if (!typeDelete) throw new Error("Opps something went wrong...")
+        messageDel = await messageModel.findById(id,"media text").lean()
+
+        if(!messageDel) {
+            throw new Error ("Opps something went wrong..")
+        }
+
+        if (typeDelete === "text") {
+            messageDel.text = ""
+        } else if (typeDelete ===  "image") {
+            messageDel.media.forEach(async (media) =>{ 
+                if (media.resource_type === "image")
+                    await cloudinary.uploader.destroy(media.id_cloud)
+            })
+            messageDel.media = messageDel.media.filter(media => media.resource_type !== "image")   
+        } else {
+            messageDel.media.forEach(async (media) =>{ 
+                if (media._id === typeDelete)
+                    await cloudinary.uploader.destroy(media.id_cloud)
+            })
+            messageDel.media = messageDel.media.filter(media => media._id !== typeDelete)  
+        }
+        
+        if (!messageDel.media.length && !messageDel.text) {
+            await messageModel.findByIdAndDelete(id)
+        }else await messageDel.save()
 
         let messageLast = await messageModel.findOne({
             $or: [
@@ -51,10 +75,8 @@ module.exports.deleteMessage = async (req, res) =>{
             { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(messageDel.receiver)] }, 
             { party: [mongoose.Types.ObjectId(messageDel.receiver), mongoose.Types.ObjectId(req.user.id)] }
         ]},{text: messageLast.text, media: messageLast.media})
-
-        console.log(messageLast,check)
-
-        return res.status(200).json({message:"success"})
+        
+        return res.status(200).json({message:"success", data: messageDel})
     } catch (err) {
         return res.status(400).json({message: err.message})
     }
