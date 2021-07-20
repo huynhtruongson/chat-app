@@ -82,7 +82,7 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
                     {fileList.length > 0 && fileList.map(file => 
                         <Box className={style.messageModule} key={file.url_cloud}>
                             {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg._id,file._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
+                                <IconButton onClick={()=>handleDeleteMessage(msg,file._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
                                     <DeleteForever/>
                                 </IconButton>
                             }

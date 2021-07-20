@@ -25,9 +25,9 @@ const MessageApi = {
         const url = `/api/conversation/file-gallery/${id}`
         return axiosClient.get(url)
     },
-    deleteMessage(id) {
+    deleteMessage(id,data) {
         const url = `/api/message/delete/${id}`
-        return axiosClient.delete(url)
+        return axiosClient.delete(url,{data})
     }
 }
 export default MessageApi

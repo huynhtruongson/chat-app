@@ -45,20 +45,6 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
             callback : async ({isConfirmed}) => {
                 if(isConfirmed) {
                     try {
-                        // const msgIndex = messages.findIndex(msg => msg._id === id)
-                        // const receiver = messages[msgIndex].receiver
-                        // const preLastMsg = messages[1]
-                        // dispatch(deleteMessage(id,data))
-                        // if(msgIndex === 0) {
-                            // dispatch(updateConversation(preLastMsg))
-                        // }
-                        // const res = await MessageApi.deleteMessage(id)
-                        // if(res.status === 200) {
-                        //     socket.emit('DELETE_MESSAGE',{id,receiver})
-                        //     if(msgIndex === 0) {
-                        //         socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver})
-                        //     }
-                        // }
                         const updateMsg = {...msg}
                         if(data === 'text')
                             updateMsg.text = ''
@@ -73,7 +59,15 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         else {
                             dispatch(updateMessage(updateMsg))
                         }
-
+                        const res = await MessageApi.deleteMessage(updateMsg._id,{typeDelete : data})
+                        if(res.status === 200) {
+                            if(!updateMsg.text && !updateMsg.media.length) {
+                                socket.emit('DELETE_MESSAGE',{id : updateMsg._id,receiver : updateMsg.receiver})
+                            }
+                            else {
+                                socket.emit('UPDATE_MESSAGE',{msg : res.data,receiver:updateMsg.receiver})
+                            }
+                        }
                     } catch (error) {
                         console.log(error)
                     }
