@@ -32,7 +32,7 @@ module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
 
-        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'createdAt': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email")
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'updatedAt': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email")
         
         return res.status(200).json({
                 message: 'get conversation list success',
@@ -188,11 +188,10 @@ module.exports.imageGallery = async (req, res) =>{
                 ],
                 "media.resource_type": "image"
             },
-            "media.url_cloud"
         ).sort({'createdAt': 'desc'})
-
-        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
         
+        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
+        imageList = imageList.filter(f => f.resource_type === 'image').map(({url_cloud}) => ({url_cloud}))
         return res.status(200).json({message: "Get image gallery success", data: imageList})
 
     } catch (err) {
@@ -204,20 +203,19 @@ module.exports.videoGallery = async (req, res) =>{
     try {
 
         let {id} = req.params
-        let imageList = []
-        let imageListQuery = await messageModel.find({
+        let videoList = []
+        let videoListQuery = await messageModel.find({
                 $or: [ 
                     { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
                     { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
                 ],
                 "media.resource_type": "video"
             },
-            "media.url_cloud"
         ).sort({'createdAt': 'desc'})
 
-        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
-        
-        return res.status(200).json({message: "Get image gallery success", data: imageList})
+        videoListQuery.forEach(element => videoList = videoList.concat(element.media))
+        videoList = videoList.filter(f => f.resource_type === 'video').map(({url_cloud}) => ({url_cloud}))
+        return res.status(200).json({message: "Get image gallery success", data: videoList})
 
     } catch (err) {
         return res.status(400).json({message: err.message})
@@ -228,20 +226,19 @@ module.exports.fileGallery = async (req, res) =>{
     try {
 
         let {id} = req.params
-        let imageList = []
-        let imageListQuery = await messageModel.find({
+        let fileList = []
+        let fileListQuery = await messageModel.find({
                 $or: [ 
                     { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
                     { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
                 ],
                 "media.resource_type": "raw"
             },
-            "media.url_cloud media.name"
         ).sort({'createdAt': 'desc'})
 
-        imageListQuery.forEach(element => imageList = imageList.concat(element.media))
-        
-        return res.status(200).json({message: "Get image gallery success", data: imageList})
+        fileListQuery.forEach(element => fileList = fileList.concat(element.media))
+        fileList = fileList.filter(f => f.resource_type === 'raw').map(({url_cloud,name}) => ({url_cloud,name}))
+        return res.status(200).json({message: "Get image gallery success", data: fileList})
 
     } catch (err) {
         return res.status(400).json({message: err.message})
