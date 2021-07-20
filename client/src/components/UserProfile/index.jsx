@@ -1,9 +1,21 @@
 import { Box,Avatar,Typography, Button, IconButton, makeStyles } from '@material-ui/core'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { useState } from 'react';
 
 const UserProfile = (props) => {
-    const {user,handleBackClick,handleChatClick,handleRequestClick,isRequesting} = props
+    const {user,handleBackClick,handleChatClick,handleBtnClick,handleRefuseFriend} = props
     const style = useStyle()
+    const [isRequesting,setIsRequesting] = useState(false)
+    const handleRefuseClick = async () => {
+        setIsRequesting(true)
+        await handleRefuseFriend()
+        setIsRequesting(false)
+    }
+    const handleMainBtnClick = async () => {
+        setIsRequesting(true)
+        await handleBtnClick()
+        setIsRequesting(false)
+    }
     return (
         <Box>
             <Box height='150px' position='relative' mx={-1.5}>
@@ -23,15 +35,28 @@ const UserProfile = (props) => {
                 <Button onClick={handleChatClick} classes={{root : style.actionBtn}} variant="outlined" size='small' color='primary'>
                     Chat
                 </Button>
-                <Button 
-                    onClick={handleRequestClick} 
-                    classes={{root : style.actionBtn}} 
-                    variant="contained" 
-                    size='small' 
-                    color='primary'
-                    disabled={isRequesting}>
-                    {user.isRequest ? 'Cancel Request' : 'Add Friend'}
-                </Button>
+                {(!user.isAccepted && user.isInvited) && 
+                    <Button 
+                        onClick={handleRefuseClick} 
+                        classes={{root : style.actionBtn}} 
+                        variant="outlined" 
+                        size='small'
+                        color='primary'
+                        disabled={isRequesting}>
+                        Skip
+                    </Button>
+                }
+                {!user.isAccepted && 
+                    <Button 
+                        onClick={handleMainBtnClick} 
+                        classes={{root : style.actionBtn}} 
+                        variant="contained" 
+                        size='small' 
+                        color='primary'
+                        disabled={isRequesting}>
+                        {user.isInvited ? 'Accept' : user.isRequested ? 'Cancel Request' : 'Add Friend'}
+                    </Button>
+                }
             </Box>
             <Box mt={3}>
                 <Box display="flex">
@@ -80,7 +105,7 @@ const useStyle = makeStyles(theme => ({
         textTransform : 'initial',
         width  : '126px',
         '&+&' : {
-            marginLeft : theme.spacing(3)
+            marginLeft : theme.spacing(2)
         }
     },
     textInfo : {

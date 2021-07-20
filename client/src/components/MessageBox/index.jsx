@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import useLoadMessage from '../../hooks/useLoadMessage';
 import { useCallback } from 'react';
 import React from 'react';
-import { deleteMessage, updateConversation } from '../../actions/messageAction';
+import { deleteMessage, updateConversation, updateMessage } from '../../actions/messageAction';
 import _alert from '../../utils/alert';
 import MessageApi from '../../api/messageApi';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
@@ -35,7 +35,7 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
         })
         if(node) observer.current.observe(node)
     },[loading,hasMore])
-    const handleDeleteMessage = async (id)=> {
+    const handleDeleteMessage = async (msg,data)=> {
         _alert({
             title : 'Delete message',
             msg : 'Are you sure you want to delete this message.',
@@ -45,20 +45,35 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
             callback : async ({isConfirmed}) => {
                 if(isConfirmed) {
                     try {
-                        const msgIndex = messages.findIndex(msg => msg._id === id)
-                        const receiver = messages[msgIndex].receiver
-                        const preLastMsg = messages[1]
-                        dispatch(deleteMessage(id))
-                        if(msgIndex === 0) {
-                            dispatch(updateConversation(preLastMsg))
+                        // const msgIndex = messages.findIndex(msg => msg._id === id)
+                        // const receiver = messages[msgIndex].receiver
+                        // const preLastMsg = messages[1]
+                        // dispatch(deleteMessage(id,data))
+                        // if(msgIndex === 0) {
+                            // dispatch(updateConversation(preLastMsg))
+                        // }
+                        // const res = await MessageApi.deleteMessage(id)
+                        // if(res.status === 200) {
+                        //     socket.emit('DELETE_MESSAGE',{id,receiver})
+                        //     if(msgIndex === 0) {
+                        //         socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver})
+                        //     }
+                        // }
+                        const updateMsg = {...msg}
+                        if(data === 'text')
+                            updateMsg.text = ''
+                        else if(data === 'image')
+                            updateMsg.media = updateMsg.media.filter(md => md.resource_type !== 'image')
+                        else {
+                            updateMsg.media = updateMsg.media.filter(md => md._id !== data)
                         }
-                        const res = await MessageApi.deleteMessage(id)
-                        if(res.status === 200) {
-                            socket.emit('DELETE_MESSAGE',{id,receiver})
-                            if(msgIndex === 0) {
-                                socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver})
-                            }
+                        if(!updateMsg.text && !updateMsg.media.length) {
+                            dispatch(deleteMessage(updateMsg._id))
                         }
+                        else {
+                            dispatch(updateMessage(updateMsg))
+                        }
+
                     } catch (error) {
                         console.log(error)
                     }
@@ -116,7 +131,7 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         user={activeConv}
                         self={msg.sender === info._id}
                         isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
-                        handleDeleteMessage={()=>handleDeleteMessage(msg._id)}
+                        handleDeleteMessage={handleDeleteMessage}
                         isLast={index === 0}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}

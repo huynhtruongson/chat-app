@@ -1,4 +1,4 @@
-import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary, IconButton, Paper} from '@material-ui/core';
+import {Avatar, Box, makeStyles, Typography,Accordion,AccordionDetails,AccordionSummary, IconButton} from '@material-ui/core';
 import { ExpandMore,ArrowBack } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
@@ -36,9 +36,9 @@ const ConversationInfo = ({handleShowInfo}) => {
                             { imageGallery.length ? 
                                 <Box className={style.imageGalleryContainer}>
                                     {imageGallery.map(img => 
-                                        <Box className={style.imageGalleryItem}>
+                                        <Box className={style.imageGalleryItem} key={img}>
                                             <Box className={style.imageGalleryRatio}>
-                                                <img key={img} onClick={()=>dispatch(getActiveImage(img))} className={style.imageItem} src={img} alt ='img'/>
+                                                <img onClick={()=>dispatch(getActiveImage(img))} className={style.imageItem} src={img} alt ='img'/>
                                             </Box>
                                         </Box>
                                     )}

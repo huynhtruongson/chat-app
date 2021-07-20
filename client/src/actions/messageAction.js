@@ -1,6 +1,6 @@
 import MessageApi from "../api/messageApi";
 import { deleteGallery, updateGallery } from "./galleryAction";
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION} from "./type";
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION, UPDATE_MESSAGE} from "./type";
 
 export const getUserMessage = (user) => async (dispatch) => {
     try {
@@ -52,11 +52,34 @@ export const getConversations = (id) => async (dispatch) => {
 }
 export const deleteMessage = (id) => (dispatch,getState) => {
     const {messages} = getState().message
-    const msgIndex = messages.findIndex(msg => msg._id === id)  
+    const msgIndex = messages.findIndex(msg => msg._id === id) 
     if(msgIndex !== -1) {
-        dispatch({type : DELETE_MESSAGE,payload : id})
+        if(msgIndex === 0) {
+            const preLastMsg = messages[1] 
+            dispatch(updateConversation(preLastMsg))
+        }
         if(messages[msgIndex].media.length)
             dispatch(deleteGallery(messages[msgIndex].media))
+        
+        dispatch({type : DELETE_MESSAGE,payload : id})
+    }
+}
+export const updateMessage = (data) => (dispatch,getState) => {
+    const {messages} = getState().message
+    const msgIndex = messages.findIndex(msg => msg._id === data._id)  
+    if(msgIndex !== -1) {
+        const currentMsg = messages[msgIndex]
+        const mediaDel = currentMsg.media.reduce((a,b) => {
+            if(data.media.findIndex(md => md._id === b._id) === -1)
+                a.push(b)
+            return a
+        },[])
+        dispatch({type : UPDATE_MESSAGE,payload : data})
+        if(mediaDel.length) 
+            dispatch(deleteGallery(mediaDel))
+        if(msgIndex === 0) {
+            dispatch(updateConversation(data))
+        }
     }
 }
 export const updateLastMessage = (message,id) => ({

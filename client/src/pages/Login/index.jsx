@@ -1,5 +1,5 @@
 import { TextField, Box, Button, Backdrop, CircularProgress } from '@material-ui/core';
-import {ArrowRightAlt,Facebook} from '@material-ui/icons';
+import {ArrowRightAlt} from '@material-ui/icons';
 import React from 'react';
 import GoogleLogin from 'react-google-login';
 import { Link, useHistory } from 'react-router-dom';

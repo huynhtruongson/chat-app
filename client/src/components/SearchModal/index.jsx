@@ -1,26 +1,36 @@
-import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress, Select, MenuItem, Divider,} from '@material-ui/core';
+import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress, Select, MenuItem} from '@material-ui/core';
 import {Search} from '@material-ui/icons';
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {getUserMessage} from '../../actions/messageAction';
 import UserApi from '../../api/userApi';
-import _alert from '../../utils/alert';
 import ModalBase from '../ModalBase';
 import UserCard from '../UserCard';
 import UserProfile from '../UserProfile';
+import * as yup from 'yup'
+const schema = yup.object().shape({
+    email : yup.string().email()
+})
 const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest}) => {
     const style = useStyle();
     const [searchInput, setSearchInput] = useState('');
-    const [searchType,setSearchType] = useState('Name')
+    const [searchType,setSearchType] = useState('fullname')
     const [searchList, setSearchList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [userDetail, setUserDetail] = useState(null);
-    const [isRequesting,setIsRequesting] = useState(false)
+    const [searchError,setSearchError] = useState('')
     const dispatch = useDispatch();
     const handleSearch = async () => {
         try {
+            if(searchType === 'email') {
+                const isValid = await schema.isValid({email : searchInput})
+                if(!isValid) {
+                    setSearchError('Invalid email!')
+                    return
+                }
+            }
             setLoading(true);
-            const params = {fullname: searchInput};
+            const params = searchType === 'email' ? {email: searchInput} : {fullname: searchInput};
             const res = await UserApi.searchFriends(params);
             if (res.status === 200) {
                 setLoading(false);
@@ -34,12 +44,21 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
     const handleClickUser = (user) => {
         setUserDetail(user);
     };
+    const handleChangeInput = (e) => {
+        setSearchError('')
+        setSearchInput(e.target.value)
+    }
+    const handleChangeSelect = (e) => {
+        setSearchError('')
+        setSearchType(e.target.value)
+    }
     const handleCloseModal = () => {
         setSearchInput('');
         setSearchList([]);
         setLoading(false);
         setUserDetail(null);
-        setSearchType('Name')
+        setSearchType('fullname')
+        setSearchError('')
     };
     const handleChatClick = () => {
         dispatch(getUserMessage(userDetail));
@@ -49,7 +68,6 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
     };
     const handleRequestClick = async (id) => {
         try {
-            setIsRequesting(true)
             const res = await UserApi.requestFriend(id)
             if(res.status === 200) {
                 const newSearchList = searchList.map((user) =>
@@ -59,19 +77,40 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
                 if(userDetail)
                     setUserDetail({...userDetail,isRequested: !userDetail.isRequested})
             }
-            if(res.status === 201) {
-                _alert({icon:'success',title:'Coincidentally',msg:res.message,
-                    callback : ({isConfirmed}) => {
-                        if(isConfirmed) {
-                            handleShowFrRequest(false)
-                        }
-                    }})
-            }
-            setIsRequesting(false)
         } catch (error) {
             console.log(error)
         }
     };
+    const handleAcceptFriend = async (id) => {
+        try {
+            const res = await UserApi.acceptAddFriend(id);
+            if(res.status === 200) {
+                const newSearchList = searchList.map((user) =>
+                    user._id === id ? {...user, isAccepted: true} : user
+                );
+                setSearchList(newSearchList)
+                if(userDetail)
+                    setUserDetail({...userDetail,isAccepted: true})
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const handleRefuseFriend = async (id) => {
+        try {
+            const res = await UserApi.refuseAddFriend(id);
+            if(res.status === 200) {
+                const newSearchList = searchList.map((user) =>
+                    user._id === id ? {...user,isInvited : false, isRequested: false} : user
+                );
+                setSearchList(newSearchList)
+                if(userDetail)
+                    setUserDetail({...userDetail,isInvited : false, isRequested: false})
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    } 
     return (
         <ModalBase
             open={open}
@@ -88,28 +127,32 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
                         user={userDetail}
                         handleBackClick={() => setUserDetail(null)}
                         handleChatClick={handleChatClick}
-                        handleRequestClick={() => handleRequestClick(userDetail._id)}
-                        isRequesting={isRequesting}
+                        handleBtnClick={
+                            userDetail.isInvited ? () => handleAcceptFriend(userDetail._id) : 
+                            () => handleRequestClick(userDetail._id)
+                        }
+                        handleRefuseFriend={() => handleRefuseFriend(userDetail._id)}
                     />
                 ) : (
                     <Box>
-                        <Box display='flex' alignItems='flex-end'>
+                        <Box display='flex' alignItems='flex-start'>
                             <Select 
                                 className={style.searchSelect} 
                                 value={searchType} 
                                 variant='standard'
-                                onChange={e => setSearchType(e.target.value)}
+                                onChange={handleChangeSelect}
                             >
-                                <MenuItem value='Name'>Name</MenuItem>
-                                <MenuItem value='Email'>Email</MenuItem>
+                                <MenuItem value='fullname'>Name</MenuItem>
+                                <MenuItem value='email'>Email</MenuItem>
                             </Select>
                             <TextField
                                 value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
+                                onChange={handleChangeInput}
                                 variant='standard'
-                                // size='small'
+                                error={!!searchError}
+                                helperText={searchError}
                                 fullWidth
-                                placeholder='Search friend...'
+                                placeholder='Search . . .'
                                 InputProps={{
                                     classes: {root: style.searchInput},
                                     endAdornment: <Search color='disabled' />,
@@ -128,8 +171,10 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
                                         key={user._id}
                                         user={user}
                                         handleClick={() => handleClickUser(user)}
-                                        handleRequestClick={() => handleRequestClick(user._id)}
-                                        isRequesting={isRequesting}
+                                        handleBtnClick={
+                                            user.isInvited ? () => handleAcceptFriend(user._id) : 
+                                            () => handleRequestClick(user._id)
+                                        }
                                     />
                                 ))
                             ) : (
