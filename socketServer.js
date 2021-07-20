@@ -41,15 +41,21 @@ module.exports.socketServer = (socket) =>{
             socket.to(receiveUser.socketID).emit("DELETE_MESSAGE",id)
     })
     
-    socket.on('UPDATE_CONVERSATION',({msg,receiver}) => {
-        const receiveUser = userList.find(({userID}) => userID === receiver)
-        if(receiveUser)
-            socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
-    })
+    // socket.on('UPDATE_CONVERSATION',({msg,receiver}) => {
+    //     const receiveUser = userList.find(({userID}) => userID === receiver)
+    //     if(receiveUser)
+    //         socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
+    // })
 
     socket.on('TYPING',({receiver}) => {
         let userChat = userList.find(({userID})=> userID === receiver)
         if(userChat)
             socket.to(userChat.socketID).emit("TYPING",{receiver})
+    })
+
+    socket.on('UPDATE_MESSAGE',({msg,receiver})=>{
+        const receiveUser = userList.find(({userID}) => userID === receiver) 
+        if(receiveUser)
+            socket.to(receiveUser.socketID).emit("UPDATE_MESSAGE",msg)
     })
 }

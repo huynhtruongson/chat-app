@@ -37,7 +37,7 @@ module.exports.deleteMessage = async (req, res) =>{
         let messageDel = undefined
 
         if (!typeDelete) throw new Error("Opps something went wrong...")
-        messageDel = await messageModel.findById(id,"media text").lean()
+        messageDel = await messageModel.findById(id)
 
         if(!messageDel) {
             throw new Error ("Opps something went wrong..")
@@ -53,10 +53,10 @@ module.exports.deleteMessage = async (req, res) =>{
             messageDel.media = messageDel.media.filter(media => media.resource_type !== "image")   
         } else {
             messageDel.media.forEach(async (media) =>{ 
-                if (media._id === typeDelete)
+                if (media._id.equals(typeDelete))
                     await cloudinary.uploader.destroy(media.id_cloud)
             })
-            messageDel.media = messageDel.media.filter(media => media._id !== typeDelete)  
+            messageDel.media = messageDel.media.filter(media => !media._id.equals(typeDelete))  
         }
         
         if (!messageDel.media.length && !messageDel.text) {
