@@ -1,4 +1,4 @@
-import { GET_ACTIVE_IMAGE, GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY, REMOVE_ACTIVE_IMAGE, UPDATE_GALLERY } from "../actions/type"
+import { DELETE_GALLERY, GET_ACTIVE_IMAGE, GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY, REMOVE_ACTIVE_IMAGE, UPDATE_GALLERY } from "../actions/type"
 
 const initialState = {
     imageGallery : [],
@@ -19,7 +19,7 @@ const GalleryReducer = (state = initialState,action) => {
         case REMOVE_ACTIVE_IMAGE : 
             return {...state,activeImage : null}
         case UPDATE_GALLERY :
-            const imgArr = [...state.activeImage]
+            const imgArr = [...state.imageGallery]
             const videoArr = [...state.videoGallery]
             const fileArr = [...state.fileGallery]
             action.payload.forEach(md => {
@@ -31,6 +31,15 @@ const GalleryReducer = (state = initialState,action) => {
                     fileArr.unshift({url_cloud : md.url_cloud, name : md.name})
             })
             return {...state,imageGallery : imgArr,videoGallery : videoArr, fileGallery : fileArr}
+        case DELETE_GALLERY:
+            let imgList = [...state.imageGallery]
+            let videoList = [...state.videoGallery]
+            let fileList = [...state.fileGallery]
+            const delList = action.payload.map(md => md.url_cloud)
+            imgList = imgList.filter(i => !delList.includes(i))
+            videoList = videoList.filter(v => !delList.includes(v))
+            videoList = videoList.filter(f => !delList.includes(f))
+            return {...state,imageGallery : imgList,videoGallery : videoList, fileGallery : fileList}
         default:
             return state;
     }

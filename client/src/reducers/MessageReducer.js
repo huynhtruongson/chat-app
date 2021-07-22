@@ -1,4 +1,4 @@
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE, UPDATE_CONVERSATION} from '../actions/type';
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE, UPDATE_CONVERSATION, UPDATE_MESSAGE} from '../actions/type';
 const initialState = {
     conversations: [],
     activeConv: {},
@@ -60,6 +60,14 @@ const MessageReducer = (state = initialState, action) => {
                 return {...state,messages : msgArr}
             }
             return state
+        case UPDATE_MESSAGE : 
+            const msgList = [...state.messages]
+            const updateIndex = msgList.findIndex(msg => msg._id === action.payload._id)
+            if(updateIndex !== -1) {
+                msgList[updateIndex] = action.payload
+                return {...state,messages : msgList}
+            }
+            return state 
         case UPDATE_CONVERSATION:
             const msgUpdate = action.payload
             const newConv = [...state.conversations]

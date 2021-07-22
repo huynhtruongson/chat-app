@@ -55,16 +55,18 @@ const ChatForm = () => {
         if(!data.message && !data.media)
             msg.text = ':like:'
         const id = Math.random()+''
+        reset()
         dispatch(addMessage({...msg,id,status : 'Sending...'},activeConv))
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)
         msg.media.forEach(file => msgData.append('media',file))
-        reset()
         const res =  await MessageApi.addMessage(msgData)
         if(res.status === 200) {
             dispatch(updateLastMessage({...res.data.new_message,status : 'Sent ✔'},id))
             socket.emit('ADD_MESSAGE',{msg : res.data.new_message,user:info})
+            if(res.data.new_message.media.length)
+                dispatch(updateGallery(res.data.new_message.media))
         }
     };
     return (
@@ -105,6 +107,7 @@ const ChatForm = () => {
                             inputRef={inputRef}
                             {...inputRest}
                             fullWidth
+                            autoComplete='off'
                             variant='outlined'
                             placeholder='Aa'
                             size='small'
