@@ -1,7 +1,7 @@
 import {Avatar,Badge,Box,Button,Divider,makeStyles,Popover,} from "@material-ui/core";
 import {Settings,AccountCircleOutlined,VpnKeyOutlined,ExitToAppOutlined,Chat,PermContactCalendar,} from "@material-ui/icons";
-import React, {useState} from "react";
-import {userLogout} from "../../actions/userAction";
+import React, {useEffect, useState, useCallback} from "react";
+import {updateNewFriendRequest, userLogout} from "../../actions/userAction";
 import PasswordModal from "../../components/PwdModal";
 import UserModal from "../../components/UserModal";
 import {useHistory} from "react-router";
@@ -11,7 +11,7 @@ import SearchModal from "../../components/SearchModal";
 import { useDispatch, useSelector } from "react-redux";
 import Conversation from "../../components/Conversation";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useCallback } from "react";
+import Swal from "sweetalert2";
 const HomePage = () => {
     const [userModal, setUserModal] = useState(false);
     const [pwdModal, setPwdModal] = useState(false);
@@ -20,7 +20,8 @@ const HomePage = () => {
     const [showFriendList,setShowFriendList] = useState(false)
     const [showFrRequest,setShowFrRequest] = useState(false)
     const [showConversation,setShowConversation] = useState(false)  // Mobile breakpoint
-    const {info} = useSelector(state => state.user)
+    const {info,friendRequest} = useSelector(state => state.user)
+    const socket = useSelector(state => state.socket)
     const dispatch = useDispatch()
     const history = useHistory();
     const style = useStyle({showConversation,showFriendList});
@@ -34,6 +35,36 @@ const HomePage = () => {
         if(isMobileBp)
             setShowConversation(val)
     },[isMobileBp])
+    useEffect(()=> {
+        if(socket) {
+            socket.on('FRIEND_REQUEST',(info)=>{
+                dispatch(updateNewFriendRequest(info))
+                const Toast = Swal.mixin({
+                    toast : true,
+                    timer : 3000,
+                    showConfirmButton : false,
+                    position : 'bottom-left',
+                    timerProgressBar : true,
+                    didOpen : (toast) => {
+                        toast.addEventListener('mouseenter',()=>toast.style.cursor = 'pointer')
+                        toast.addEventListener('click',()=> {
+                            setShowFriendList(true)
+                            setShowFrRequest(true)
+                            handleShowConversation(true)
+                        })
+                    }
+                })
+                Toast.fire({
+                    icon : 'info',
+                    html : `You have a new friend request from <b>${info.fullname}</b>`
+                })
+            })
+        }
+        return ()=>{
+            if(socket)
+                socket.off('FRIEND_REQUEST')
+        }
+    },[handleShowConversation,socket,dispatch])
     return (
         <Box height="100vh" display="flex" overflow='hidden'>
             <Box
@@ -56,22 +87,26 @@ const HomePage = () => {
                     </Badge>
                 </Box>
                 <Box mt={2}>
-                    <Button classes={{root: `${style.settingBtn} ${!showFriendList && style.settingBtnActive}`}}
-                        onClick={()=>{
-                            if(showFriendList) 
-                                handleShowConversation(false)
-                            setShowFriendList(false)
+                    <Badge badgeContent={2} color='error' classes={{anchorOriginTopRightRectangle: style.btnBadgeAnchor}}>
+                        <Button classes={{root: `${style.settingBtn} ${!showFriendList && style.settingBtnActive}`}}
+                            onClick={()=>{
+                                if(showFriendList) 
+                                    handleShowConversation(false)
+                                setShowFriendList(false)
+                                }}>
+                            <Chat fontSize="large" />
+                        </Button>
+                    </Badge>
+                    <Badge badgeContent={friendRequest.length} color='error' classes={{anchorOriginTopRightRectangle: style.btnBadgeAnchor}}>
+                        <Button classes={{root: `${style.settingBtn} ${showFriendList && style.settingBtnActive}`}}
+                            onClick={()=>{
+                                if(!showFriendList)
+                                    handleShowConversation(false)
+                                setShowFriendList(true)
                             }}>
-                        <Chat fontSize="large" />
-                    </Button>
-                    <Button classes={{root: `${style.settingBtn} ${showFriendList && style.settingBtnActive}`}}
-                        onClick={()=>{
-                            if(!showFriendList)
-                                handleShowConversation(false)
-                            setShowFriendList(true)
-                        }}>
-                        <PermContactCalendar fontSize="large" />
-                    </Button>
+                            <PermContactCalendar fontSize="large" />
+                        </Button>
+                    </Badge>
                 </Box>
                 <Box marginTop='auto'>
                     <Button
@@ -190,7 +225,8 @@ const useStyle = makeStyles((theme) => ({
         borderRadius: 0,
         "&:hover": {
             backgroundColor: "rgb(255 255 255 / 40%)",
-        },
+        }
+
     },
     settingBtnActive : {
         backgroundColor: "rgb(255 255 255 / 40%)",
@@ -201,6 +237,10 @@ const useStyle = makeStyles((theme) => ({
         "&:last-child": {
             color: "red",
         },
+    },
+    btnBadgeAnchor: {
+        top: "12px",
+        right: "12px",
     },
     '@keyframes slideIn' : {
         '0%' : {

@@ -3,15 +3,19 @@ import {Box, makeStyles, Typography, Button, Avatar, IconButton} from '@material
 import { ArrowBack } from '@material-ui/icons';
 import Images from '../../constants/Images';
 import UserApi from '../../api/userApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFriendRequest, updateFriendRequest } from '../../actions/userAction';
 const FriendRequest = ({handleShowConversation}) => {
     const style = useStyle();
-    const [requestList, setRequestList] = useState([]);
+    // const [requestList, setRequestList] = useState([]);
+    const {friendRequest} = useSelector(state => state.user)
+    const dispatch = useDispatch()
     const handleAcceptFriend = async (id) => {
         try {
-            const newRequestArr = requestList.map((user) =>
+            const newRequestArr = friendRequest.map((user) =>
                 user._id === id ? {...user, isAccepted: true} : user
             );
-            setRequestList(newRequestArr)
+            dispatch(updateFriendRequest(newRequestArr))
             await UserApi.acceptAddFriend(id);
         } catch (error) {
             console.log(error);
@@ -19,28 +23,29 @@ const FriendRequest = ({handleShowConversation}) => {
     };
     const handleRefuseFriend = async (id) => {
         try {
-            const newRequestArr = requestList.filter((user) =>
+            const newRequestArr = friendRequest.filter((user) =>
                 user._id !== id
             );
-            setRequestList(newRequestArr)
+            dispatch(updateFriendRequest(newRequestArr))
             await UserApi.refuseAddFriend(id);
         } catch (error) {
             console.log(error);
         }
     } 
     useEffect(() => {
-        const fetchFriendRequest = async () => {
-            try {
-                const res = await UserApi.getFriendRequests();
-                if (res.status === 200) {
-                    setRequestList(res.data);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        fetchFriendRequest();
-    }, []);
+        // const fetchFriendRequest = async () => {
+        //     try {
+        //         const res = await UserApi.getFriendRequests();
+        //         if (res.status === 200) {
+        //             setRequestList(res.data);
+        //         }
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // };
+        // fetchFriendRequest();
+        dispatch(getFriendRequest())
+    }, [dispatch]);
     return (
         <Box height='100%'>
             <Box display='flex' alignItems='center' borderBottom='1px solid #cacaca' p={1}>
@@ -49,11 +54,11 @@ const FriendRequest = ({handleShowConversation}) => {
                 </IconButton>
                 <Box display='flex' alignItems='center'>
                     <img className={style.addFrIcon} src={Images.ADDFR_ICON} alt='img' />
-                    <Typography variant='h6'>Friend Requests ({requestList.length})</Typography>
+                    <Typography variant='h6'>Friend Requests ({friendRequest.length})</Typography>
                 </Box>
             </Box>
             <Box p={2}>
-                {requestList.map((user) => (
+                {friendRequest.map((user) => (
                     <Box key={user._id} className={style.requestItem}>
                         <Box display='flex' alignItems='center'>
                             <Avatar classes={{root: style.requestAvatar}} src={user.avatar} />

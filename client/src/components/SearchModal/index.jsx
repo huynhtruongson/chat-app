@@ -1,7 +1,7 @@
 import {Box,TextField,DialogContent,makeStyles,DialogActions,Typography,Button,LinearProgress, Select, MenuItem} from '@material-ui/core';
 import {Search} from '@material-ui/icons';
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {getUserMessage} from '../../actions/messageAction';
 import UserApi from '../../api/userApi';
 import ModalBase from '../ModalBase';
@@ -19,6 +19,8 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
     const [loading, setLoading] = useState(false);
     const [userDetail, setUserDetail] = useState(null);
     const [searchError,setSearchError] = useState('')
+    const {info} = useSelector(state => state.user)
+    const socket = useSelector(state => state.socket)
     const dispatch = useDispatch();
     const handleSearch = async () => {
         try {
@@ -70,14 +72,19 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
         try {
             const res = await UserApi.requestFriend(id)
             if(res.status === 200) {
+                const user = searchList.find(u => u._id === id)
+                if(user && !user.isRequested)
+                    socket.emit('FRIEND_REQUEST',({info,id}))
                 const newSearchList = searchList.map((user) =>
                     user._id === id ? {...user, isRequested: !user.isRequested} : user
                 );
                 setSearchList(newSearchList)
                 if(userDetail)
-                    setUserDetail({...userDetail,isRequested: !userDetail.isRequested})
+                setUserDetail({...userDetail,isRequested: !userDetail.isRequested})
+                
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.log(error)
         }
     };
