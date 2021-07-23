@@ -8,12 +8,21 @@ const conversationSchema = new Schema({
             ref:"Account",
         }
     ],
+    last_sender: {
+        type: Schema.Types.ObjectId,
+        ref:"Account",
+    },
     delete: [
         {
             type: Schema.Types.ObjectId,
             ref:"Account",
         }
     ],
+    seen: {
+        type: Boolean,
+        default: false
+    },
+    update_time: Date,
     name: String,
     text: String,
     media: [{

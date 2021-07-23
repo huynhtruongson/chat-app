@@ -155,7 +155,9 @@ module.exports.addMessage = async (req, res) => {
             {
                 party: [ mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] ,
                 text: text,
-                media: messageMedia
+                media: messageMedia,
+                delete: [],
+                update_time: new Date().toISOString(),
                 
             },
             { new: true, upsert: true }
@@ -272,4 +274,30 @@ module.exports.delConversation = async (req, res) =>{
     } catch (err){
         return res.status(400).json({message: err.message})
     }
+}
+
+module.exports.seenConversation = async (req, res) =>{
+    try {
+        let {id} = req.params
+    
+        if (!id) throw new Error("Opps something went wrong..")
+        let updateConversation = await conversationModel.findOne({ 
+            $or: [
+                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(receiver)] }, 
+                { party: [mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] }
+            ]}
+        )
+
+        if(req.user.id ===updateConversation.last_sender)
+            throw new Error("Error logic send api")
+        
+        updateConversation.seen = true
+        await updateConversation.save()
+
+        return res.status(200).json({message: "Success"})
+    } catch (err) {
+        return res.status(400).json({message: err.message})
+    }
+    
+
 }
