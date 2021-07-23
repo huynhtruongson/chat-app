@@ -1,9 +1,18 @@
-import { Avatar, Badge, Box, makeStyles, Typography } from '@material-ui/core'
-import { Description } from '@material-ui/icons'
-import React from 'react'
+import { Avatar, Badge, Box, Button, IconButton, makeStyles, Popover, Typography } from '@material-ui/core'
+import { Description,MoreHoriz,DeleteForever } from '@material-ui/icons'
+import moment from 'moment'
+import React, { useState } from 'react'
 
 const ChatCard = ({user,handleClickUser,active,isConv,isOnline}) => {
     const style = useStyle({active,isOnline})
+    const [anchorEl, setAnchorEl] = useState(null);
+    const handleOptionBtnClick = (e) => {
+        e.stopPropagation() // prevent parent click
+        setAnchorEl(e.target)
+    }
+    const handleDeleteConv = (e) => {
+        e.stopPropagation()
+    }
     return (
         <Box onClick={handleClickUser} className={style.chatCard} display='flex' p={1} alignItems='center'>
             <Badge
@@ -29,6 +38,23 @@ const ChatCard = ({user,handleClickUser,active,isConv,isOnline}) => {
                 )
                 }
             </Box>
+            {isConv && <Box display='flex' flexDirection='column' alignItems='flex-end'>
+                <Typography variant='caption' color='textSecondary' >{moment(new Date().toISOString()).fromNow()}</Typography>
+                <IconButton onClick={handleOptionBtnClick} size='small' classes={{root : style.optionBtn}}>
+                    <MoreHoriz fontSize='small' />
+                </IconButton>
+                <Popover
+                    open={!!anchorEl}
+                    anchorEl={anchorEl}
+                    onClose={() => setAnchorEl(null)}
+                    anchorOrigin={{vertical: "bottom", horizontal: "center"}}
+                    transformOrigin={{vertical : 'top',horizontal : 'center'}}>
+                    <Button onClick={handleDeleteConv} startIcon={<DeleteForever fontSize='small' color='secondary'/>} color='secondary'>
+                        Delete
+                    </Button>
+                </Popover>
+            </Box>
+            }
         </Box>
     )
 }
@@ -56,6 +82,8 @@ const useStyle = makeStyles(theme => ({
     badgeAnchor: {
         top: '8px',
         right: '6px',
+    },
+    optionBtn : {
     }
 }))
 export default ChatCard

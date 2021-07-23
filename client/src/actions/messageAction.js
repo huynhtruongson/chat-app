@@ -1,6 +1,6 @@
 import MessageApi from "../api/messageApi";
 import { deleteGallery, updateGallery } from "./galleryAction";
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION, UPDATE_MESSAGE} from "./type";
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION, UPDATE_MESSAGE, DELETE_CONVERSATION} from "./type";
 
 export const getUserMessage = (user) => async (dispatch) => {
     try {
@@ -94,3 +94,7 @@ export const getMessages = (messages) => ({
     type: GET_MESSAGES,
     payload: messages,
 });
+export const deleteConversation = (id) => ({
+    type : DELETE_CONVERSATION,
+    payload : id
+})

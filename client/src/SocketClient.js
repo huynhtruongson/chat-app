@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addMessage, deleteMessage, updateConversation, updateMessage } from './actions/messageAction'
+import { addMessage, deleteMessage, updateMessage } from './actions/messageAction'
 import { addUserOnline, getUserOnline, removeUserOnline } from './actions/onlineUserAction'
 
 const SocketClient = () => {
