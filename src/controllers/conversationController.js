@@ -31,9 +31,7 @@ function convertViToEn(str) {
 module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
-
-        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'updatedAt': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email")
-        
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'update_time': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email")
         return res.status(200).json({
                 message: 'get conversation list success',
                 data:conversationList
@@ -157,8 +155,9 @@ module.exports.addMessage = async (req, res) => {
                 text: text,
                 media: messageMedia,
                 delete: [],
+                seen: false,
                 update_time: new Date().toISOString(),
-                
+                last_sender: req.user.id
             },
             { new: true, upsert: true }
         )
