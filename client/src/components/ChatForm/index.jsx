@@ -56,7 +56,7 @@ const ChatForm = () => {
             msg.text = ':like:'
         const id = Math.random()+''
         reset()
-        dispatch(addMessage({...msg,id,status : 'Sending...'},activeConv))
+        dispatch(addMessage({...msg,id,createdAt : new Date().toISOString(),status : 'Sending...'},activeConv))
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)

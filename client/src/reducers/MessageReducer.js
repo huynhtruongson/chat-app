@@ -1,4 +1,4 @@
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE, UPDATE_CONVERSATION, UPDATE_MESSAGE} from '../actions/type';
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE, UPDATE_CONVERSATION, UPDATE_MESSAGE, DELETE_CONVERSATION, UPDATE_SEEN_CONVERSATION} from '../actions/type';
 const initialState = {
     conversations: [],
     activeConv: {},
@@ -15,14 +15,24 @@ const MessageReducer = (state = initialState, action) => {
                 (cv) => cv._id === msg.sender || cv._id === msg.receiver
             );
             if (index !== -1) { 
-                cvArr[index] = {...cvArr[index], text: msg.text, media: msg.media};
+                cvArr[index] = {...cvArr[index], 
+                    text: msg.text, 
+                    media: msg.media,
+                    last_sender : msg.sender,
+                    update_time : msg.createdAt
+                };
                 cvArr.sort((currCv, nextCv) => {
                     if (currCv._id === cvArr[index]._id) return -1;
                     else if (nextCv._id === cvArr[index]._id) return 1;
                     return 0;
                 });
             } else {
-                const newCv = {...user, text: msg.text, media: msg.media};
+                const newCv = {...user, 
+                    text: msg.text, 
+                    media: msg.media,
+                    last_sender : msg.sender,
+                    update_time : msg.createdAt
+                };
                 cvArr.unshift(newCv);
             }
             if(state.activeConv._id === msg.sender || state.activeConv._id === msg.receiver)  
@@ -77,6 +87,22 @@ const MessageReducer = (state = initialState, action) => {
                 return {...state,conversations : newConv} 
             }
             return state
+        case DELETE_CONVERSATION : 
+            const convArr = [...state.conversations]
+            const convIndex = convArr.findIndex(cv => cv._id === action.payload)
+            if(convIndex !== -1) 
+                convArr.splice(convIndex,1)
+            return {...state,conversations : convArr}
+        case UPDATE_SEEN_CONVERSATION : 
+            const {convId,data} = action.payload
+            const convList = [...state.conversations]
+            const currentConv = {...state.activeConv}
+            const convPos =  convList.findIndex(cv => cv._id === convId)
+            if(convPos !== -1) 
+                convList[convPos].seen = data
+            if(currentConv._id === convId)
+                currentConv.seen = data
+            return {...state,conversations : convList,activeConv : currentConv}
         default:
             return state;
     }

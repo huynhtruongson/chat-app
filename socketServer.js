@@ -64,4 +64,9 @@ module.exports.socketServer = (socket) =>{
         if(receiveUser)
             socket.to(receiveUser.socketID).emit("FRIEND_REQUEST",info)
     })
+    socket.on('SEEN_CONVERSATION',({id,data}) => {
+        const receiveUser = userList.find(({userID}) => userID === id) 
+        if(receiveUser)
+            socket.to(receiveUser.socketID).emit("SEEN_CONVERSATION",{id,data})
+    })
 }

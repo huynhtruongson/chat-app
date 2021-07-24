@@ -84,6 +84,7 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                               handleClickUser={() => handleClickUserConversations(cv._id)}
                               isConv
                               isOnline={onlineUser.includes(cv._id)}
+                              self={cv.last_sender === userId}
                           />
                       ))
                     : friendListSearch?.map((user) => (

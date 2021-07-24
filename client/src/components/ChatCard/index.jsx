@@ -2,16 +2,20 @@ import { Avatar, Badge, Box, Button, IconButton, makeStyles, Popover, Typography
 import { Description,MoreHoriz,DeleteForever } from '@material-ui/icons'
 import moment from 'moment'
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { deleteConversation } from '../../actions/messageAction'
 
-const ChatCard = ({user,handleClickUser,active,isConv,isOnline}) => {
-    const style = useStyle({active,isOnline})
+const ChatCard = ({user,handleClickUser,active,isConv,isOnline,self}) => {
+    const style = useStyle({active,isOnline,seen : user.seen})
     const [anchorEl, setAnchorEl] = useState(null);
+    const dispatch = useDispatch()
     const handleOptionBtnClick = (e) => {
         e.stopPropagation() // prevent parent click
         setAnchorEl(e.target)
     }
     const handleDeleteConv = (e) => {
         e.stopPropagation()
+        dispatch(deleteConversation(user._id))
     }
     return (
         <Box onClick={handleClickUser} className={style.chatCard} display='flex' p={1} alignItems='center'>
@@ -34,19 +38,24 @@ const ChatCard = ({user,handleClickUser,active,isConv,isOnline}) => {
                         <Description fontSize='small' />
                         <Typography variant='body2' >{`${user.media.length} file media`}</Typography>
                     </Box> :
-                    <Typography variant='body2' noWrap color='textSecondary'>{user.text === ':like:' ? '👍' : user.text}</Typography>
+                    <Typography variant='body2' noWrap color='textSecondary'>
+                        {self && 'You:'}{user.text === ':like:' ? '👍' : user.text}
+                    </Typography>
                 )
                 }
             </Box>
-            {isConv && <Box display='flex' flexDirection='column' alignItems='flex-end'>
-                <Typography variant='caption' color='textSecondary' >{moment(new Date().toISOString()).fromNow()}</Typography>
-                <IconButton onClick={handleOptionBtnClick} size='small' classes={{root : style.optionBtn}}>
-                    <MoreHoriz fontSize='small' />
-                </IconButton>
+            {isConv && <Box display='flex' flexDirection='column' alignItems='flex-end' alignSelf='stretch'>
+                <Typography variant='caption' color='textSecondary' >{moment(user.update_time ||new Date().toISOString()).fromNow()}</Typography>
+                <Box display='flex' alignItems='center'>
+                    <IconButton onClick={handleOptionBtnClick} size='small' classes={{root : style.optionBtn}}>
+                        <MoreHoriz fontSize='small' />
+                    </IconButton>
+                    <Box className={style.unseenMark}></Box>
+                </Box>
                 <Popover
                     open={!!anchorEl}
                     anchorEl={anchorEl}
-                    onClose={() => setAnchorEl(null)}
+                    onClose={(e) => {setAnchorEl(null);e.stopPropagation()}}
                     anchorOrigin={{vertical: "bottom", horizontal: "center"}}
                     transformOrigin={{vertical : 'top',horizontal : 'center'}}>
                     <Button onClick={handleDeleteConv} startIcon={<DeleteForever fontSize='small' color='secondary'/>} color='secondary'>
@@ -63,7 +72,11 @@ const useStyle = makeStyles(theme => ({
         cursor : 'pointer',
         backgroundColor : ({active}) => active ? '#E5EFFF' : null,
         '&:hover' : {
-            backgroundColor : theme.palette.grey[200]
+            backgroundColor : theme.palette.grey[200],
+            '& $optionBtn' : {
+                // display : 'block'
+                opacity : 1
+            }
         }
     },
     avatar : {
@@ -84,6 +97,15 @@ const useStyle = makeStyles(theme => ({
         right: '6px',
     },
     optionBtn : {
+        // display : 'none'
+        opacity : 0
+    },
+    unseenMark : {
+        width : '10px',
+        height :'10px',
+        borderRadius : '100rem',
+        backgroundColor : ({seen}) => seen ? 'transparent' : '#db342e'
+        
     }
 }))
 export default ChatCard
