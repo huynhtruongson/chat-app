@@ -167,6 +167,7 @@ module.exports.addMessage = async (req, res) => {
             sender: mongoose.Types.ObjectId(req.user.id),
             receiver: mongoose.Types.ObjectId(receiver),
             text: text,
+            seen: false,
             media: messageMedia,
         })
         new_message.save()
@@ -249,13 +250,23 @@ module.exports.fileGallery = async (req, res) =>{
 module.exports.delConversation = async (req, res) =>{
     try {
         let {id} = req.params
-        let checkExist = await conversationModel.findById(id)
+        let checkExist = await conversationModel.findOne({
+            $or: [
+                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(id)] }, 
+                { party: [mongoose.Types.ObjectId(id), mongoose.Types.ObjectId(req.user.id)] }
+            ]}
+        )
 
         if(!checkExist || checkExist.delete.includes(req.user.id)) {
             throw new Error ("Opps something went wrong ...")
         }
         
-        let updateConversation = await conversationModel.findByIdAndUpdate(id, {$push: {delete: req.user.id}}, {new: true})
+        let updateConversation = await conversationModel.findOneAndUpdate({
+            $or: [
+                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(id)] }, 
+                { party: [mongoose.Types.ObjectId(id), mongoose.Types.ObjectId(req.user.id)] }
+            ]}
+            , {$push: {delete: req.user.id}}, {new: true})
         
         let receiver = updateConversation.party.find(user => String(user) !== req.user.id)
 
@@ -286,9 +297,17 @@ module.exports.seenConversation = async (req, res) =>{
                 { party: [mongoose.Types.ObjectId(id), mongoose.Types.ObjectId(req.user.id)] }
             ]}
         )
+        
+        if(!updateConversation) throw new Error("Opps something went wrong ...")
 
-        // if(req.user.id ===updateConversation.last_sender)
-        //     throw new Error("Error logic send api")
+        let updateMessages = await messageModel.updateMany({
+            $or: [
+                { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
+                { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+            ],
+            seen: false,
+
+        },{seen: true})
         
         updateConversation.seen = true
         await updateConversation.save()

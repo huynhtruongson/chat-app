@@ -20,6 +20,7 @@ const messageSchema = new Schema({
             ref:"Account",
         }
     ],
+    seen: Boolean,
     text: String,
     media: [{
         id_cloud: String,
