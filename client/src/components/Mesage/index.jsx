@@ -3,7 +3,7 @@ import {Avatar, Box, makeStyles, Typography, IconButton} from '@material-ui/core
 import {ThumbUp,Description,DeleteForever} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
-const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast},ref) => {
+const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast,seen},ref) => {
     const imageList = msg.media.filter((md) => md.resource_type === 'image')
     const videoList = msg.media.filter((md) => md.resource_type === 'video')
     const fileList = msg.media.filter((md) => md.resource_type === 'raw')
@@ -95,8 +95,10 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
                         </Box>)
                     }
             </Box>
-            {(isLast && msg.status) && <Box className={style.messageStatus}>
-                <Typography color='primary'>{msg.status}</Typography>
+            {(isLast) && <Box className={style.messageStatus}>
+                <Typography color='primary' variant='caption'>
+                    {(self && seen) ? 'Seen' :  msg.status ? msg.status : ''}
+                </Typography>
             </Box>
             }
         </Box>

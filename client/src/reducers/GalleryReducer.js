@@ -38,7 +38,7 @@ const GalleryReducer = (state = initialState,action) => {
             const delList = action.payload.map(md => md.url_cloud)
             imgList = imgList.filter(i => !delList.includes(i))
             videoList = videoList.filter(v => !delList.includes(v))
-            videoList = videoList.filter(f => !delList.includes(f))
+            fileList = fileList.filter(f => !delList.includes(f.url_cloud))
             return {...state,imageGallery : imgList,videoGallery : videoList, fileGallery : fileList}
         default:
             return state;

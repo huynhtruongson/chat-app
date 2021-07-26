@@ -1,22 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Box, makeStyles, Typography, Button, Avatar, IconButton} from '@material-ui/core';
 import { ArrowBack } from '@material-ui/icons';
 import Images from '../../constants/Images';
 import UserApi from '../../api/userApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFriendRequest, updateFriendRequest } from '../../actions/userAction';
+import { getFriendRequest, updateFriendRequest, updateNewFriend } from '../../actions/userAction';
 const FriendRequest = ({handleShowConversation}) => {
     const style = useStyle();
-    // const [requestList, setRequestList] = useState([]);
     const {friendRequest} = useSelector(state => state.user)
     const dispatch = useDispatch()
     const handleAcceptFriend = async (id) => {
         try {
-            const newRequestArr = friendRequest.map((user) =>
-                user._id === id ? {...user, isAccepted: true} : user
-            );
-            dispatch(updateFriendRequest(newRequestArr))
-            await UserApi.acceptAddFriend(id);
+            const user = friendRequest.find(u => u._id === id)
+            if(user) {
+                const newRequestArr = friendRequest.map((user) =>
+                    user._id === id ? {...user, isAccepted: true} : user
+                );
+                dispatch(updateFriendRequest(newRequestArr))
+                dispatch(updateNewFriend(user))
+                await UserApi.acceptAddFriend(id);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -33,17 +36,6 @@ const FriendRequest = ({handleShowConversation}) => {
         }
     } 
     useEffect(() => {
-        // const fetchFriendRequest = async () => {
-        //     try {
-        //         const res = await UserApi.getFriendRequests();
-        //         if (res.status === 200) {
-        //             setRequestList(res.data);
-        //         }
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        // };
-        // fetchFriendRequest();
         dispatch(getFriendRequest())
     }, [dispatch]);
     return (

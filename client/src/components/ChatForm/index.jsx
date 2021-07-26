@@ -6,7 +6,7 @@ import IsolateMedia from '../IsolateMedia';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { addMessage, updateLastMessage } from '../../actions/messageAction';
+import { addMessage, updateLastMessage, updateSeenConversation } from '../../actions/messageAction';
 import MessageApi from '../../api/messageApi';
 import ICONS from '../../constants/Icons';
 import { updateGallery } from '../../actions/galleryAction';
@@ -38,7 +38,7 @@ const ChatForm = () => {
         const currentFile = [].concat(getValues('media') || []);
         setValue('media', [...currentFile, ...fileArr]);
         if(fileErrorArr.length)
-            _alert({icon:'error',title:'File is too large!',msg:fileErrorArr.join(',')})
+            _alert({icon:'error',title:'File is too large!',msg:'Maximum size of a file is 10MB'})
     };
     const handleRemoveMedia = (index) => {
         const currentFiles = [...getValues('media')]
@@ -56,7 +56,8 @@ const ChatForm = () => {
             msg.text = ':like:'
         const id = Math.random()+''
         reset()
-        dispatch(addMessage({...msg,id,status : 'Sending...'},activeConv))
+        dispatch(addMessage({...msg,id,createdAt : new Date().toISOString(),status : 'Sending...'},activeConv))
+        dispatch(updateSeenConversation(activeConv._id,false))
         const msgData = new FormData()
         msgData.append('text',msg.text)
         msgData.append('receiver',msg.receiver)
@@ -69,6 +70,12 @@ const ChatForm = () => {
                 dispatch(updateGallery(res.data.new_message.media))
         }
     };
+    const handleFocusInput = () => {
+        socket.emit('USER_TYPING',{receiver :activeConv._id,convId: info._id})
+    }
+    const handleBlurInput = () => {
+        socket.emit('USER_CANCEL_TYPING',{receiver :activeConv._id,convId: info._id})
+    }
     return (
         <Box>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -123,6 +130,8 @@ const ChatForm = () => {
                                     </InputAdornment>
                                 ),
                             }}
+                            onFocus={handleFocusInput}
+                            onBlur={handleBlurInput}
                         />
                     </Box>
                     <IconButton type='submit' color='primary'>

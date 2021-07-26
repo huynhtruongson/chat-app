@@ -8,6 +8,7 @@ import ModalBase from '../ModalBase';
 import UserCard from '../UserCard';
 import UserProfile from '../UserProfile';
 import * as yup from 'yup'
+import { updateNewFriend } from '../../actions/userAction';
 const schema = yup.object().shape({
     email : yup.string().email()
 })
@@ -90,14 +91,18 @@ const SearchModal = ({open, onClose,handleShowConversation,handleShowFrRequest})
     };
     const handleAcceptFriend = async (id) => {
         try {
-            const res = await UserApi.acceptAddFriend(id);
-            if(res.status === 200) {
-                const newSearchList = searchList.map((user) =>
-                    user._id === id ? {...user, isAccepted: true} : user
-                );
-                setSearchList(newSearchList)
-                if(userDetail)
-                    setUserDetail({...userDetail,isAccepted: true})
+            const user = searchList.find(u => u._id === id)
+            if(user) {
+                const res = await UserApi.acceptAddFriend(id);
+                if(res.status === 200) {
+                    const newSearchList = searchList.map((user) =>
+                        user._id === id ? {...user, isAccepted: true} : user
+                    );
+                    setSearchList(newSearchList)
+                    if(userDetail)
+                        setUserDetail({...userDetail,isAccepted: true})
+                    dispatch(updateNewFriend(user))
+                }
             }
         } catch (error) {
             console.log(error);

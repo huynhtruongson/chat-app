@@ -133,10 +133,10 @@ module.exports.registerController = async (req, res) =>{
         var token = crypto.randomBytes(48).toString('hex')
         let fullname = firstname + " " + lastname
         
-        let checkExist = await AccountModel.findOne({email: email, type_account: "emai"})
+        let checkExist = await AccountModel.findOne({email: email, type_account: "email"})
 
         if (checkExist) {
-            throw new Error ('This account is registered')
+            throw new Error ('This email has already registered')
         }
 
         let password_hash = await bcrypt.hash(password,10)
