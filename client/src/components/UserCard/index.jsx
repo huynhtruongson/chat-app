@@ -15,7 +15,7 @@ const UserCard = ({user,handleClick,handleBtnClick}) => {
                 <Avatar src={user.avatar} />
                 <Typography classes={{root : style.username}} variant='subtitle2'>{user.fullname}</Typography>
             </Box>
-            {user.isAccepted ? <Typography variant='subtitle1'>Accepted</Typography> : 
+            {user.isAccepted ? <Typography variant='subtitle2' color='primary' classes={{root : style.btn}}>Accepted!</Typography> : 
                 <Button 
                     onClick={btnClick} 
                     classes={{root : style.btn}} 

@@ -21,6 +21,7 @@ const HomePage = () => {
     const [showFrRequest,setShowFrRequest] = useState(false)
     const [showConversation,setShowConversation] = useState(false)  // Mobile breakpoint
     const {info,friendRequest} = useSelector(state => state.user)
+    const {conversations} = useSelector(state => state.message)
     const socket = useSelector(state => state.socket)
     const dispatch = useDispatch()
     const history = useHistory();
@@ -35,6 +36,7 @@ const HomePage = () => {
         if(isMobileBp)
             setShowConversation(val)
     },[isMobileBp])
+    const unseenConv = conversations.filter(cv => !cv.seen && cv._id === cv.last_sender).length
     useEffect(()=> {
         if(socket) {
             socket.on('FRIEND_REQUEST',(info)=>{
@@ -87,7 +89,7 @@ const HomePage = () => {
                     </Badge>
                 </Box>
                 <Box mt={2}>
-                    <Badge badgeContent={2} color='error' classes={{anchorOriginTopRightRectangle: style.btnBadgeAnchor}}>
+                    <Badge badgeContent={unseenConv} color='error' classes={{anchorOriginTopRightRectangle: style.btnBadgeAnchor}}>
                         <Button classes={{root: `${style.settingBtn} ${!showFriendList && style.settingBtnActive}`}}
                             onClick={()=>{
                                 if(showFriendList) 

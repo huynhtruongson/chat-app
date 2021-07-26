@@ -11,6 +11,8 @@ import React from 'react';
 import { deleteMessage, updateMessage } from '../../actions/messageAction';
 import _alert from '../../utils/alert';
 import MessageApi from '../../api/messageApi';
+import Images from '../../constants/Images';
+import ProfileModal from '../ProfileModal';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
     console.log('message box reredenr')
     const {activeConv,messages} = useSelector(state => state.message)
@@ -18,7 +20,9 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
     const socket = useSelector(state => state.socket)
     const onlineUser = useSelector(state => state.onlineUser)
     const isUserOnline = onlineUser.includes(activeConv._id)
-    const style = useStyle({isUserOnline});
+    const [onTyping,setOnTyping] = useState(false)
+    const [userModal,setUserModal] = useState(false)
+    const style = useStyle({isUserOnline,onTyping});
     const dispatch = useDispatch()
     const observer = useRef()
     const [page,setPage] = useState(1)
@@ -75,7 +79,46 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
             }
         })
     }
-    useEffect(()=>{setPage(1)},[activeConv._id])
+    useEffect(()=>{
+        setPage(1)
+        setOnTyping(false)
+    },[activeConv._id])
+    useEffect(()=>{
+        if(socket) {
+            socket.on('USER_TYPING',(convId)=> {
+                if(activeConv._id === convId)
+                    setOnTyping(true)
+            })
+        }
+        return ()=> {
+            if(socket)
+                socket.off('USER_TYPING')
+        }
+    },[socket,activeConv._id])
+    useEffect(()=>{
+        if(socket) {
+            socket.on('USER_TYPING',(convId)=> {
+                if(activeConv._id === convId)
+                    setOnTyping(true)
+            })
+        }
+        return ()=> {
+            if(socket)
+                socket.off('USER_TYPING')
+        }
+    },[socket,activeConv._id])
+    useEffect(()=>{
+        if(socket) {
+            socket.on('USER_CANCEL_TYPING',(convId)=> {
+                if(activeConv._id === convId)
+                    setOnTyping(false)
+            })
+        }
+        return ()=> {
+            if(socket)
+                socket.off('USER_CANCEL_TYPING')
+        }
+    },[socket,activeConv._id])
     return (
         <Box display="flex" flexDirection="column" height="100%">
             <Box className={style.messageHeader}>
@@ -97,6 +140,7 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                     </Badge>
                     <Box ml={0.8}>
                         <Typography
+                            onClick={()=>setUserModal(true)}
                             classes={{ root: style.username }}
                             variant="subtitle2">
                             {activeConv.fullname}
@@ -118,19 +162,25 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                 </Box> 
             </Box>
             <Box className={style.messagesContainer}>
+                <Box className={style.typingMsg}>
+                    <Avatar src={activeConv.avatar} />
+                    <img src={Images.TYPING_IMG} alt="" className={style.typingImage} />
+                </Box>
                 {messages && messages.map((msg,index) => (
                     <Message 
-                        key={msg+Math.random()} 
+                        key={msg._id} 
                         msg={msg} 
                         user={activeConv}
                         self={msg.sender === info._id}
                         isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
                         handleDeleteMessage={handleDeleteMessage}
                         isLast={index === 0}
+                        seen={activeConv.seen}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}
             </Box>
             <ChatForm/>
+            <ProfileModal open={userModal} onClose={()=> setUserModal(false)} user={activeConv} />
         </Box>
     );
 };
@@ -142,6 +192,10 @@ const useStyle = makeStyles((theme) => ({
     },
     username: {
         fontSize: '1.1rem',
+        cursor : 'pointer',
+        '&:hover' : {
+            textDecoration : 'underline'
+        }
     },
     loading : {
         textAlign : 'center',
@@ -186,6 +240,16 @@ const useStyle = makeStyles((theme) => ({
     badgeAnchor: {
         top: '8px',
         right: '6px',
+    },
+    typingMsg : {
+        display: ({onTyping}) => onTyping ? 'flex' : 'none',
+        alignItems:'center',
+        marginLeft: theme.spacing(1)
+    },
+    typingImage : {
+        width : '60px',
+        height : '40px',
+        objectFit : 'cover'
     }
 }));
 export default React.memo(MessageBox);

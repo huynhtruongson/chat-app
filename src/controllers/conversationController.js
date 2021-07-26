@@ -31,7 +31,7 @@ function convertViToEn(str) {
 module.exports.conversationList = async (req, res) => {
     try{
         let pageSkip = req.query.pageSkip*1 || 0
-        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'update_time': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email")
+        let conversationList = await conversationModel.find({party: mongoose.Types.ObjectId(req.user.id), delete: {$ne: [req.user.id]}}).sort({'update_time': 'desc'}).limit(15).skip(pageSkip).populate("party","fullname avatar email firstname lastname")
         return res.status(200).json({
                 message: 'get conversation list success',
                 data:conversationList
@@ -282,13 +282,13 @@ module.exports.seenConversation = async (req, res) =>{
         if (!id) throw new Error("Opps something went wrong..")
         let updateConversation = await conversationModel.findOne({ 
             $or: [
-                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(receiver)] }, 
-                { party: [mongoose.Types.ObjectId(receiver), mongoose.Types.ObjectId(req.user.id)] }
+                { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(id)] }, 
+                { party: [mongoose.Types.ObjectId(id), mongoose.Types.ObjectId(req.user.id)] }
             ]}
         )
 
-        if(req.user.id ===updateConversation.last_sender)
-            throw new Error("Error logic send api")
+        // if(req.user.id ===updateConversation.last_sender)
+        //     throw new Error("Error logic send api")
         
         updateConversation.seen = true
         await updateConversation.save()

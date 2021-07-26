@@ -3,15 +3,15 @@ import {Search,PersonAdd} from "@material-ui/icons";
 import {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {getConversations, getUserMessage} from "../../actions/messageAction";
+import { getFriendList } from "../../actions/userAction";
 import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
 const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal,handleShowConversation}) => {
     const style = useStyle();
-    const {info : {_id : userId}} = useSelector(state => state.user)
+    const {info : {_id : userId},friendList} = useSelector(state => state.user)
     const {conversations,activeConv} = useSelector(state => state.message)
     const onlineUser = useSelector(state => state.onlineUser)
-    const [friendList,setFriendList] = useState([])
     const [search,setSearch] = useState('')
     const dispatch = useDispatch()
     const friendListSearch = friendList.filter(f => f.fullname.toLowerCase().includes(search.toLowerCase()))
@@ -38,17 +38,8 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
         setSearch(e.target.value)
     }
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                dispatch(getConversations(userId))
-                const res = await UserApi.getFriendList()
-                if(res.status === 200)
-                    setFriendList(res.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        fetchUserData()
+        dispatch(getConversations(userId))
+        dispatch(getFriendList())
     }, [dispatch,userId]);
     return (
         <Box>
@@ -84,6 +75,7 @@ const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSear
                               handleClickUser={() => handleClickUserConversations(cv._id)}
                               isConv
                               isOnline={onlineUser.includes(cv._id)}
+                              unseen={cv.last_sender === cv._id && !cv.seen}
                               self={cv.last_sender === userId}
                           />
                       ))

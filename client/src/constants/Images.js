@@ -6,6 +6,7 @@ import FORGOT_LOGO from '../assets/images/forgot-logo.jpg'
 import AUTH_BG from '../assets/images/auth-bg.jpg'
 import RESET_LOGO from '../assets/images/reset-logo.jpg'
 import ADDFR_ICON from '../assets/images/addfr-icon.png'
+import TYPING_IMG from '../assets/images/typing.gif'
 const Images = {
     TDT_LOGO,
     CHAT_LOGO,
@@ -14,6 +15,7 @@ const Images = {
     AUTH_BG,
     FORGOT_LOGO,
     RESET_LOGO,
-    ADDFR_ICON
+    ADDFR_ICON,
+    TYPING_IMG
 }
 export default Images

@@ -4,9 +4,11 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { deleteConversation } from '../../actions/messageAction'
+import MessageApi from '../../api/messageApi'
+import _alert from '../../utils/alert'
 
-const ChatCard = ({user,handleClickUser,active,isConv,isOnline,self}) => {
-    const style = useStyle({active,isOnline,seen : user.seen})
+const ChatCard = ({user,handleClickUser,active,isConv,isOnline,self,unseen}) => {
+    const style = useStyle({active,isOnline,unseen})
     const [anchorEl, setAnchorEl] = useState(null);
     const dispatch = useDispatch()
     const handleOptionBtnClick = (e) => {
@@ -15,7 +17,23 @@ const ChatCard = ({user,handleClickUser,active,isConv,isOnline,self}) => {
     }
     const handleDeleteConv = (e) => {
         e.stopPropagation()
-        dispatch(deleteConversation(user._id))
+        _alert({
+            title : 'Delete conversation',
+            msg : 'Are you sure you want to delete this conversation.',
+            icon : 'warning',
+            showCancelButton : true,
+            confirmButtonText : 'Delete',
+            callback : async ({isConfirmed}) => {
+                if(isConfirmed) {
+                    try {
+                        dispatch(deleteConversation(user._id))
+                        await MessageApi.deleteConversation(user._id)
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            }
+        })
     }
     return (
         <Box onClick={handleClickUser} className={style.chatCard} display='flex' p={1} alignItems='center'>
@@ -34,11 +52,11 @@ const ChatCard = ({user,handleClickUser,active,isConv,isOnline,self}) => {
             <Box flex={1} display='flex' flexDirection='column' justifyContent='center' ml={1} overflow='hidden'>
                 <Typography>{user.fullname}</Typography>
                 {(isConv) && (
-                    user.media.length ? <Box display='flex' alignItems='center' color='#757575'>
+                    user.media.length ? <Box display='flex' alignItems='center' color={unseen ? 'initial' : '#757575'}>
                         <Description fontSize='small' />
                         <Typography variant='body2' >{`${user.media.length} file media`}</Typography>
                     </Box> :
-                    <Typography variant='body2' noWrap color='textSecondary'>
+                    <Typography variant='body2' noWrap color={unseen ? 'initial' : 'textSecondary'}>
                         {self && 'You:'}{user.text === ':like:' ? '👍' : user.text}
                     </Typography>
                 )
@@ -104,7 +122,7 @@ const useStyle = makeStyles(theme => ({
         width : '10px',
         height :'10px',
         borderRadius : '100rem',
-        backgroundColor : ({seen}) => seen ? 'transparent' : '#db342e'
+        backgroundColor : ({unseen}) => unseen ? '#db342e' : 'transparent'
         
     }
 }))

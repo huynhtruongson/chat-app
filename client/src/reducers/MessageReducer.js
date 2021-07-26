@@ -83,15 +83,22 @@ const MessageReducer = (state = initialState, action) => {
             const newConv = [...state.conversations]
             const cvIndex = newConv.findIndex(cv => cv._id === msgUpdate.sender || cv._id === msgUpdate.receiver)
             if(cvIndex !== -1) {
-                newConv[cvIndex] = {...newConv[cvIndex],text : msgUpdate.text,media : msgUpdate.media}
+                newConv[cvIndex] = {...newConv[cvIndex],
+                    text : msgUpdate.text,
+                    media : msgUpdate.media,
+                    last_sender : msgUpdate.sender
+                }
                 return {...state,conversations : newConv} 
             }
             return state
         case DELETE_CONVERSATION : 
             const convArr = [...state.conversations]
             const convIndex = convArr.findIndex(cv => cv._id === action.payload)
-            if(convIndex !== -1) 
+            if(convIndex !== -1)  {
                 convArr.splice(convIndex,1)
+                if(action.payload === state.activeConv._id)
+                    return {...state,conversations : convArr,messages : []}
+            }
             return {...state,conversations : convArr}
         case UPDATE_SEEN_CONVERSATION : 
             const {convId,data} = action.payload

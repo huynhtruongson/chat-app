@@ -1,5 +1,5 @@
 import UserApi from "../api/userApi";
-import {GET_FRIEND_REQUEST, NEW_FRIEND_REQUEST, UPDATE_FRIEND_REQUEST, UPDATE_USER_INFO,USER_LOGIN_SUCCESS,USER_LOGOUT } from "./type";
+import {NEW_FRIEND_LIST,GET_FRIEND_LIST, GET_FRIEND_REQUEST, NEW_FRIEND_REQUEST, UPDATE_FRIEND_REQUEST, UPDATE_USER_INFO,USER_LOGIN_SUCCESS,USER_LOGOUT } from "./type";
 
 export const getUserInfo = (token) => async (dispatch) => {
     try {
@@ -22,6 +22,19 @@ export const getFriendRequest = () => async (dispatch) => {
         console.log(error)
     }
 }
+export const getFriendList = () => async (dispatch) => {
+    try {
+        const res = await UserApi.getFriendList()
+        if(res.status === 200)
+            dispatch({type : GET_FRIEND_LIST,payload : res.data})
+    } catch (error) {
+        console.log(error)
+    }
+}
+export const updateNewFriend = (data) => ({
+    type : NEW_FRIEND_LIST,
+    payload : data
+})
 export const updateNewFriendRequest = (info) => ({
     type : NEW_FRIEND_REQUEST,
     payload : info

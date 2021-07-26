@@ -41,16 +41,21 @@ module.exports.socketServer = (socket) =>{
             socket.to(receiveUser.socketID).emit("DELETE_MESSAGE",id)
     })
     
-    // socket.on('UPDATE_CONVERSATION',({msg,receiver}) => {
-    //     const receiveUser = userList.find(({userID}) => userID === receiver)
-    //     if(receiveUser)
-    //         socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
-    // })
+    socket.on('UPDATE_CONVERSATION',({msg,receiver}) => {
+        const receiveUser = userList.find(({userID}) => userID === receiver)
+        if(receiveUser)
+            socket.to(receiveUser.socketID).emit("UPDATE_CONVERSATION",msg)
+    })
 
-    socket.on('TYPING',({receiver}) => {
+    socket.on('USER_TYPING',({receiver,convId}) => {
         let userChat = userList.find(({userID})=> userID === receiver)
         if(userChat)
-            socket.to(userChat.socketID).emit("TYPING",{receiver})
+            socket.to(userChat.socketID).emit("USER_TYPING",convId)
+    })
+    socket.on('USER_CANCEL_TYPING',({receiver,convId}) => {
+        let userChat = userList.find(({userID})=> userID === receiver)
+        if(userChat)
+            socket.to(userChat.socketID).emit("USER_CANCEL_TYPING",convId)
     })
 
     socket.on('UPDATE_MESSAGE',({msg,receiver})=>{
@@ -64,8 +69,8 @@ module.exports.socketServer = (socket) =>{
         if(receiveUser)
             socket.to(receiveUser.socketID).emit("FRIEND_REQUEST",info)
     })
-    socket.on('SEEN_CONVERSATION',({id,data}) => {
-        const receiveUser = userList.find(({userID}) => userID === id) 
+    socket.on('SEEN_CONVERSATION',({id,data,receiver}) => {
+        const receiveUser = userList.find(({userID}) => userID === receiver) 
         if(receiveUser)
             socket.to(receiveUser.socketID).emit("SEEN_CONVERSATION",{id,data})
     })

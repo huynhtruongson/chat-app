@@ -28,6 +28,14 @@ const MessageApi = {
     deleteMessage(id,data) {
         const url = `/api/message/delete/${id}`
         return axiosClient.delete(url,{data})
+    },
+    seenConverastion(id) {
+        const url = `/api/conversation/seen/${id}`
+        return axiosClient.put(url,{id})
+    },
+    deleteConversation(id) {
+        const url = `/api/conversation/delete/${id}`
+        return axiosClient.delete(url)
     }
 }
 export default MessageApi

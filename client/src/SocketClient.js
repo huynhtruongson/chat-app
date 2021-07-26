@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addMessage, deleteMessage, updateMessage, updateSeenConversation } from './actions/messageAction'
+import { addMessage, deleteMessage, updateConversation, updateMessage, updateSeenConversation } from './actions/messageAction'
 import { addUserOnline, getUserOnline, removeUserOnline } from './actions/onlineUserAction'
 
 const SocketClient = () => {
@@ -67,12 +67,12 @@ const SocketClient = () => {
         return ()=> socket.off('SEEN_CONVERSATION') 
     },[socket,dispatch])
     // Update conversation
-    // useEffect(()=>{
-    //     socket.on('UPDATE_CONVERSATION',(msg) => {
-    //         dispatch(updateConversation(msg))
-    //     })
-    //     return ()=> socket.off('UPDATE_CONVERSATION') 
-    // },[socket,dispatch])
+    useEffect(()=>{
+        socket.on('UPDATE_CONVERSATION',(msg) => {
+            dispatch(updateConversation(msg))
+        })
+        return ()=> socket.off('UPDATE_CONVERSATION') 
+    },[socket,dispatch])
     
     return <></>
 }
