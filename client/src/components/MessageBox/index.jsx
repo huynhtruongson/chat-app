@@ -14,7 +14,6 @@ import MessageApi from '../../api/messageApi';
 import Images from '../../constants/Images';
 import ProfileModal from '../ProfileModal';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
-    console.log('message box reredenr')
     const {activeConv,messages} = useSelector(state => state.message)
     const {info} = useSelector(state => state.user)
     const socket = useSelector(state => state.socket)
@@ -175,7 +174,6 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
                         handleDeleteMessage={handleDeleteMessage}
                         isLast={index === 0}
-                        seen={activeConv.seen}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}
             </Box>

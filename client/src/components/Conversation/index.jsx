@@ -10,7 +10,6 @@ import { useEffect } from 'react'
 import { getFileGallery, getImageGallery, getVideoGallery, removeActiveImage } from '../../actions/galleryAction'
 import { useCallback } from 'react'
 const Conversation = ({handleShowConversation}) => {
-    console.log('conversation render')
     const [showInfo,setShowInfo] = useState(false)
     const {activeConv} = useSelector(state => state.message)
     const {imageGallery,activeImage} = useSelector(state => state.gallery)

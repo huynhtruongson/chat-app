@@ -19,7 +19,7 @@ const MessageReducer = (state = initialState, action) => {
                     text: msg.text, 
                     media: msg.media,
                     last_sender : msg.sender,
-                    update_time : msg.createdAt
+                    update_time : msg.createdAt,
                 };
                 cvArr.sort((currCv, nextCv) => {
                     if (currCv._id === cvArr[index]._id) return -1;
@@ -31,7 +31,7 @@ const MessageReducer = (state = initialState, action) => {
                     text: msg.text, 
                     media: msg.media,
                     last_sender : msg.sender,
-                    update_time : msg.createdAt
+                    update_time : msg.createdAt,
                 };
                 cvArr.unshift(newCv);
             }
@@ -86,7 +86,8 @@ const MessageReducer = (state = initialState, action) => {
                 newConv[cvIndex] = {...newConv[cvIndex],
                     text : msgUpdate.text,
                     media : msgUpdate.media,
-                    last_sender : msgUpdate.sender
+                    last_sender : msgUpdate.sender,
+                    seen : msgUpdate.seen
                 }
                 return {...state,conversations : newConv} 
             }
@@ -103,13 +104,13 @@ const MessageReducer = (state = initialState, action) => {
         case UPDATE_SEEN_CONVERSATION : 
             const {convId,data} = action.payload
             const convList = [...state.conversations]
-            const currentConv = {...state.activeConv}
+            let messageList = [...state.messages]
             const convPos =  convList.findIndex(cv => cv._id === convId)
             if(convPos !== -1) 
                 convList[convPos].seen = data
-            if(currentConv._id === convId)
-                currentConv.seen = data
-            return {...state,conversations : convList,activeConv : currentConv}
+            if(state.activeConv._id === convId && data)
+                messageList = messageList.map(msg => msg.seen ? msg : {...msg,seen : true})
+            return {...state,conversations: convList,messages: messageList}
         default:
             return state;
     }

@@ -4,7 +4,6 @@ import {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {getConversations, getUserMessage} from "../../actions/messageAction";
 import { getFriendList } from "../../actions/userAction";
-import UserApi from "../../api/userApi";
 import Images from "../../constants/Images";
 import ChatCard from "../ChatCard";
 const ConversationSidebar = ({showFriendList, handleShowFrRequest,handleShowSearchModal,handleShowConversation}) => {
