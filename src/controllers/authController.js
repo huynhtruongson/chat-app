@@ -219,12 +219,13 @@ module.exports.forgotPasswordController = async(req, res) => {
         let email = req.body.email
         var token = crypto.randomBytes(48).toString('hex')
 
-        let checkEmail = await AccountModel.findOne({email: email, type_account: "email"})
+        let user = await AccountModel.findOne({email: email, type_account: "email"})
 
-        if(!checkEmail) throw new Error("Your email is not exist")
+        if(!user) throw new Error("Your email is not exist")
 
-        await AccountModel.findOneAndUpdate({email:email},{tokenVerify:token})
-
+        // await AccountModel.findOneAndUpdate({email:email,type_account: "email"},{tokenVerify:token})
+        user.tokenVerify = token
+        await user.save()
         const accessToken = await oAuth2Client.getAccessToken()
 
         var transporter = nodemailer.createTransport({
