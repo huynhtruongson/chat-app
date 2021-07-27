@@ -74,7 +74,7 @@ module.exports.deleteMessage = async (req, res) =>{
         let check = await conversationModel.findOneAndUpdate({$or: [
             { party: [mongoose.Types.ObjectId(req.user.id), mongoose.Types.ObjectId(messageDel.receiver)] }, 
             { party: [mongoose.Types.ObjectId(messageDel.receiver), mongoose.Types.ObjectId(req.user.id)] }
-        ]},{text: messageLast.text, media: messageLast.media,last_sender:messageLast.sender})
+        ]},{text: messageLast.text, media: messageLast.media,last_sender:messageLast.sender,seen:messageLast.seen})
         
         return res.status(200).json({message:"success", data: messageDel})
     } catch (err) {

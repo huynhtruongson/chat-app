@@ -89,13 +89,13 @@ export const deleteMessage = (id) => (dispatch,getState) => {
     if(msgIndex !== -1) {
         if(msgIndex === 0) {
             const preLastMsg = messages[1] 
-            dispatch(updateConversation(preLastMsg))
-            if(messages[msgIndex].receiver !== info._id)
+            if(messages[msgIndex].receiver !== info._id) {
+                dispatch(updateConversation(preLastMsg))
                 socket.emit('UPDATE_CONVERSATION',{msg : preLastMsg,receiver : messages[msgIndex].receiver})
+            }
         }
         if(messages[msgIndex].media.length)
             dispatch(deleteGallery(messages[msgIndex].media))
-        
         dispatch({type : DELETE_MESSAGE,payload : id})
     }
 }
@@ -115,9 +115,10 @@ export const updateMessage = (data) => (dispatch,getState) => {
         if(mediaDel.length) 
             dispatch(deleteGallery(mediaDel))
         if(msgIndex === 0) {
-            dispatch(updateConversation(data))
-            if(data.receiver !== info._id)
+            if(data.receiver !== info._id) {
+                dispatch(updateConversation(data))
                 socket.emit('UPDATE_CONVERSATION',{msg : data,receiver : data.receiver})
+            }
         }
     }
 }

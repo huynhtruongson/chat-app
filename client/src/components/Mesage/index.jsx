@@ -3,7 +3,7 @@ import {Avatar, Box, makeStyles, Typography, IconButton} from '@material-ui/core
 import {ThumbUp,Description,DeleteForever} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
-const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast,seen},ref) => {
+const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast},ref) => {
     const imageList = msg.media.filter((md) => md.resource_type === 'image')
     const videoList = msg.media.filter((md) => md.resource_type === 'video')
     const fileList = msg.media.filter((md) => md.resource_type === 'raw')
@@ -97,7 +97,7 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
             </Box>
             {(isLast) && <Box className={style.messageStatus}>
                 <Typography color='primary' variant='caption'>
-                    {(self && seen) ? 'Seen' :  msg.status ? msg.status : ''}
+                    {(self && msg.seen) ? 'Seen' :  msg.status ? msg.status : ''}
                 </Typography>
             </Box>
             }
@@ -143,11 +143,17 @@ const useStyle = makeStyles((theme) => ({
     imgMessage: {
         width : '100%',
         height : '100%',
-        maxHeight : '400px',
+        maxHeight : ({imgLength}) => imgLength === 1 ? '400px' : 'unset',
         objectFit: 'cover',
         cursor : 'pointer',
         '&:hover' : {
             filter : 'contrast(50%)',
+        },
+        [theme.breakpoints.down('xs')] : {
+            maxHeight : ({imgLength}) => imgLength === 1 ? '300px' : 'unset',
+        },
+        [theme.breakpoints.down('440')] : {
+            maxHeight : ({imgLength}) => imgLength === 1 ? '200px' : 'unset',
         }
     },
     imgMessageItem : ({imgLength}) => (
@@ -169,22 +175,22 @@ const useStyle = makeStyles((theme) => ({
     imageContainer : ({imgLength}) => (
         imgLength > 1 ?
         {   
-            width:'380px',
+            width:'300px',
             display : 'grid',
             gridTemplateColumns : imgLength > 3 ? 'repeat(3,1fr)' : `repeat(${imgLength},1fr)`,
             borderRadius : theme.spacing(1),
             overflow : 'hidden',
             [theme.breakpoints.down('xs')] : {
-                width : '300px'
+                width : '260px'
             },
             [theme.breakpoints.down('440')] : {
                 maxWidth : '200px'
             }
         } : 
         {
-            maxWidth : '380px',
+            maxWidth : '300px',
             [theme.breakpoints.down('xs')] : {
-                maxWidth : '300px'
+                maxWidth : '260px'
             },
             [theme.breakpoints.down('440')] : {
                 maxWidth : '200px'

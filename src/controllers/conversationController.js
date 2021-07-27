@@ -279,7 +279,7 @@ module.exports.delConversation = async (req, res) =>{
 
         }, {$push: {delete: req.user.id}})
         
-        return res.send(updateConversation)
+        return res.status(200).json({message : 'success'})
        
     } catch (err){
         return res.status(400).json({message: err.message})
@@ -302,8 +302,8 @@ module.exports.seenConversation = async (req, res) =>{
 
         let updateMessages = await messageModel.updateMany({
             $or: [
-                { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(receiver) }, 
-                { sender: mongoose.Types.ObjectId(receiver), receiver: mongoose.Types.ObjectId(req.user.id) }
+                { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
+                { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
             ],
             seen: false,
 

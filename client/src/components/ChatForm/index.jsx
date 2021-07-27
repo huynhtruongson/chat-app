@@ -56,7 +56,11 @@ const ChatForm = () => {
             msg.text = ':like:'
         const id = Math.random()+''
         reset()
-        dispatch(addMessage({...msg,id,createdAt : new Date().toISOString(),status : 'Sending...'},activeConv))
+        dispatch(addMessage({...msg,
+            id,
+            createdAt : new Date().toISOString(),
+            status : 'Sending...',
+            seen : false},activeConv))
         dispatch(updateSeenConversation(activeConv._id,false))
         const msgData = new FormData()
         msgData.append('text',msg.text)
