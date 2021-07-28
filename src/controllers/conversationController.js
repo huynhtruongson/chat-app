@@ -188,6 +188,7 @@ module.exports.imageGallery = async (req, res) =>{
                     { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
                     { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
                 ],
+                delete: {$ne: [req.user.id]},
                 "media.resource_type": "image"
             },
         ).sort({'createdAt': 'desc'})
@@ -211,6 +212,7 @@ module.exports.videoGallery = async (req, res) =>{
                     { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
                     { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
                 ],
+                delete: {$ne: [req.user.id]},
                 "media.resource_type": "video"
             },
         ).sort({'createdAt': 'desc'})
@@ -234,6 +236,7 @@ module.exports.fileGallery = async (req, res) =>{
                     { sender: mongoose.Types.ObjectId(req.user.id),  receiver: mongoose.Types.ObjectId(id) }, 
                     { sender: mongoose.Types.ObjectId(id), receiver: mongoose.Types.ObjectId(req.user.id) }
                 ],
+                delete: {$ne: [req.user.id]},
                 "media.resource_type": "raw"
             },
         ).sort({'createdAt': 'desc'})
