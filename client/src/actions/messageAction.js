@@ -1,6 +1,6 @@
 import MessageApi from "../api/messageApi";
 import { deleteGallery, updateGallery } from "./galleryAction";
-import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION, UPDATE_MESSAGE, DELETE_CONVERSATION, UPDATE_SEEN_CONVERSATION} from "./type";
+import {ADD_MESSAGE, GET_CONVERSATIONS, GET_MESSAGES, GET_USER_MESSAGE, UPDATE_LAST_MESSAGE, GET_MORE_MESSAGES, DELETE_MESSAGE,UPDATE_CONVERSATION, UPDATE_MESSAGE, DELETE_CONVERSATION, UPDATE_SEEN_CONVERSATION, DELETE_CONVERSATION_GALLERY} from "./type";
 
 export const getUserMessage = (user) => async (dispatch,getState) => {
     try {
@@ -134,10 +134,12 @@ export const getMessages = (messages) => ({
     type: GET_MESSAGES,
     payload: messages,
 });
-export const deleteConversation = (id) => ({
-    type : DELETE_CONVERSATION,
-    payload : id
-})
+export const deleteConversation = (id) => (dispatch,getState) => {
+    dispatch({type : DELETE_CONVERSATION,payload : id})
+    const {activeConv} = getState().message
+    if(activeConv._id === id)
+        dispatch({type : DELETE_CONVERSATION_GALLERY})
+}
 export const updateSeenConversation = (convId,data) => ({
     type : UPDATE_SEEN_CONVERSATION,
     payload : {convId,data}

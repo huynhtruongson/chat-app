@@ -1,4 +1,4 @@
-import { DELETE_GALLERY, GET_ACTIVE_IMAGE, GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY, REMOVE_ACTIVE_IMAGE, UPDATE_GALLERY } from "../actions/type"
+import { DELETE_CONVERSATION, DELETE_CONVERSATION_GALLERY, DELETE_GALLERY, GET_ACTIVE_IMAGE, GET_FILE_GALLERY, GET_IMAGE_GALLERY, GET_VIDEO_GALLERY, REMOVE_ACTIVE_IMAGE, UPDATE_GALLERY } from "../actions/type"
 
 const initialState = {
     imageGallery : [],
@@ -40,6 +40,8 @@ const GalleryReducer = (state = initialState,action) => {
             videoList = videoList.filter(v => !delList.includes(v))
             fileList = fileList.filter(f => !delList.includes(f.url_cloud))
             return {...state,imageGallery : imgList,videoGallery : videoList, fileGallery : fileList}
+        case DELETE_CONVERSATION_GALLERY:
+            return {...state,imageGallery : [],videoGallery : [],fileGallery : []}
         default:
             return state;
     }
