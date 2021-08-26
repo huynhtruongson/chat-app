@@ -13,6 +13,7 @@ import _alert from '../../utils/alert';
 import MessageApi from '../../api/messageApi';
 import Images from '../../constants/Images';
 import ProfileModal from '../ProfileModal';
+import moment from 'moment';
 const MessageBox = ({handleShowInfo,handleShowConversation}) => {
     const {activeConv,messages} = useSelector(state => state.message)
     const {info} = useSelector(state => state.user)
@@ -77,6 +78,12 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                 }
             }
         })
+    }
+    const isDisplayTimeDivider = (pre,curr) => {
+        const msgTime = moment(curr)
+        const preMsgTime = moment(pre)
+        const duration = moment.duration(msgTime.diff(preMsgTime))
+        return Math.abs(duration.asHours()) >= 1
     }
     useEffect(()=>{
         setPage(1)
@@ -171,8 +178,11 @@ const MessageBox = ({handleShowInfo,handleShowConversation}) => {
                         msg={msg} 
                         user={activeConv}
                         self={msg.sender === info._id}
-                        isAvatar={index === 0 ? true : msg.receiver !== messages[index-1].receiver}
+                        isAvatar={index === 0 ? true : 
+                            msg.receiver !== messages[index-1].receiver || 
+                            isDisplayTimeDivider(messages[index-1].createdAt,msg.createdAt)}
                         handleDeleteMessage={handleDeleteMessage}
+                        displayTime={index === messages.length-1 ? true : isDisplayTimeDivider(messages[index+1].createdAt,msg.createdAt)}
                         isLast={index === 0}
                         ref={index === messages.length-1 ? messageEndRef : null}/>
                 ))}

@@ -1,9 +1,11 @@
 import React from 'react';
-import {Avatar, Box, makeStyles, Typography, IconButton} from '@material-ui/core';
+import {Avatar, Box, makeStyles, Typography, IconButton, Tooltip} from '@material-ui/core';
 import {ThumbUp,Description,DeleteForever} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { getActiveImage } from '../../actions/galleryAction';
-const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast},ref) => {
+import moment from 'moment'
+import { isValidURL } from '../../utils';
+const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage,isLast,displayTime},ref) => {
     const imageList = msg.media.filter((md) => md.resource_type === 'image')
     const videoList = msg.media.filter((md) => md.resource_type === 'video')
     const fileList = msg.media.filter((md) => md.resource_type === 'raw')
@@ -12,102 +14,121 @@ const Message = React.forwardRef(({user, self, msg, isAvatar,handleDeleteMessage
     const handleShowGallery = (url) => {
         dispatch(getActiveImage(url))
     }
+    const timeFormat = () => {
+        return moment(msg.createdAt).calendar(null,{
+            sameDay : 'LT',
+            lastDay: '[Yesterday], LT',
+            lastWeek: '[Last] dddd, LT',
+            sameElse: 'lll'
+        })
+    }
+    const renderText = (text) => {
+        if(text === ':like:')
+            return <ThumbUp fontSize='large' color='primary' />
+        else if(isValidURL(text))
+            return <a className={style.textContent} href={text} target='_blank' rel='noreferrer'>{text}</a>
+        else 
+            return <Typography className={style.textContent} variant='body1'>{text}</Typography>
+    }
     return (
-        <Box className={style.messageContainer}>
-            {!self &&<Box minWidth='40px' mr={1}>
-                {!self && isAvatar && <Avatar src={user.avatar} />}
+        <Box className={style.messageItem}>
+            {ref && <div ref={ref} className={style.messageRef}></div>}
+            {displayTime && <Box className={style.divider}>
+                <Typography variant='caption' color='textSecondary'>{timeFormat()}</Typography>
             </Box>}
-            {/* {self &&
-                <Box className={style.deleteBtn}>
-                    <IconButton onClick={handleDeleteMessage} color='secondary'>
-                        <DeleteForever/>
-                    </IconButton>
-                </Box>
-            } */}
-            <Box className={style.contentContainer}>
-                {ref && <div ref={ref} className={style.messageRef}></div>}
-                {msg.text &&
-                    (msg.text === ':like:' ? (
-                        <Box className={style.messageModule}>
-                            {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg,'text')} size='small' color='secondary' classes={{root : style.deleteBtn}}>
-                                    <DeleteForever/>
-                                </IconButton>
-                            }
-                            <Box><ThumbUp fontSize='large' color='primary' /></Box>
-                        </Box>
-                    ) : (
-                        <Box className={style.messageModule}>
-                            {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg,'text')} size='small' color='secondary' classes={{root : style.deleteBtn}}>
-                                    <DeleteForever/>
-                                </IconButton>
-                            }
-                            <Box className={style.textMessage}>
-                                <Typography variant='body1'>{msg.text}</Typography>
-                            </Box>
-                        </Box>
-                    ))}
-                    {imageList.length > 0  &&
-                        <Box className={style.messageModule}>
-                            {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg,'image')} size='small' color='secondary' classes={{root : style.deleteBtn}}>
-                                    <DeleteForever/>
-                                </IconButton>
-                            }                      
-                            <Box className={style.imageContainer}>
-                                {imageList.map(img => 
-                                    <Box className={style.imgMessageItem} key={img.url_cloud}>
-                                        <Box className={style.imgMessageRatio}>
-                                            <img onClick={()=>handleShowGallery(img.url_cloud)} key={img.url_cloud} src={img.url_cloud} className={style.imgMessage} alt='img'/>
-                                        </Box>
-                                    </Box>
-                                    )
+            <Box className={style.messageItemContainer}>
+                <Box className={style.messageContainer}>
+                    {!self &&<Box minWidth='40px' mr={1}>
+                        {!self && isAvatar && <Avatar src={user.avatar} />}
+                    </Box>}
+                    <Box className={style.contentContainer}>
+                        {msg.text &&
+                            <Box className={style.messageModule}>
+                                {self &&
+                                    <IconButton onClick={()=>handleDeleteMessage(msg,'text')} size='small' color='secondary' classes={{root : style.deleteBtn}}>
+                                        <DeleteForever/>
+                                    </IconButton>
                                 }
+                                <Box className={msg.text !== ':like:' && style.textMessage}>
+                                    <Tooltip title={timeFormat()}>
+                                        {renderText(msg.text)}
+                                    </Tooltip>
+                                </Box>
                             </Box>
-                        </Box>
-                    }
-                    {videoList.length > 0 && videoList.map(video => 
-                        <Box className={style.messageModule} key={video.url_cloud}>
-                            {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg,video._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
-                                    <DeleteForever/>
-                                </IconButton>
-                            }
-                            <Box className={style.videoContainer}>
-                                <video src={video.url_cloud} className={style.videoMessage} controls />
+                        }
+                        {imageList.length > 0  &&
+                            <Box className={style.messageModule}>
+                                {self &&
+                                    <IconButton onClick={()=>handleDeleteMessage(msg,'image')} size='small' color='secondary' classes={{root : style.deleteBtn}}>
+                                        <DeleteForever/>
+                                    </IconButton>
+                                }
+                                <Tooltip title={timeFormat()}>
+                                    <Box className={style.imageContainer}>
+                                        {imageList.map(img =>
+                                            <Box className={style.imgMessageItem} key={img.url_cloud}>
+                                                <Box className={style.imgMessageRatio}>
+                                                    <img onClick={()=>handleShowGallery(img.url_cloud)} key={img.url_cloud} src={img.url_cloud} className={style.imgMessage} alt='img'/>
+                                                </Box>
+                                            </Box>
+                                            )
+                                        }
+                                    </Box>
+                                </Tooltip>
                             </Box>
-                        </Box>)
+                        }
+                        {videoList.length > 0 && videoList.map(video =>
+                            <Box className={style.messageModule} key={video.url_cloud}>
+                                {self &&
+                                    <IconButton onClick={()=>handleDeleteMessage(msg,video._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
+                                        <DeleteForever/>
+                                    </IconButton>
+                                }
+                                <Tooltip title={timeFormat()}>
+                                    <Box className={style.videoContainer}>
+                                        <video src={video.url_cloud} className={style.videoMessage} controls />
+                                    </Box>
+                                </Tooltip>
+                            </Box>)
+                        }
+                        {fileList.length > 0 && fileList.map(file =>
+                            <Box className={style.messageModule} key={file.url_cloud}>
+                                {self &&
+                                    <IconButton onClick={()=>handleDeleteMessage(msg,file._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
+                                        <DeleteForever/>
+                                    </IconButton>
+                                }
+                                <Tooltip title={timeFormat()}>
+                                    <Box className={style.fileContainer}>
+                                        <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
+                                            <Description/>
+                                            <Typography variant='inherit'>{file.name}</Typography>
+                                        </a>
+                                    </Box>
+                                </Tooltip>
+                            </Box>)
+                        }
+                    </Box>
+                    {(isLast) && <Box className={style.messageStatus}>
+                        <Typography color='primary' variant='caption'>
+                            {(self && msg.seen) ? 'Seen' :  msg.status ? msg.status : ''}
+                        </Typography>
+                    </Box>
                     }
-                    {fileList.length > 0 && fileList.map(file => 
-                        <Box className={style.messageModule} key={file.url_cloud}>
-                            {self &&
-                                <IconButton onClick={()=>handleDeleteMessage(msg,file._id)} size='small' color='secondary' classes={{root : style.deleteBtn}}>
-                                    <DeleteForever/>
-                                </IconButton>
-                            }
-                            <Box className={style.fileContainer}>
-                                <a className={style.fileMessage} target='_blank' href={file.url_cloud} rel='noreferrer'>
-                                    <Description/>
-                                    <Typography variant='inherit'>{file.name}</Typography>
-                                </a>
-                            </Box>
-                        </Box>)
-                    }
+                </Box>
             </Box>
-            {(isLast) && <Box className={style.messageStatus}>
-                <Typography color='primary' variant='caption'>
-                    {(self && msg.seen) ? 'Seen' :  msg.status ? msg.status : ''}
-                </Typography>
-            </Box>
-            }
         </Box>
     );
 });
 const useStyle = makeStyles((theme) => ({
+    messageItem : {
+        padding: `0 ${theme.spacing(1)}px  ${theme.spacing(1.5)}px`,
+    },
+    messageItemContainer : {
+        display: 'flex',
+        justifyContent : ({self}) => self ? 'flex-end' : 'flex-start',
+    },
     messageContainer : {
-        margin: `0 ${theme.spacing(1)}px  ${theme.spacing(1.5)}px`,
-        alignSelf:({self}) => self ? 'flex-end' : 'flex-start',
         display:'flex',
         alignItems:'flex-end',
         position : 'relative',
@@ -139,6 +160,10 @@ const useStyle = makeStyles((theme) => ({
             maxWidth : '200px'
         }
 
+    },
+    textContent : {
+        color: 'inherit',
+        wordBreak : 'break-all'
     },
     imgMessage: {
         width : '100%',
@@ -264,6 +289,28 @@ const useStyle = makeStyles((theme) => ({
                 display : 'block'
             }
         },
+    },
+    divider : {
+        position: 'relative',
+        textAlign : 'center',
+        '&>.MuiTypography-root' : {
+            display : 'inline-block',
+            position: 'relative',
+            backgroundColor : 'white',
+            zIndex : 2,
+            padding: '0 8px',
+            fontWeight : 500
+        },
+        '&::before' : {
+            content : '""',
+            position : 'absolute',
+            width  :'100%',
+            height: '1px',
+            top : '50%',
+            left: 0,
+            transform: 'translateY(-50%)',
+            backgroundColor : theme.palette.text.secondary
+        }
     }
 }));
 export default Message;
